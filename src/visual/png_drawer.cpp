@@ -1,26 +1,38 @@
 #include "png_drawer.h"
-#include <pngwriter.h>
+#include "png++/png.hpp"
 
 using namespace std;
 using namespace wtm::audio;
 
+using namespace png;
+
 namespace wtm {
-namespace vizual {
+namespace visual {
 
 /**
  * Draw PNG visualization for the data
+ *
+ * @see http://fedetft.wordpress.com/2010/10/05/handling-png-images-in-cpp/
  */
 void draw_data(wav_data_t* data, string file) {
-	int size_x = 500;
-	int size_y = 500;
 
-	pngwriter png(size_x, size_y, 0, file);
+	int size_x = 1024;
+	int size_y = 768;
 
-	for (wav_data_t::iterator it=data->begin(); it != data->end(); ++it) {
-		png.plot(i, y, 0.0, 0.0, 1.0);
+	image img(size_x, size_y);
+
+	int it_x = 0;
+	for (wav_data_t::iterator it=data->begin(); it != data->end(); it_x++) {
+
+		// TODO We need to know max X,Y to implement contractive mapping
+		int x = it_x / size_x;
+		int y = *it / size_y;
+
+		rgb_pixel pixel = basic_rgb_pixel(0, 0, 0);
+		img.set_pixel(x, y, pixel);
 	}
 
-	png.close();
+	img.write(file);
 }
 
 } // namespace

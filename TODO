@@ -1,3 +1,6 @@
+
+! Extend wav_data_t to store additional information (max X/Y, etc)
+
 1. Add ligpng into dependencies
 2. Compile png++ and use it as external library
 

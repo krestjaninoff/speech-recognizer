@@ -5,17 +5,20 @@
 #define PNG_DRAWER_H_
 
 #include <string>
-#include "../audio/wav_reader.h"
+#include "../audio/audio.h"
 
 namespace wtm {
-namespace vizual {
+namespace visual {
 
 /**
  * Draw PNG visualization for the data
+ * <p>
+ * Uses png++ library.
+ * @see http://savannah.nongnu.org/projects/pngpp/
  */
-void draw_png(wav_data_t* data, string file);
+void draw_png(wav_data_t* data, std::string file);
 
-}
-}
+} // namespace wtm
+} // namespace visual
 
 #endif /* PNG_DRAWER_H_ */
