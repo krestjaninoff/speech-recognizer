@@ -1,0 +1,1 @@
+WavToMe is my modest attempt to implement text recognition app. Let's hope it will be successful!
