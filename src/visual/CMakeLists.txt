@@ -7,3 +7,6 @@ set(SOURCE
 )
 
 add_library(visual STATIC ${SOURCE})
+
+find_library(LIBPNG libpng)
+target_link_library(visual ${LIBPNG})

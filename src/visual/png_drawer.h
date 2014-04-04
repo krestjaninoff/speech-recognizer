@@ -13,10 +13,10 @@ namespace visual {
 /**
  * Draw PNG visualization for the data
  * <p>
- * Uses png++ library.
+ * Uses png++/libpng library.
  * @see http://savannah.nongnu.org/projects/pngpp/
  */
-void draw_png(wav_data_t* data, std::string file);
+void draw_png(audio::wav_data_t* wav_data, std::string file);
 
 } // namespace wtm
 } // namespace visual

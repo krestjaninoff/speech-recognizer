@@ -446,7 +446,7 @@ namespace png
 
         void set_tRNS(tRNS const& trns)
         {
-            m_info.set_tRNS(trns);
+            //m_info.set_tRNS(trns);
         }
 
     protected:

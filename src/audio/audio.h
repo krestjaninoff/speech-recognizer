@@ -37,7 +37,26 @@ typedef struct wav_hdr_t {
 /**
  * WAV data
  */
-typedef std::list<int16_t> wav_data_t;
+class wav_data_t {
+public:
+	std::list<int16_t>*	data;
+	int16_t				max_x;
+	int16_t				min_x;
+	int16_t				duration;
+
+	wav_data_t() {
+		this->max_x = 0;
+		this->min_x = 0;
+		this->duration = 0;
+
+		data = new std::list<int16_t>;
+	}
+
+	~wav_data_t() {
+		delete data;
+	}
+
+};
 
 } // namespace
 } // namespace

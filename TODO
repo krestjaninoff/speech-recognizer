@@ -1,6 +1,4 @@
 
-! Extend wav_data_t to store additional information (max X/Y, etc)
-
 1. Add ligpng into dependencies
-2. Compile png++ and use it as external library
+2. Compile png++ and use it as external static library (http://ubuntuforums.org/showthread.php?t=1725448, http://stackoverflow.com/questions/12054858/add-so-and-a-libraries-to-makefile)
 
