@@ -3,23 +3,29 @@
  */
 #include <iostream>
 #include <stdlib.h>
+#include <cstdlib>
+#include "audio/audio.h"
 #include "audio/wav_reader.h"
 #include "visual/png_drawer.h"
 
 using namespace std;
 using namespace wtm;
+using namespace wtm::audio;
 
-int main(int argc, char **argv) {
+int main() {
 
-	char* sampleFile = "samples/example.wav";
-	audio::wav_data_t* wav_data = audio::readWav(sampleFile);
+	string sampleFile = "samples/example.wav";
+	audio::TWavDataPtr wavData = audio::WavReader::readFromFile(sampleFile);
 
-	for (list<int16_t>::iterator it=wav_data->data->begin(); it != wav_data->data->end(); ++it) {
-	    cout << it << endl;
+	/*
+	for (list<raw_t>::iterator yCurr = wavData->getRawData()->begin();
+				yCurr != wavData->getRawData()->end(); ++yCurr) {
+		cout << (int) *yCurr << endl;
 	}
+	*/
 
-	char* diagramFile = "diagram.png";
-	visual::draw_png(wav_data, diagramFile);
+	string diagramFile = "diagram.png";
+	visual::PngDrawer::drawToFile(wavData, diagramFile);
 
 	return EXIT_SUCCESS;
 }

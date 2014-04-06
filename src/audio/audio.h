@@ -7,6 +7,8 @@
 
 #include <string>
 #include <list>
+#include <memory>
+#include <cstdlib>
 #include <stdint.h>
 
 namespace wtm {
@@ -15,50 +17,84 @@ namespace audio {
 /**
  * WAV header
  */
-typedef struct wav_hdr_t {
-    char                RIFF[4];        // RIFF Header
-    unsigned long       ChunkSize;      // RIFF Chunk Size
-    char                WAVE[4];        // WAVE Header
+typedef struct TWavHeader {
+    char                 riff[4];        // RIFF Header
+    unsigned long       chunkSize;      // RIFF Chunk Size
+    char                 wave[4];        // WAVE Header
 
-    char                fmt[4];         // FMT header
-    unsigned long       Subchunk1Size;  // Size of the fmt chunk
-    unsigned short      AudioFormat;    // Audio format 1=PCM, 6=mulaw, 7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-    unsigned short      NumOfChan;      // Number of channels 1=Mono 2=Sterio
-    unsigned long       SamplesPerSec;  // Sampling Frequency in Hz
+    char                 fmt[4];         // FMT header
+    unsigned long       subchunk1Size;  // Size of the fmt chunk
+    unsigned short      audioFormat;    // Audio format 1=PCM, 6=mulaw, 7=alaw,
+    									  // 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
+    unsigned short      numOfChan;      // Number of channels 1=Mono 2=Sterio
+    unsigned long       samplesPerSec;  // Sampling Frequency in Hz
     unsigned long       bytesPerSec;    // bytes per second
     unsigned short      blockAlign;     // 2=16-bit mono, 4=16-bit stereo
     unsigned short      bitsPerSample;  // Number of bits per sample
 
-    char                Subchunk2ID[4]; // "data"  string
-    unsigned long       Subchunk2Size;  // Sampled data length
+    char                 subchunk2ID[4]; // DATA header
+    unsigned long       subchunk2Size;  // Sampled data length
 
-} wav_hdr_t;
+} TWavHeader;
+
+/**
+ * RAW data
+ */
+typedef uint8_t raw_t;
 
 /**
  * WAV data
  */
-class wav_data_t {
+class TWavData {
 public:
-	std::list<int16_t>*	data;
-	int16_t				max_x;
-	int16_t				min_x;
-	int16_t				duration;
 
-	wav_data_t() {
-		this->max_x = 0;
-		this->min_x = 0;
+	TWavData() {
+		this->maxVal = 0;
+		this->minVal = 0;
 		this->duration = 0;
 
-		data = new std::list<int16_t>;
+		rawData = new std::list<raw_t>;
 	}
 
-	~wav_data_t() {
-		delete data;
+	~TWavData() {
+		delete rawData;
 	}
 
+	uint32_t getDuration() const {
+		return duration;
+	}
+	void setDuration(uint32_t duration) {
+		this->duration = duration;
+	}
+
+	raw_t getMaxVal() const {
+		return maxVal;
+	}
+	void setMaxVal(raw_t maxVal) {
+		this->maxVal = maxVal;
+	}
+
+	raw_t getMinVal() const {
+		return minVal;
+	}
+	void setMinVal(raw_t minVal) {
+		this->minVal = minVal;
+	}
+
+	std::list<raw_t>* getRawData() const {
+		return rawData;
+	}
+
+private:
+	std::list<raw_t>*	rawData;
+	raw_t				maxVal;
+	raw_t				minVal;
+	uint32_t			duration;
 };
 
-} // namespace
-} // namespace
+typedef std::auto_ptr<TWavData> TWavDataPtr;
+
+} // namespace audio
+} // namespace wtm
 
 #endif /* AUDIO_H_ */

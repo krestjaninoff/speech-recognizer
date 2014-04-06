@@ -15,9 +15,17 @@ namespace wtm {
 namespace audio {
 
 /**
- * Read Wav data from a file
+ * Reads Wav data from a file
  */
-wav_data_t readWav(std::string file);
+class WavReader {
+
+public:
+	static TWavDataPtr readFromFile(const std::string& file);
+
+private:
+	static void checkData(const TWavHeader& wav_header);
+};
+
 
 } // namespace audio
 } // namespace wtm

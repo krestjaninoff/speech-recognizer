@@ -1,4 +1,1 @@
-
-1. Add ligpng into dependencies
-2. Compile png++ and use it as external static library (http://ubuntuforums.org/showthread.php?t=1725448, http://stackoverflow.com/questions/12054858/add-so-and-a-libraries-to-makefile)
-
+* Generate valid diagram

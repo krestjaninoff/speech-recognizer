@@ -16,9 +16,18 @@ namespace visual {
  * Uses libpng library.
  * @see http://www.libpng.org/pub/png/book/
  */
-void draw_png(audio::wav_data_t* wav_data, std::string file);
+class PngDrawer {
 
-} // namespace wtm
+public:
+	static void drawToFile(const audio::TWavDataPtr wav_data, const std::string& file);
+
+private:
+	static int writeImage(const char* filename, bool* buffer, uint32_t width,
+			uint32_t height);
+
+}; // class PngDrawer
+
 } // namespace visual
+} // namespace wtm
 
 #endif /* PNG_DRAWER_H_ */

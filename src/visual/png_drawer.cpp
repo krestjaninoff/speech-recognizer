@@ -1,5 +1,7 @@
-#include "png_drawer.h"
+#include <cstdlib>
 #include "png.h"
+#include "png_drawer.h"
+#include "assert.h"
 
 using namespace std;
 using namespace wtm::audio;
@@ -12,33 +14,44 @@ namespace visual {
  *
  * @see http://www.libpng.org/pub/png/book/
  */
-void draw_data(wav_data_t* wav_data, string file) {
+void PngDrawer::drawToFile(const TWavDataPtr wavData, const string& file) {
 
-	size_t width = 1024;
-	size_t height = 768;
-	size_t max_x = wav_data->duration;
-	size_t max_y = max(abs(wav_data->max_x), abs(wav_data->min_x));
+	uint32_t imgWidth = 10 * 1024;
+	uint32_t imgHeight = 255;
+	uint32_t xMax = wavData->getDuration();
+	uint32_t yMax = wavData->getMaxVal();
 
-	bool* buffer = (bool*) malloc(width * height * sizeof(bool));
-	if (buffer == NULL) {
+	uint32_t bufferSize = imgWidth * imgHeight * sizeof(bool);
+	bool* image = (bool*) malloc(bufferSize);
+	if (image == NULL) {
 		fprintf(stderr, "Could not create image buffer\n");
 		return;
 	}
+	memset(image, 0, bufferSize);
 
-	int16_t it_x = 0;
-	for (list<int16_t>::iterator it=wav_data->data->begin(); it != wav_data->data->end(); it_x++) {
+	uint32_t xCurr = 0;
+	for (list<raw_t>::iterator yCurr = wavData->getRawData()->begin();
+			yCurr != wavData->getRawData()->end(); ++yCurr) {
 
-		size_t x = it_x * width / max_x;
-		size_t y = *it * height / max_y;
+		// Contractive mapping
+		uint32_t x = xCurr * (imgWidth - 1) / xMax;
+		assert(x <= xMax);
 
-		buffer[y * width + x] = true;
+		uint32_t y = (*yCurr) * (imgHeight - 1) / yMax;
+		assert(y <= yMax);
+
+		uint32_t index = x + y * imgWidth;
+		assert(index <= bufferSize);
+
+		image[index] = true;
+		xCurr++;
 	}
 
-	write_image(file.c_str(), width, height, buffer);
-	free(buffer);
+	writeImage(file.c_str(), image, imgWidth, imgHeight);
+	free(image);
 }
 
-int inline write_image(const char* filename, size_t width, size_t height, bool* buffer) {
+int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uint32_t height) {
 	int code = 0;
 	FILE *fp;
 	png_structp png_ptr;
@@ -86,22 +99,23 @@ int inline write_image(const char* filename, size_t width, size_t height, bool* 
 	png_write_info(png_ptr, info_ptr);
 
 	// Allocate memory for one row (3 bytes per pixel - RGB)
-	row = (png_bytep) malloc(3 * width * sizeof(png_byte));
+	uint32_t rowSize;
+	rowSize = 3 * width * sizeof(png_byte);
+	row = (png_bytep) malloc(rowSize);
 
 	// Write image data
-	int x, y;
-	for (y=0 ; y<height ; y++) {
-		for (x=0 ; x<width ; x++) {
-			if (buffer[y * width + x]) {
-				row[0] = 255;
-				row[2] = 255;
-				row[3] = 255;
-			} else {
-				row[0] = 0;
-				row[2] = 0;
-				row[3] = 0;
+	uint32_t x, y;
+	for (y = 0; y < height; y++) {
+		memset(row, 0, rowSize);
+
+		for (x = 0; x < width; x++) {
+			if (image[x + y * width]) {
+				row[x] = 255;
+				row[x + 1] = 255;
+				row[x + 2] = 255;
 			}
 		}
+
 		png_write_row(png_ptr, row);
 	}
 
