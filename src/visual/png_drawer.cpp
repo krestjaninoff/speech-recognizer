@@ -3,6 +3,8 @@
 #include "png_drawer.h"
 #include "assert.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace wtm::audio;
 
@@ -16,7 +18,7 @@ namespace visual {
  */
 void PngDrawer::drawToFile(const TWavDataPtr wavData, const string& file) {
 
-	uint32_t imgWidth = 10 * 1024;
+	uint32_t imgWidth = 1024;
 	uint32_t imgHeight = 255;
 	uint32_t xMax = wavData->getDuration();
 	uint32_t yMax = wavData->getMaxVal();
@@ -35,13 +37,15 @@ void PngDrawer::drawToFile(const TWavDataPtr wavData, const string& file) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
-		assert(x <= xMax);
+		assert(x <= imgWidth);
 
 		uint32_t y = (*yCurr) * (imgHeight - 1) / yMax;
-		assert(y <= yMax);
+		assert(y <= imgHeight);
+
+		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;
 
 		uint32_t index = x + y * imgWidth;
-		assert(index <= bufferSize);
+		assert(index <= imgWidth * imgHeight);
 
 		image[index] = true;
 		xCurr++;
@@ -57,6 +61,7 @@ int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uin
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytep row;
+	const short bytesPerPixel = 3;
 
 	// Open file for writing (binary mode)
 	fp = fopen(filename, "wb");
@@ -100,7 +105,7 @@ int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uin
 
 	// Allocate memory for one row (3 bytes per pixel - RGB)
 	uint32_t rowSize;
-	rowSize = 3 * width * sizeof(png_byte);
+	rowSize = bytesPerPixel * width * sizeof(png_byte);
 	row = (png_bytep) malloc(rowSize);
 
 	// Write image data
@@ -108,11 +113,11 @@ int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uin
 	for (y = 0; y < height; y++) {
 		memset(row, 0, rowSize);
 
-		for (x = 0; x < width; x++) {
+		for (x = 0; x < width; x ++) {
 			if (image[x + y * width]) {
-				row[x] = 255;
-				row[x + 1] = 255;
-				row[x + 2] = 255;
+				row[3*x] = 255;
+				row[3*x + 1] = 255;
+				row[3*x + 2] = 255;
 			}
 		}
 

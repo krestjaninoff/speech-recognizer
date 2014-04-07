@@ -18,21 +18,21 @@ namespace audio {
  * WAV header
  */
 typedef struct TWavHeader {
-    char                 riff[4];        // RIFF Header
+    char                riff[4];        // RIFF Header
     unsigned long       chunkSize;      // RIFF Chunk Size
-    char                 wave[4];        // WAVE Header
+    char                wave[4];        // WAVE Header
 
-    char                 fmt[4];         // FMT header
+    char                fmt[4];         // FMT header
     unsigned long       subchunk1Size;  // Size of the fmt chunk
-    unsigned short      audioFormat;    // Audio format 1=PCM, 6=mulaw, 7=alaw,
-    									  // 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-    unsigned short      numOfChan;      // Number of channels 1=Mono 2=Sterio
+    unsigned short      audioFormat;    // Audio format 1=PCM (Other formats are unsupported)
+    unsigned short      numOfChan;      // Number of channels 1=Mono, 2=Stereo
     unsigned long       samplesPerSec;  // Sampling Frequency in Hz
     unsigned long       bytesPerSec;    // bytes per second
     unsigned short      blockAlign;     // 2=16-bit mono, 4=16-bit stereo
     unsigned short      bitsPerSample;  // Number of bits per sample
 
-    char                 subchunk2ID[4]; // DATA header
+    // The data below depends on audioFormat, but we work only with PCM cases
+    char                data[4];        // DATA header
     unsigned long       subchunk2Size;  // Sampled data length
 
 } TWavHeader;
