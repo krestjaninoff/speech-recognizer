@@ -50,17 +50,6 @@ typedef std::auto_ptr<WavData> WavDataPtr;
 class WavData {
 public:
 
-	WavData() {
-		rawData = new std::vector<raw_t>;
-		this->maxVal = 0;
-		this->minVal = 0;
-		this->numberOfSamples = 0;
-
-		this->frames = new std::vector<Frame*>;
-		this->frameLengthMs	= 25;
-		this->frameOverlap	= 0.5;
-	}
-
 	~WavData() {
 		delete rawData;
 	}
@@ -76,9 +65,12 @@ public:
 	raw_t getMinVal() const { return minVal; }
 	void setMinVal(raw_t minVal) { this->minVal = minVal;}
 
-	std::vector<raw_t>& getRawData() const { return *rawData; }
+	const WavHeader& getHeader() const { return header; }
+	const std::vector<raw_t>& getRawData() const { return *rawData; }
 
 private:
+	WavHeader			header;
+
 	std::vector<raw_t>*	rawData;
 	raw_t				maxVal;
 	raw_t				minVal;
@@ -88,12 +80,24 @@ private:
 	uint32_t			frameLengthMs;
 	double				frameOverlap;	// Overlap between frames - fraction of frame length (0 < overlap < 1)
 
+	WavData(WavHeader header) {
+		this->header = header;
+
+		this->rawData = new std::vector<raw_t>;
+		this->maxVal = 0;
+		this->minVal = 0;
+		this->numberOfSamples = 0;
+
+		this->frames = new std::vector<Frame*>;
+		this->frameLengthMs	= 25;
+		this->frameOverlap	= 0.5;
+	}
+
 	static void checkHeader(const WavHeader& wav_header);
 	static void readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
+
+	void divideIntoFrames();
 };
-
-
-
 
 } // namespace audio
 } // namespace wtm

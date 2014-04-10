@@ -16,7 +16,6 @@ namespace audio {
  */
 WavDataPtr WavData::readFromFile(const std::string& file) {
 	WavHeader wavHeader;
-	WavDataPtr wavFile(new WavData());
 
 	// Open file
 	std::fstream fs;
@@ -32,8 +31,11 @@ WavDataPtr WavData::readFromFile(const std::string& file) {
 	checkHeader(wavHeader);
 
 	// Read raw data
+	WavDataPtr wavFile(new WavData(wavHeader));
 	readRawData(fs, wavHeader, *wavFile);
 	fs.close();
+
+	// Split data into frames
 
 	return wavFile;
 }
@@ -111,13 +113,18 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 		if (minValue > value) {
 			minValue = value;
 		}
-		wavFile.getRawData().push_back(value);
+
+		wavFile.rawData->push_back(value);
 	}
 
 	// Update values
 	wavFile.setMinVal(minValue);
 	wavFile.setMaxVal(maxValue);
 	wavFile.setNumberOfSamples(sampleNumber);
+}
+
+void WavData::divideIntoFrames() {
+	// TODO Add method implementation
 }
 
 } // namespace audio

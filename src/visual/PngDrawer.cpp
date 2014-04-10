@@ -33,7 +33,7 @@ void PngDrawer::drawToFile(const WavDataPtr wavData, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (vector<raw_t>::iterator yCurr = wavData->getRawData().begin();
+	for (vector<raw_t>::const_iterator yCurr = wavData->getRawData().begin();
 			yCurr != wavData->getRawData().end(); ++yCurr) {
 
 		// Contractive mapping
@@ -41,7 +41,6 @@ void PngDrawer::drawToFile(const WavDataPtr wavData, const string& file) {
 		assert(x <= imgWidth);
 
 		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
-		if (y > imgHeight)
 		assert(y <= imgHeight);
 
 		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;
