@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include "png.h"
-#include "png_drawer.h"
+#include "PngDrawer.h"
 #include "assert.h"
 
 #include <iostream>
@@ -16,12 +16,13 @@ namespace visual {
  *
  * @see http://www.libpng.org/pub/png/book/
  */
-void PngDrawer::drawToFile(const TWavDataPtr wavData, const string& file) {
+void PngDrawer::drawToFile(const WavDataPtr wavData, const string& file) {
 
 	uint32_t imgWidth = 1024;
 	uint32_t imgHeight = 255;
-	uint32_t xMax = wavData->getDuration();
-	uint32_t yMax = wavData->getMaxVal();
+	uint32_t xMax = wavData->getNumberOfSamples();
+	uint32_t yCorrection = wavData->getMinVal() < 0 ? -wavData->getMinVal() : 0;
+	uint32_t yMax = wavData->getMaxVal() + yCorrection;
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(bool);
 	bool* image = (bool*) malloc(bufferSize);
@@ -32,14 +33,15 @@ void PngDrawer::drawToFile(const TWavDataPtr wavData, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (list<raw_t>::iterator yCurr = wavData->getRawData()->begin();
-			yCurr != wavData->getRawData()->end(); ++yCurr) {
+	for (vector<raw_t>::iterator yCurr = wavData->getRawData().begin();
+			yCurr != wavData->getRawData().end(); ++yCurr) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = (*yCurr) * (imgHeight - 1) / yMax;
+		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
+		if (y > imgHeight)
 		assert(y <= imgHeight);
 
 		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;

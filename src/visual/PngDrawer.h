@@ -6,6 +6,7 @@
 
 #include <string>
 #include "../audio/audio.h"
+#include "../audio/WavData.h"
 
 namespace wtm {
 namespace visual {
@@ -19,7 +20,7 @@ namespace visual {
 class PngDrawer {
 
 public:
-	static void drawToFile(const audio::TWavDataPtr wav_data, const std::string& file);
+	static void drawToFile(const audio::WavDataPtr wav_data, const std::string& file);
 
 private:
 	static int writeImage(const char* filename, bool* buffer, uint32_t width,
