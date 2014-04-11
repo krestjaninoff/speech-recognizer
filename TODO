@@ -1,1 +1,7 @@
+TODO:
+1. Fix issue with NPE
+2. Split data into words (by silence time, RMS)
+3. MFCC transformation
 
+Dinctionary:
+Один, Два, Три, Четыре, Пять, Шесть, Семь, Восемь, Девять, Десять

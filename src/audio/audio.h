@@ -22,7 +22,7 @@ namespace audio {
 	/**
 	 * Raw audio data type
 	 */
-	typedef uint32_t leght_t;
+	typedef uint32_t lenght_t;
 
 
 } // namespace audio

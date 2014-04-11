@@ -51,13 +51,18 @@ class WavData {
 public:
 
 	~WavData() {
-		delete rawData;
+		if (this->rawData) {
+			delete this->rawData;
+		}
+		if (this->frames) {
+			delete this->frames;
+		}
 	}
 
 	static WavDataPtr readFromFile(const std::string& file);
 
-	leght_t getNumberOfSamples() const { return numberOfSamples; }
-	void setNumberOfSamples(leght_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
+	lenght_t getNumberOfSamples() const { return numberOfSamples; }
+	void setNumberOfSamples(lenght_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
 
 	raw_t getMaxVal() const { return maxVal; }
 	void setMaxVal(raw_t maxVal) { this->maxVal = maxVal; }
@@ -67,18 +72,20 @@ public:
 
 	const WavHeader& getHeader() const { return header; }
 	const std::vector<raw_t>& getRawData() const { return *rawData; }
+	const std::vector<Frame*>& getFrames() const { return *frames; }
 
 private:
-	WavHeader			header;
+	WavHeader				header;
 
-	std::vector<raw_t>*	rawData;
-	raw_t				maxVal;
-	raw_t				minVal;
-	leght_t				numberOfSamples;
+	std::vector<raw_t>*		rawData;
+	raw_t					maxVal;
+	raw_t					minVal;
+	lenght_t				numberOfSamples;
 
-	std::vector<Frame*>* frames;
-	uint32_t			frameLengthMs;
-	double				frameOverlap;	// Overlap between frames - fraction of frame length (0 < overlap < 1)
+	std::vector<Frame*>*	frames;
+	lenght_t				frameLengthMs;
+	double					frameOverlap;	// Overlap between frames - fraction of frame length (0 < overlap < 1)
+	lenght_t				samplesPerFrame;
 
 	WavData(WavHeader header) {
 		this->header = header;
@@ -91,6 +98,7 @@ private:
 		this->frames = new std::vector<Frame*>;
 		this->frameLengthMs	= 25;
 		this->frameOverlap	= 0.5;
+		this->samplesPerFrame = 0;
 	}
 
 	static void checkHeader(const WavHeader& wav_header);

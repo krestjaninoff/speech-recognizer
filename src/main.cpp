@@ -17,8 +17,11 @@ int main() {
 	string sampleFile = "samples/example.wav";
 	audio::WavDataPtr wavData = audio::WavData::readFromFile(sampleFile);
 
-	string diagramFile = "diagram.png";
-	visual::PngDrawer::drawToFile(wavData, diagramFile);
+	//string diagramRaw = "raw.png";
+	//visual::PngDrawer::drawRawData(wavData, diagramRaw);
+
+	string diagramFrame = "frame.png";
+	visual::PngDrawer::drawFrames(wavData, diagramFrame);
 
 	cout << "An diagram is successfully created!" << endl;
 	return EXIT_SUCCESS;

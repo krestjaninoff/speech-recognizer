@@ -20,7 +20,8 @@ namespace visual {
 class PngDrawer {
 
 public:
-	static void drawToFile(const audio::WavDataPtr wav_data, const std::string& file);
+	static void drawRawData(const audio::WavDataPtr wav_data, const std::string& file);
+	static void drawFrames(const audio::WavDataPtr wav_data, const std::string& file);
 
 private:
 	static int writeImage(const char* filename, bool* buffer, uint32_t width,

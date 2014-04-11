@@ -1,9 +1,9 @@
 #include <cstdlib>
 #include "png.h"
-#include "PngDrawer.h"
 #include "assert.h"
-
 #include <iostream>
+#include "PngDrawer.h"
+#include "Frame.h"
 
 using namespace std;
 using namespace wtm::audio;
@@ -12,11 +12,9 @@ namespace wtm {
 namespace visual {
 
 /**
- * Draw PNG visualization for the data
- *
- * @see http://www.libpng.org/pub/png/book/
+ * Draw PNG visualization of raw data
  */
-void PngDrawer::drawToFile(const WavDataPtr wavData, const string& file) {
+void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 
 	uint32_t imgWidth = 1024;
 	uint32_t imgHeight = 255;
@@ -41,6 +39,48 @@ void PngDrawer::drawToFile(const WavDataPtr wavData, const string& file) {
 		assert(x <= imgWidth);
 
 		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
+		assert(y <= imgHeight);
+
+		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;
+
+		uint32_t index = x + y * imgWidth;
+		assert(index <= imgWidth * imgHeight);
+
+		image[index] = true;
+		xCurr++;
+	}
+
+	writeImage(file.c_str(), image, imgWidth, imgHeight);
+	free(image);
+}
+
+/**
+ * Draw PNG visualization of frames
+ */
+void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
+
+	uint32_t imgWidth = 1024;
+	uint32_t imgHeight = 255;
+	uint32_t xMax = wavData->getFrames().size();
+	uint32_t yMax = wavData->getMaxVal();
+
+	uint32_t bufferSize = imgWidth * imgHeight * sizeof(bool);
+	bool* image = (bool*) malloc(bufferSize);
+	if (image == NULL) {
+		fprintf(stderr, "Could not create image buffer\n");
+		return;
+	}
+	memset(image, 0, bufferSize);
+
+	uint32_t xCurr = 0;
+	for (vector<Frame*>::const_iterator yCurr = wavData->getFrames().begin();
+			yCurr != wavData->getFrames().end(); ++yCurr) {
+
+		// Contractive mapping
+		uint32_t x = xCurr * (imgWidth - 1) / xMax;
+		assert(x <= imgWidth);
+
+		uint32_t y = ((*yCurr)->getAvgValue()) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 
 		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;

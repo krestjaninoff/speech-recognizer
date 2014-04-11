@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include "audio.h"
 
 namespace wtm {
 namespace audio {
@@ -13,7 +14,9 @@ namespace audio {
 class Frame {
 
 public:
-	Frame(const std::vector<int>& source, int32_t start, int32_t finish);
+	Frame(const std::vector<raw_t>& source, lenght_t start, lenght_t finish);
+
+	double getAvgValue() const;
 
 private:
 	/**
