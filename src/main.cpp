@@ -14,7 +14,7 @@ using namespace wtm::audio;
 
 int main() {
 
-	string sampleFile = "samples/example.wav";
+	string sampleFile = "samples/male1.wav";
 	audio::WavDataPtr wavData = audio::WavData::readFromFile(sampleFile);
 
 	//string diagramRaw = "raw.png";
