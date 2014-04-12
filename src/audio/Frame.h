@@ -1,3 +1,7 @@
+/**
+ * Frame is a short fragment of a signal
+ */
+
 #ifndef FRAME_H_
 #define FRAME_H_
 
@@ -8,26 +12,34 @@
 namespace wtm {
 namespace audio {
 
-/**
- * Frame is a short fragment of a signal
- */
 class Frame {
 
 public:
 	Frame(const std::vector<raw_t>& source, lenght_t start, lenght_t finish);
 
-	double getAvgValue() const;
+	double calcRMS() const;
+
+	lenght_t getStart() const { return start; }
+
+	double getMaRms() const { return maRms; }
+	void setMaRms(double maRms) { this->maRms = maRms; }
 
 private:
-	/**
-	 * First and last sample of this frame
-	 */
-	const uint32_t start, finish;
 
 	/**
 	 * A reference to the source (wav file)
 	 */
-	const std::vector<int32_t>& source;
+	const std::vector<raw_t>& source;
+
+	/**
+	 * First and last sample of this frame
+	 */
+	const lenght_t start, finish;
+
+	/**
+	 * Moving average RMS
+	 */
+	double maRms;
 };
 
 } /* namespace audio */

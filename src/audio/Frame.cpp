@@ -1,21 +1,22 @@
-#include <Frame.h>
 #include <cmath>
+#include <Frame.h>
 
 namespace wtm {
 namespace audio {
 
 	Frame::Frame(const std::vector<raw_t>& source, lenght_t start, lenght_t finish):
-		source(source), start(start), finish(finish) {
+		source(source), start(start), finish(finish), maRms(0) {
 	}
 
-	double Frame::getAvgValue() const {
-		double avgValue = source.at(start);
+	double Frame::calcRMS() const {
+		double value = 0;
 
-		for (int i = start + 1; i < finish; i++) {
-			avgValue = (avgValue + source.at(i)) / 2;
+		for (lenght_t i = start; i < finish; i++) {
+			value += source.at(i) * source.at(i);
 		}
+		value /= (finish - start);
 
-		return abs(avgValue);
+		return sqrt(value);
 	}
 
 } /* namespace audio */

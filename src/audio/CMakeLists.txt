@@ -3,6 +3,7 @@ project(audio)
 
 set(SOURCE
 	Frame.cpp
+	Word.cpp
 	WavData.cpp
 )
 

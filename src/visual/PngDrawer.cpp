@@ -80,7 +80,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = ((*yCurr)->getAvgValue()) * (imgHeight - 1) / yMax;
+		uint32_t y = ((*yCurr)->calcRMS()) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 
 		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;
