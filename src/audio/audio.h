@@ -28,7 +28,7 @@ namespace audio {
 	/**
 	 * Length of frame (ms)
 	 */
-	const lenght_t FRAME_LENGTH = 25;
+	const lenght_t FRAME_LENGTH = 10;
 
 	/**
 	 * Percentage of overlap for frames (0 <= x < 1)
@@ -37,9 +37,14 @@ namespace audio {
 
 	/**
 	 * Amount (odd) of elements for moving average smoothing during words splitting
-	 * Length of analyzing fragment is FRAME_LENGTH * (1 - FRAME_OVERLAP) * MA_SIZE
+	 * Length of analysing fragment is FRAME_LENGTH * (1 - FRAME_OVERLAP) * MA_SIZE
 	 */
-	const unsigned short MOVING_AVERAGE_SIZE = 5;
+	const unsigned short MOVING_AVERAGE_SIZE = 3;
+
+	/**
+	 * Minimal amount of framer per one word
+	 */
+	const unsigned short FRAMES_PER_WORD_MIN = 5;
 
 } // namespace audio
 } // namespace wtm

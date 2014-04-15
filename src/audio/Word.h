@@ -22,8 +22,8 @@ public:
 	const std::vector<Frame*>& getFrames() const { return *frames; }
 
 private:
-	const std::vector<Frame*>* frames;
-	std::string                 text;
+	const std::vector<Frame*>*  frames;
+	std::string                text;
 };
 
 } /* namespace audio */

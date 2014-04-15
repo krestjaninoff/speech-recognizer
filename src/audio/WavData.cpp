@@ -3,9 +3,11 @@
 #include <memory>
 #include <stdio.h>
 #include <string.h>
+#include <limits>
 #include <limits.h>
 #include <cassert>
 #include <vector>
+#include <math.h>
 #include "audio.h"
 #include "WavData.h"
 #include "Frame.h"
@@ -167,36 +169,52 @@ void WavData::divideIntoWords() {
 	assert(frames->size() > 10);
 
 	double maMin = 0;
-	double maMax = 0;
 	double maAvg = 0;
+	double maMax = 0;
 	double ma;
 
 	// Let's use Moving Average value to avoid spikes
 	unsigned short maShift = MOVING_AVERAGE_SIZE / 2;
-	for (lenght_t i = maShift; i < frames->size() - maShift; ++i) {
+	maAvg = maMin = frames->at(0)->calcRMS();
+	lenght_t iFrame;
+	for (iFrame = maShift; iFrame < frames->size() - maShift; ++iFrame) {
 
 		ma = 0;
-		for (unsigned short iMa = i - maShift; iMa <= i + maShift; iMa++) {
-			ma += frames->at(i)->calcRMS();
+		for (unsigned short iMa = iFrame - maShift; iMa <= iFrame + maShift; iMa++) {
+			ma += frames->at(iMa)->calcRMS();
 		}
 		ma /= MOVING_AVERAGE_SIZE;
-		frames->at(i)->setMaRms(ma);
+		frames->at(iFrame)->setMaRms(ma);
 
 		if (maMin > ma) {
 			maMin = ma;
 		}
-		if (maMax < ma) {
+		if (ma > maMax) {
 			maMax = ma;
 		}
 
-		maAvg = (maAvg + ma) / 2;
+		maAvg += ma;
 	}
+	maAvg /= iFrame;
+
+	// A little hack to calculate bound values
+	for (lenght_t iFrame = 0; iFrame < maShift; ++iFrame) {
+		frames->at(iFrame)->setMaRms(frames->at(iFrame)->calcRMS());
+		frames->at(frames->size() - 1 - iFrame)->setMaRms(frames->at(frames->size() - 1 - iFrame)->calcRMS());
+	}
+
+	// Tries to guess the best threshold value
+	double thresholdCandidate = getThresholdCandidate(maMin, maAvg, maMax);
 
 	// If max value greater than min value more then 50% then we have the "silence" threshold.
 	// Otherwise, let's think that we have only one world.
 	double threshold = 0;
 	if (maMax * 0.5 > maMin) {
-		threshold = min(maMin * 5 , maAvg * 0.3);
+		threshold = thresholdCandidate;
+
+		// TODO Find a way to prevent splitting word into two parts.
+		// Actually, MA is supposed to resolve the "subsidence" problem... but seems it doesn't work as I wanted :(
+		// Can we combine two standing together words?
 
 		// Divide frames into words
 		std::vector<Frame*>* wordFrames = 0;
@@ -211,10 +229,18 @@ void WavData::divideIntoWords() {
 				}
 				wordFrames->push_back(*frame);
 
-			// Got a silence
+			// Got silence
 			} else {
 				if (wordFrames) {
-					this->words->push_back(new Word(wordFrames));
+
+					if (wordFrames->size() > FRAMES_PER_WORD_MIN) {
+						Word* word = new Word(wordFrames);
+						this->words->push_back(word);
+
+					} else {
+						delete wordFrames;
+					}
+
 					wordFrames = 0;
 				}
 			}
@@ -224,6 +250,147 @@ void WavData::divideIntoWords() {
 	} else {
 		this->words->push_back(new Word(this->frames));
 	}
+}
+
+/**
+ * Determination of silence threshold
+ *
+ * Method divides data into 3 clusters (using something like k-means algorithm).
+ * The cluster center of "Min" cluster is used as threshold candidate.
+ *
+ * // TODO Optimize clustering logic
+ */
+double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) {
+	short currIter = 0, maxIterCnt = 30;
+	bool isCenterChanged = true;
+
+	// Init clusters
+	double minClusterCenter = maMin;
+	double minClusterCenterNew = 0;
+	std::vector<Frame*>* minCluster = new std::vector<Frame*>();
+
+	double avgClusterCenter = maMax / 2;
+	double avgClusterCenterNew = 0;
+	std::vector<Frame*>* avgCluster = new std::vector<Frame*>();
+
+	double maxClusterCenter = maMax;
+	double maxClusterCenterNew = 0;
+	std::vector<Frame*>* maxCluster = new std::vector<Frame*>();
+
+	double maRms;
+	for (vector<Frame*>::const_iterator frame = frames->begin();
+		frame != frames->end(); ++frame) {
+
+		maRms = (*frame)->getMaRms();
+
+		if (fabs(maRms - minClusterCenter) < fabs(maRms - avgClusterCenter)
+				&& fabs(maRms - minClusterCenter) < fabs(maRms - maxClusterCenter)) {
+			minCluster->push_back(*frame);
+
+		} else if (fabs(maRms - avgClusterCenter) < fabs(maRms - minClusterCenter)
+				&& fabs(maRms - avgClusterCenter) < fabs(maRms - maxClusterCenter)) {
+			avgCluster->push_back(*frame);
+
+		} else {
+			maxCluster->push_back(*frame);
+		}
+	}
+
+	// Iterate
+	while (currIter < maxIterCnt && isCenterChanged) {
+
+		cout << "Min center: " << minClusterCenter << ", size:" << minCluster->size() << endl;
+		cout << "Avg center: " << avgClusterCenter << ", size:" << avgCluster->size() << endl;
+		cout << "Max center: " << maxClusterCenter << ", size:" << maxCluster->size() << endl;
+		cout << "_" << endl;
+
+		// Calculates new cluster centres
+		if (minCluster->size() > 0) {
+			minClusterCenterNew = minCluster->at(0)->getMaRms();
+
+			for (vector<Frame*>::const_iterator frame = minCluster->begin();
+						frame != minCluster->end(); ++frame) {
+				minClusterCenterNew += (*frame)->getMaRms();
+			}
+			minClusterCenterNew /= minCluster->size();
+
+		} else {
+			break;
+		}
+
+		if (avgCluster->size() > 0) {
+			avgClusterCenterNew = avgCluster->at(0)->getMaRms();
+
+			for (vector<Frame*>::const_iterator frame = avgCluster->begin();
+						frame != avgCluster->end(); ++frame) {
+				avgClusterCenterNew += (*frame)->getMaRms();
+			}
+			avgClusterCenterNew /= avgCluster->size();
+
+		} else {
+			break;
+		}
+
+		if (maxCluster->size() > 0) {
+			maxClusterCenterNew = maxCluster->at(0)->getMaRms();
+
+			for (vector<Frame*>::const_iterator frame = maxCluster->begin();
+						frame != maxCluster->end(); ++frame) {
+				maxClusterCenterNew += (*frame)->getMaRms();
+			}
+			maxClusterCenterNew /= maxCluster->size();
+
+		} else {
+			break;
+		}
+
+		// Check if clusters centers changed
+		if (fabs(minClusterCenterNew - minClusterCenter) < numeric_limits<double>::epsilon()
+				&& fabs(avgClusterCenterNew - avgClusterCenter) < numeric_limits<double>::epsilon()
+				&& fabs(maxClusterCenterNew - maxClusterCenter) < numeric_limits<double>::epsilon()) {
+			isCenterChanged = false;
+			break;
+		}
+
+		// Update clusters centers
+		minClusterCenter = minClusterCenterNew;
+		avgClusterCenter = avgClusterCenterNew;
+		maxClusterCenter = maxClusterCenterNew;
+
+		// Rebuild clusters
+		minCluster->clear();
+		avgCluster->clear();
+		maxCluster->clear();
+
+		for (vector<Frame*>::const_iterator frame = frames->begin();
+				frame != frames->end(); ++frame) {
+
+			if (fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - avgClusterCenter)
+					&& fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - maxClusterCenter)) {
+
+				minCluster->push_back(*frame);
+
+			} else if (fabs((*frame)->getMaRms() - avgClusterCenter) < fabs((*frame)->getMaRms() - minClusterCenter)
+					&& fabs((*frame)->getMaRms() - avgClusterCenter) < fabs((*frame)->getMaRms() - maxClusterCenter)) {
+
+				avgCluster->push_back(*frame);
+
+			} else {
+				maxCluster->push_back(*frame);
+			}
+		}
+
+		currIter++;
+	}
+
+	double thresholdCandidate = minClusterCenter;
+	cout << "Threshold candidate: " << thresholdCandidate << endl;
+
+	delete minCluster;
+	delete avgCluster;
+	delete maxCluster;
+
+	return thresholdCandidate;
 }
 
 void WavData::saveToFile(const std::string& file, const Word& word) const {

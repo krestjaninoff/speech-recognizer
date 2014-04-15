@@ -115,6 +115,8 @@ private:
 	static void readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
 
 	void divideIntoFrames();
+
+	double getThresholdCandidate(double min, double avg, double max);
 	void divideIntoWords();
 };
 
