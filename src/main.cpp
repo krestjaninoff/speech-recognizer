@@ -22,12 +22,12 @@ void saveWords(audio::WavDataPtr wavData);
 
 int main() {
 
-	string sampleFile = "samples/female1.wav";
+	string sampleFile = "samples/male1.wav";
 	audio::WavDataPtr wavData = audio::WavData::readFromFile(sampleFile);
 	wavData->init();
 
-	//draw(wavData);
-	saveWords(wavData);
+	draw(wavData);
+	//saveWords(wavData);
 
 	DEBUG("!!!\nProgram completed successfully\n!!!");
 	return EXIT_SUCCESS;

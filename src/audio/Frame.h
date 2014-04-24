@@ -42,7 +42,7 @@ public:
 private:
 
 	/**
-	 * A reference to the source (wav data)
+	 * Reference to the source (wav data)
 	 */
 	const std::vector<raw_t>& source;
 

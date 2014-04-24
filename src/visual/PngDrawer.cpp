@@ -16,14 +16,15 @@ namespace visual {
  */
 void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 
-	uint32_t imgWidth = 1024;
-	uint32_t imgHeight = 768;
+	uint32_t imgWidth = IMAGE_WIDTH;
+	uint32_t imgHeight = IMAGE_HEIGHT;
+
 	uint32_t xMax = wavData->getNumberOfSamples();
 	uint32_t yCorrection = wavData->getMinVal() < 0 ? -wavData->getMinVal() : 0;
 	uint32_t yMax = wavData->getMaxVal() + yCorrection;
 
-	uint32_t bufferSize = imgWidth * imgHeight * sizeof(bool);
-	bool* image = (bool*) malloc(bufferSize);
+	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
+	uint8_t* image = (uint8_t*) malloc(bufferSize);
 	if (image == NULL) {
 		fprintf(stderr, "Could not create image buffer\n");
 		return;
@@ -41,8 +42,6 @@ void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 
-		//std::cout << "x: " << x << ", y: " << y << "(" << ((int) *yCurr) << ")" << std::endl;
-
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
@@ -59,13 +58,14 @@ void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
  */
 void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 
-	uint32_t imgWidth = 2 * 1024;
-	uint32_t imgHeight = 768;
+	uint32_t imgWidth = IMAGE_WIDTH;
+	uint32_t imgHeight = IMAGE_HEIGHT;
+
 	uint32_t xMax = wavData->getFrames().size();
 	uint32_t yMax = wavData->getMaRMSMax();
 
-	uint32_t bufferSize = imgWidth * imgHeight * sizeof(bool);
-	bool* image = (bool*) malloc(bufferSize);
+	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
+	uint8_t* image = (uint8_t*) malloc(bufferSize);
 	if (image == NULL) {
 		fprintf(stderr, "Could not create image buffer\n");
 		return;
@@ -74,34 +74,39 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 
 	// Draw maRMS for frames
 	uint32_t xCurr = 0;
-	for (vector<Frame*>::const_iterator yCurr = wavData->getFrames().begin();
-			yCurr != wavData->getFrames().end(); ++yCurr) {
+	for (vector<Frame*>::const_iterator frame = wavData->getFrames().begin();
+			frame != wavData->getFrames().end(); ++frame) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = ((*yCurr)->calcRms()) * (imgHeight - 1) / yMax;
+		uint32_t y = ((*frame)->getMaRms()) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
-		image[index] = true;
+		if (wavData->isPartOfWord(*frame)) {
+			image[index] = 2;
+		} else {
+			image[index] = 1;
+		}
+
 		xCurr++;
 	}
 
 	// Draw word threshold
 	uint32_t thresholdY = (wavData->getWordsThreshold()) * (imgHeight - 1) / yMax;
 	for (length_t x = 0; x < imgWidth; x++) {
-		image[x + thresholdY * imgWidth] = true;
+		image[x + thresholdY * imgWidth] = 3;
 	}
 
 	writeImage(file.c_str(), image, imgWidth, imgHeight);
 	free(image);
 }
 
-int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uint32_t height) {
+int PngDrawer::writeImage(const char* filename, uint8_t* image, uint32_t width, uint32_t height) {
 	int code = 0;
 	FILE *fp;
 	png_structp png_ptr;
@@ -159,10 +164,19 @@ int PngDrawer::writeImage(const char* filename, bool* image, uint32_t width, uin
 	for (y = 0; y < height; y++) {
 		memset(row, 0, rowSize);
 
+		// TODO Refactor me
 		for (x = 0; x < width; x ++) {
-			if (image[x + y * width]) {
+			if (1 == image[x + y * width]) {
 				row[3*x] = 255;
+				row[3*x + 1] = 0;
+				row[3*x + 2] = 0;
+			} else if (2 == image[x + y * width]) {
+				row[3*x] = 0;
 				row[3*x + 1] = 255;
+				row[3*x + 2] = 0;
+			} else if (3 == image[x + y * width]) {
+				row[3*x] = 0;
+				row[3*x + 1] = 0;
 				row[3*x + 2] = 255;
 			}
 		}

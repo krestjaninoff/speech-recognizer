@@ -477,5 +477,24 @@ void WavData::saveToFile(const std::string& file, const Word& word) const {
 	delete [] data;
 }
 
+bool WavData::isPartOfWord(const Frame* frame) const {
+	bool isPartOfWord = false;
+
+	for (vector<Word*>::const_iterator word = this->words->begin();
+			word != this->words->end(); ++word) {
+
+		length_t left = (*(*word)->getFrames()->begin())->getNumber();
+		length_t right = (*word)->getFrames()->at((*word)->getFrames()->size() - 1)->getNumber();
+
+		if (left <= frame->getNumber() && frame->getNumber() <= right) {
+
+			isPartOfWord = true;
+			break;
+		}
+	}
+
+	return isPartOfWord;
+}
+
 } // namespace audio
 } // namespace wtm

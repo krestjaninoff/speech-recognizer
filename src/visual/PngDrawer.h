@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../common.h"
+#include "visual.h"
 #include "../audio/audio.h"
 #include "../audio/WavData.h"
 
@@ -22,7 +23,7 @@ public:
 	static void drawFrames(const audio::WavDataPtr wav_data, const std::string& file);
 
 private:
-	static int writeImage(const char* filename, bool* buffer, uint32_t width,
+	static int writeImage(const char* filename, uint8_t* buffer, uint32_t width,
 			uint32_t height);
 
 }; // class PngDrawer

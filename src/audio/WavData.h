@@ -85,6 +85,8 @@ public:
 	const std::vector<Frame*>& getFrames() const { return *frames; }
 	const std::vector<Word*>& getWords() const { return *words; }
 
+	bool isPartOfWord(const Frame* frame) const;
+
 	void saveToFile(const std::string& file, const Word& word) const;
 
 private:
