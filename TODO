@@ -1,7 +1,18 @@
 TODO:
-1. Fix issue with NPE
-2. Split data into words (by silence time, RMS)
-3. MFCC transformation
+
+* Refactor visualization module
+** raw data, rms, maRms;
+** highlight words;
+** threshold line
+
+* Save words on FS
+
+* Refactor WavData class (it's too big)
+
+* MFCC transformation
+
+
 
 Dinctionary:
-Один, Два, Три, Четыре, Пять, Шесть, Семь, Восемь, Девять, Десять
+
+РћРґРёРЅ, Р”РІР°, РўСЂРё, Р§РµС‚С‹СЂРµ, РџСЏС‚СЊ, РЁРµСЃС‚СЊ, РЎРµРјСЊ, Р’РѕСЃРµРјСЊ, Р”РµРІСЏС‚СЊ, Р”РµСЃСЏС‚СЊ

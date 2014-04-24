@@ -1,13 +1,14 @@
 /**
- * An entry point for testing
+ * Entry point for testing
  */
 #include <iostream>
 #include <stdlib.h>
 #include <cstdlib>
+#include <sstream>
+#include "common.h"
 #include "audio/audio.h"
 #include "audio/WavData.h"
 #include "visual/PngDrawer.h"
-#include <sstream>
 
 #define toString( x ) dynamic_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
@@ -21,14 +22,14 @@ void saveWords(audio::WavDataPtr wavData);
 
 int main() {
 
-	string sampleFile = "samples/male2.wav";
+	string sampleFile = "samples/female1.wav";
 	audio::WavDataPtr wavData = audio::WavData::readFromFile(sampleFile);
 	wavData->init();
 
 	//draw(wavData);
 	saveWords(wavData);
 
-	cout << "Program completed successfully" << endl;
+	DEBUG("!!!\nProgram completed successfully\n!!!");
 	return EXIT_SUCCESS;
 }
 
@@ -43,11 +44,11 @@ void draw(audio::WavDataPtr wavData) {
 void saveWords(audio::WavDataPtr wavData) {
 	int counter = 1;
 
-	cout << "Words: " << endl;
+	DEBUG("Words: %d", wavData->getWords().size());
 	for (vector<Word*>::const_iterator word = wavData->getWords().begin();
 			word != wavData->getWords().end(); ++word) {
 
-		cout << counter++ << ": " << (*word)->getFrames().size() << endl;
+		DEBUG("%d: %d", counter++, (*word)->getFrames()->size());
 
 		//string fileName(sampleFile);
 		//fileName + "." + toString(counter) + ".wav";

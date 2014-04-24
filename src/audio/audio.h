@@ -10,6 +10,7 @@
 #include <memory>
 #include <cstdlib>
 #include <stdint.h>
+#include "../common.h"
 
 namespace wtm {
 namespace audio {
@@ -22,13 +23,13 @@ namespace audio {
 	/**
 	 * Raw audio data type
 	 */
-	typedef uint32_t lenght_t;
+	typedef uint32_t length_t;
 
 
 	/**
 	 * Length of frame (ms)
 	 */
-	const lenght_t FRAME_LENGTH = 10;
+	const length_t FRAME_LENGTH = 10;
 
 	/**
 	 * Percentage of overlap for frames (0 <= x < 1)
@@ -42,9 +43,18 @@ namespace audio {
 	const unsigned short MOVING_AVERAGE_SIZE = 3;
 
 	/**
-	 * Minimal amount of framer per one word
+	 * Minimal size of word (in frames)
+	 * <p>
+	 * Let's put that minimal length of word is 200ms.
 	 */
-	const unsigned short FRAMES_PER_WORD_MIN = 5;
+	const unsigned short WORD_MIN_SIZE = (200 / FRAME_LENGTH) / (1 - FRAME_OVERLAP);
+
+	/**
+	 * Minimal amount of framer between two words
+	 * <p>
+	 * Let's put that minimal distance between two words is 50% of minimal size of word
+	 */
+	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.50;
 
 } // namespace audio
 } // namespace wtm

@@ -68,14 +68,17 @@ public:
 	static WavDataPtr readFromFile(const std::string& file);
 	void init();
 
-	lenght_t getNumberOfSamples() const { return numberOfSamples; }
-	void setNumberOfSamples(lenght_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
+	length_t getNumberOfSamples() const { return numberOfSamples; }
+	void setNumberOfSamples(length_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
 
 	raw_t getMaxVal() const { return maxVal; }
 	void setMaxVal(raw_t maxVal) { this->maxVal = maxVal; }
 
 	raw_t getMinVal() const { return minVal; }
-	void setMinVal(raw_t minVal) { this->minVal = minVal;}
+	void setMinVal(raw_t minVal) { this->minVal = minVal; }
+
+	double getWordsThreshold() const { return this->wordsThreshold; }
+	double getMaRMSMax() const { return this->maRmsMax; }
 
 	const WavHeader& getHeader() const { return header; }
 	const std::vector<raw_t>& getRawData() const { return *rawData; }
@@ -90,12 +93,14 @@ private:
 	std::vector<raw_t>*     rawData;
 	raw_t                   maxVal;
 	raw_t                   minVal;
-	lenght_t                numberOfSamples;
+	length_t                numberOfSamples;
 
 	std::vector<Frame*>*    frames;
-	lenght_t                samplesPerFrame;
+	length_t                samplesPerFrame;
 
 	std::vector<Word*>*     words;
+	raw_t					maRmsMax;
+	double                 wordsThreshold;
 
 	WavData(WavHeader header) {
 		this->header = header;
@@ -109,6 +114,8 @@ private:
 		this->samplesPerFrame = 0;
 
 		this->words = new std::vector<Word*>;
+		this->maRmsMax = 0;
+		this->wordsThreshold = 0;
 	}
 
 	static void checkHeader(const WavHeader& wav_header);

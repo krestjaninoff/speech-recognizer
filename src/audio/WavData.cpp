@@ -89,7 +89,7 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 	uint8_t value8, valueLeft8, valueRight8;
 	int16_t value16, valueLeft16, valueRight16;
 
-	lenght_t bytesPerSample = static_cast<uint32_t>(wavHeader.bitsPerSample / 8);
+	length_t bytesPerSample = static_cast<uint32_t>(wavHeader.bitsPerSample / 8);
 	unsigned long numberOfSamplesXChannels = wavHeader.subchunk2Size /
 			(wavHeader.numOfChan * bytesPerSample);
 
@@ -135,8 +135,8 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 	wavFile.setMaxVal(maxValue);
 	wavFile.setNumberOfSamples(sampleNumber);
 
-	lenght_t bytesPerFrame = static_cast<lenght_t>(wavHeader.bytesPerSec * FRAME_LENGTH / 1000.0);
-	wavFile.samplesPerFrame = static_cast<lenght_t>(bytesPerFrame / bytesPerSample);
+	length_t bytesPerFrame = static_cast<length_t>(wavHeader.bytesPerSec * FRAME_LENGTH / 1000.0);
+	wavFile.samplesPerFrame = static_cast<length_t>(bytesPerFrame / bytesPerSample);
 	assert(wavFile.samplesPerFrame > 0);
 }
 
@@ -150,14 +150,14 @@ void WavData::divideIntoFrames() {
 
 	frames->reserve(framesCount);
 
-	lenght_t indexBegin = 0, indexEnd = 0;
-	for (lenght_t i = 0, size = rawData->size(); i < framesCount; ++i) {
+	length_t indexBegin = 0, indexEnd = 0;
+	for (length_t i = 0, size = rawData->size(); i < framesCount; ++i) {
 
 		indexBegin = i * samplesPerNonOverlap;
 		indexEnd = indexBegin + samplesPerFrame;
 		if (indexEnd < size) {
 
-			Frame* frame = new Frame(*rawData, indexBegin, indexEnd);
+			Frame* frame = new Frame(i, *rawData, indexBegin, indexEnd);
 			frames->push_back(frame);
 		} else {
 			break;
@@ -175,13 +175,13 @@ void WavData::divideIntoWords() {
 
 	// Let's use Moving Average value to avoid spikes
 	unsigned short maShift = MOVING_AVERAGE_SIZE / 2;
-	maAvg = maMin = frames->at(0)->calcRMS();
-	lenght_t iFrame;
+	maAvg = maMin = frames->at(0)->calcRms();
+	length_t iFrame;
 	for (iFrame = maShift; iFrame < frames->size() - maShift; ++iFrame) {
 
 		ma = 0;
 		for (unsigned short iMa = iFrame - maShift; iMa <= iFrame + maShift; iMa++) {
-			ma += frames->at(iMa)->calcRMS();
+			ma += frames->at(iMa)->calcRms();
 		}
 		ma /= MOVING_AVERAGE_SIZE;
 		frames->at(iFrame)->setMaRms(ma);
@@ -196,55 +196,94 @@ void WavData::divideIntoWords() {
 		maAvg += ma;
 	}
 	maAvg /= iFrame;
+	this->maRmsMax = maMax;
 
 	// A little hack to calculate bound values
-	for (lenght_t iFrame = 0; iFrame < maShift; ++iFrame) {
-		frames->at(iFrame)->setMaRms(frames->at(iFrame)->calcRMS());
-		frames->at(frames->size() - 1 - iFrame)->setMaRms(frames->at(frames->size() - 1 - iFrame)->calcRMS());
+	for (length_t iFrame = 0; iFrame < maShift; ++iFrame) {
+		frames->at(iFrame)->setMaRms(frames->at(iFrame)->calcRms());
+		frames->at(frames->size() - 1 - iFrame)->setMaRms(
+				frames->at(frames->size() - 1 - iFrame)->calcRms());
 	}
 
 	// Tries to guess the best threshold value
 	double thresholdCandidate = getThresholdCandidate(maMin, maAvg, maMax);
+	this->wordsThreshold = thresholdCandidate;
 
 	// If max value greater than min value more then 50% then we have the "silence" threshold.
-	// Otherwise, let's think that we have only one world.
+	// Otherwise, let's think that we have only one word.
 	double threshold = 0;
 	if (maMax * 0.5 > maMin) {
 		threshold = thresholdCandidate;
 
-		// TODO Find a way to prevent splitting word into two parts.
-		// Actually, MA is supposed to resolve the "subsidence" problem... but seems it doesn't work as I wanted :(
-		// Can we combine two standing together words?
-
 		// Divide frames into words
-		std::vector<Frame*>* wordFrames = 0;
+		long firstFrameInCurrentWordNumber = -1;
+		vector<Frame*>::const_iterator firstFrame;
+		vector<Frame*>::const_iterator lastFrame;
+		Word* lastWord = 0;
 		for (vector<Frame*>::const_iterator frame = frames->begin();
 				frame != frames->end(); ++frame) {
 
 			// Got a sound
 			if ((*frame)->getMaRms() > threshold) {
 
-				if (!wordFrames) {
-					wordFrames = new std::vector<Frame*>;
+				if (-1 == firstFrameInCurrentWordNumber) {
+					firstFrameInCurrentWordNumber = (*frame)->getNumber();
+					DEBUG("Word started at frame %d", firstFrameInCurrentWordNumber);
 				}
-				wordFrames->push_back(*frame);
 
 			// Got silence
 			} else {
-				if (wordFrames) {
+				if (firstFrameInCurrentWordNumber >= 0) {
 
-					if (wordFrames->size() > FRAMES_PER_WORD_MIN) {
-						Word* word = new Word(wordFrames);
-						this->words->push_back(word);
-
-					} else {
-						delete wordFrames;
+					// Let's find distance between start of the current word and end of the previous word
+					length_t distance = 0;
+					if (0 != lastWord) {
+						Frame* lastFrameInPreviousWord = lastWord->getFrames()->at(
+								lastWord->getFrames()->size() - 1);
+						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWord->getNumber();
 					}
 
-					wordFrames = 0;
+					// We have a new word
+					if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
+
+						firstFrame = frames->begin() + firstFrameInCurrentWordNumber;
+						lastFrame =	frames->begin() + (*frame)->getNumber();
+
+						std::vector<Frame*>* extendedFrames = new std::vector<Frame*>(
+								firstFrame, lastFrame);
+						lastWord = new Word(extendedFrames);
+
+						this->words->push_back(lastWord);
+						DEBUG("Word finished at frame %d", (*frame)->getNumber());
+
+					// We need to add the current word to the previous one
+					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
+						firstFrame = frames->begin() + (*lastWord->getFrames()->begin())->getNumber();
+						lastFrame =	frames->begin() + (*frame)->getNumber();
+
+						std::vector<Frame*>* extendedFrames = new std::vector<Frame*>(
+								firstFrame, lastFrame);
+						lastWord = new Word(extendedFrames);
+
+						this->words->pop_back();
+						this->words->push_back(lastWord);
+
+						DEBUG("Word finished at frame %d and added to previous one", frame - frames->begin());
+					}
+
+					firstFrameInCurrentWordNumber = -1;
 				}
 			}
 		}
+
+		// Clean up short words
+		for (vector<Word*>::iterator word = this->words->begin();
+				word != this->words->end(); ++word) {
+			if ((*word)->getFramesCount() < WORD_MIN_SIZE) {
+				this->words->erase(word);
+			}
+		}
+
 
 	// Seems we have only one word
 	} else {
@@ -256,9 +295,7 @@ void WavData::divideIntoWords() {
  * Determination of silence threshold
  *
  * Method divides data into 3 clusters (using something like k-means algorithm).
- * The cluster center of "Min" cluster is used as threshold candidate.
- *
- * // TODO Optimize clustering logic
+ * The cluster center of "Min" cluster is used as a threshold candidate.
  */
 double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) {
 	short currIter = 0, maxIterCnt = 30;
@@ -269,6 +306,7 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 	double minClusterCenterNew = 0;
 	std::vector<Frame*>* minCluster = new std::vector<Frame*>();
 
+	// TODO May be maAvg will serve better?
 	double avgClusterCenter = maMax / 2;
 	double avgClusterCenterNew = 0;
 	std::vector<Frame*>* avgCluster = new std::vector<Frame*>();
@@ -299,12 +337,12 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 	// Iterate
 	while (currIter < maxIterCnt && isCenterChanged) {
 
-		cout << "Min center: " << minClusterCenter << ", size:" << minCluster->size() << endl;
-		cout << "Avg center: " << avgClusterCenter << ", size:" << avgCluster->size() << endl;
-		cout << "Max center: " << maxClusterCenter << ", size:" << maxCluster->size() << endl;
-		cout << "_" << endl;
+		DEBUG("Min center: %f, size: %d", minClusterCenter, minCluster->size());
+		DEBUG("Avg center: %f, size: %d", avgClusterCenter, avgCluster->size());
+		DEBUG("Max center: %f, size: %d", maxClusterCenter, maxCluster->size());
+		DEBUG("_");
 
-		// Calculates new cluster centres
+		// Calculates new cluster centers
 		if (minCluster->size() > 0) {
 			minClusterCenterNew = minCluster->at(0)->getMaRms();
 
@@ -384,7 +422,7 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 	}
 
 	double thresholdCandidate = minClusterCenter;
-	cout << "Threshold candidate: " << thresholdCandidate << endl;
+	DEBUG("Threshold candidate: %f", thresholdCandidate);
 
 	delete minCluster;
 	delete avgCluster;
@@ -396,7 +434,7 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 void WavData::saveToFile(const std::string& file, const Word& word) const {
 
 	// number of data bytes in the resulting wave file
-	unsigned int waveSize = word.getFrames().size() * (1 - FRAME_OVERLAP) * sizeof(raw_t);
+	unsigned int waveSize = word.getFrames()->size() * (1 - FRAME_OVERLAP) * sizeof(raw_t);
 	unsigned int samplesPerNonOverlap =
 			static_cast<unsigned int>(samplesPerFrame * (1 - FRAME_OVERLAP));
 
@@ -423,10 +461,10 @@ void WavData::saveToFile(const std::string& file, const Word& word) const {
 	raw_t* data = new raw_t[waveSize / sizeof(raw_t)];
 
 	int frameNumber = 0;
-	for (vector<Frame*>::const_iterator frame = word.getFrames().begin();
-			frame != word.getFrames().end(); ++frame) {
+	for (vector<Frame*>::const_iterator frame = word.getFrames()->begin();
+			frame != word.getFrames()->end(); ++frame) {
 
-		for (lenght_t i = 0; i < samplesPerNonOverlap; i++) {
+		for (length_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
 					this->rawData->at((*frame)->getStart() + i);
 		}

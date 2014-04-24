@@ -1,10 +1,8 @@
-/*
- * A simple instrument for data visualization
- */
 #ifndef PNG_DRAWER_H_
 #define PNG_DRAWER_H_
 
 #include <string>
+#include "../common.h"
 #include "../audio/audio.h"
 #include "../audio/WavData.h"
 
@@ -12,7 +10,7 @@ namespace wtm {
 namespace visual {
 
 /**
- * Draw PNG visualization for the data
+ * Simple instrument for data visualization
  * <p>
  * Uses libpng library.
  * @see http://www.libpng.org/pub/png/book/

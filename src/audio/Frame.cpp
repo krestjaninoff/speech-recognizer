@@ -4,14 +4,14 @@
 namespace wtm {
 namespace audio {
 
-	Frame::Frame(const std::vector<raw_t>& source, lenght_t start, lenght_t finish):
-		source(source), start(start), finish(finish), maRms(0) {
+	Frame::Frame(length_t number, const std::vector<raw_t>& source, length_t start, length_t finish):
+		number(number), source(source), start(start), finish(finish), maRms(0) {
 	}
 
-	double Frame::calcRMS() const {
+	double Frame::calcRms() const {
 		double value = 0;
 
-		for (lenght_t i = start; i < finish; i++) {
+		for (length_t i = start; i < finish; i++) {
 			value += source.at(i) * source.at(i);
 		}
 		value /= (finish - start);
