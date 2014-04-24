@@ -434,9 +434,9 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 void WavData::saveToFile(const std::string& file, const Word& word) const {
 
 	// number of data bytes in the resulting wave file
-	unsigned int waveSize = word.getFrames()->size() * (1 - FRAME_OVERLAP) * sizeof(raw_t);
 	unsigned int samplesPerNonOverlap =
 			static_cast<unsigned int>(samplesPerFrame * (1 - FRAME_OVERLAP));
+	unsigned int waveSize = word.getFrames()->size() * samplesPerNonOverlap * sizeof(raw_t);
 
 	// prepare a new header and write it to file stream
 	WavHeader headerNew;
@@ -448,9 +448,9 @@ void WavData::saveToFile(const std::string& file, const Word& word) const {
 	headerNew.audioFormat = this->header.audioFormat;
 	headerNew.numOfChan = 1;
 	headerNew.samplesPerSec = this->header.samplesPerSec;
-	headerNew.bytesPerSec = this->header.samplesPerSec * sizeof(raw_t) / 8;
-	headerNew.blockAlign = sizeof(raw_t) / 8;
-	headerNew.bitsPerSample = sizeof(raw_t);
+	headerNew.bytesPerSec = this->header.samplesPerSec * sizeof(raw_t);
+	headerNew.blockAlign = sizeof(raw_t);
+	headerNew.bitsPerSample = sizeof(raw_t) * 8;
 	strncpy(headerNew.data, this->header.data, 4);
 	headerNew.subchunk2Size = waveSize;
 
@@ -467,6 +467,9 @@ void WavData::saveToFile(const std::string& file, const Word& word) const {
 		for (length_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
 					this->rawData->at((*frame)->getStart() + i);
+
+			DEBUG("Frame %d (%d): %d", frameNumber,
+					(*frame)->getStart() + i, this->rawData->at((*frame)->getStart() + i));
 		}
 
 		frameNumber++;

@@ -18,7 +18,7 @@ namespace audio {
 	/**
 	 * Raw audio data type
 	 */
-	typedef int32_t raw_t;
+	typedef int16_t raw_t;
 
 	/**
 	 * Raw audio data type

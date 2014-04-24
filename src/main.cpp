@@ -22,12 +22,12 @@ void saveWords(audio::WavDataPtr wavData);
 
 int main() {
 
-	string sampleFile = "samples/male1.wav";
+	string sampleFile = "samples/female1.wav";
 	audio::WavDataPtr wavData = audio::WavData::readFromFile(sampleFile);
 	wavData->init();
 
-	draw(wavData);
-	//saveWords(wavData);
+	//draw(wavData);
+	saveWords(wavData);
 
 	DEBUG("!!!\nProgram completed successfully\n!!!");
 	return EXIT_SUCCESS;
@@ -48,12 +48,10 @@ void saveWords(audio::WavDataPtr wavData) {
 	for (vector<Word*>::const_iterator word = wavData->getWords().begin();
 			word != wavData->getWords().end(); ++word) {
 
-		DEBUG("%d: %d", counter++, (*word)->getFrames()->size());
+		string fileName = "sampleFile." + toString(counter) + ".wav";
+		cout << fileName << endl;
 
-		//string fileName(sampleFile);
-		//fileName + "." + toString(counter) + ".wav";
-		//cout << fileName << endl;
-
-		//wavData->saveToFile(fileName, *(*word));
+		wavData->saveToFile(fileName, *(*word));
+		counter++;
 	}
 }
