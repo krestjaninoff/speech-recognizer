@@ -54,7 +54,7 @@ namespace audio {
 	 * <p>
 	 * Let's put that minimal distance between two words is 50% of minimal size of word
 	 */
-	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.50;
+	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.70;
 
 } // namespace audio
 } // namespace wtm

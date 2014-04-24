@@ -96,6 +96,7 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 	unsigned long sampleNumber = 0;
 	for (; sampleNumber < numberOfSamplesXChannels && !fs.eof(); sampleNumber++) {
 
+		// TODO Should we match 8 bit values to 16 bit? Vice versa?
 		if (8 == wavHeader.bitsPerSample) {
 			if (1 == wavHeader.numOfChan) {
 				fs.read((char*)(&value8), sizeof(uint8_t));
@@ -421,7 +422,7 @@ double WavData::getThresholdCandidate(double maMin, double maAvg, double maMax) 
 		currIter++;
 	}
 
-	double thresholdCandidate = minClusterCenter;
+	double thresholdCandidate = minClusterCenter / 2;
 	DEBUG("Threshold candidate: %f", thresholdCandidate);
 
 	delete minCluster;

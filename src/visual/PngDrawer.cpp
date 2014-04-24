@@ -41,6 +41,7 @@ void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 
 		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
+		y = imgHeight - y - 1;
 
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
@@ -83,6 +84,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 
 		uint32_t y = ((*frame)->getMaRms()) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
+		y = imgHeight - y - 1;
 
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
@@ -98,6 +100,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 
 	// Draw word threshold
 	uint32_t thresholdY = (wavData->getWordsThreshold()) * (imgHeight - 1) / yMax;
+	thresholdY = imgHeight - thresholdY - 1;
 	for (length_t x = 0; x < imgWidth; x++) {
 		image[x + thresholdY * imgWidth] = 3;
 	}

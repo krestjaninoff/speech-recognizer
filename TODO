@@ -3,11 +3,12 @@ TODO:
 * Refactor visualization module
 ** raw data, rms, maRms;
 ** highlight words;
-** threshold line
-
-* Save words on FS
+** threshold line;
 
 * Refactor WavData class (it's too big)
+
+
+* Add console control module
 
 * MFCC transformation
 
