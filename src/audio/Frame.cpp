@@ -4,11 +4,19 @@
 namespace wtm {
 namespace audio {
 
-	Frame::Frame(length_t number, const std::vector<raw_t>& source, length_t start, length_t finish):
-		number(number), source(source), start(start), finish(finish), maRms(0) {
+	Frame::Frame(length_t id):
+		id(id), rms(0), maRms(0) {
 	}
 
-	double Frame::calcRms() const {
+	void Frame::init(const std::vector<raw_t>& source, length_t start, length_t finish) {
+
+		this->calcRms(source, start, finish);
+		this->calcMFCC(source, start, finish);
+
+		this->maRms = this->rms;
+	}
+
+	void Frame::calcRms(const std::vector<raw_t>& source, length_t start, length_t finish) {
 		double value = 0;
 
 		for (length_t i = start; i < finish; i++) {
@@ -16,7 +24,11 @@ namespace audio {
 		}
 		value /= (finish - start);
 
-		return sqrt(value);
+		this->rms = sqrt(value);
+	}
+
+	void Frame::calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish) {
+		// TODO Implement me
 	}
 
 } /* namespace audio */

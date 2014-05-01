@@ -12,8 +12,11 @@ add_subdirectory(audio)
 
 include_directories(visual)
 add_subdirectory(visual)
+
+include_directories(command)
+add_subdirectory(command)
                        
 add_executable(main ${SOURCE})
-target_link_libraries(main audio visual)
+target_link_libraries(main audio visual command)
 
 file(COPY ${CMAKE_SOURCE_DIR}/../samples DESTINATION .)

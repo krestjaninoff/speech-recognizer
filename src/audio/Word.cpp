@@ -3,13 +3,9 @@
 namespace wtm {
 namespace audio {
 
-	Word::Word(const std::vector<Frame*>* frames) {
-		this->frames = frames;
+	Word::Word(length_t id) {
+		this->id = id;
 		this->text = "";
-	}
-
-	length_t Word::getFramesCount() const {
-		return std::distance(this->frames->begin(), this->frames->end());
 	}
 
 } /* namespace audio */

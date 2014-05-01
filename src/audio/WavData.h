@@ -8,8 +8,8 @@
  * @see https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
  * @see https://code.google.com/p/aquila/source
  */
-#ifndef WAV_READER_H_
-#define WAV_READER_H_
+#ifndef WAV_DATA_H_
+#define WAV_DATA_H_
 
 #include <string>
 #include <vector>
@@ -21,7 +21,7 @@ namespace wtm {
 namespace audio {
 
 /**
- * WAV header structure
+ * WAV header
  */
 struct WavHeader {
     char               riff[4];        // RIFF Header
@@ -43,7 +43,6 @@ struct WavHeader {
 };
 
 class WavData;
-typedef std::auto_ptr<WavData> WavDataPtr;
 
 /**
  * WAV data
@@ -55,18 +54,9 @@ public:
 		if (this->rawData) {
 			delete this->rawData;
 		}
-
-		if (this->frames) {
-			delete this->frames;
-		}
-
-		if (this->words) {
-			delete this->words;
-		}
 	}
 
-	static WavDataPtr readFromFile(const std::string& file);
-	void init();
+	static WavData* readFromFile(const std::string& file);
 
 	length_t getNumberOfSamples() const { return numberOfSamples; }
 	void setNumberOfSamples(length_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
@@ -77,59 +67,31 @@ public:
 	raw_t getMinVal() const { return minVal; }
 	void setMinVal(raw_t minVal) { this->minVal = minVal; }
 
-	double getWordsThreshold() const { return this->wordsThreshold; }
-	double getMaRMSMax() const { return this->maRmsMax; }
-
 	const WavHeader& getHeader() const { return header; }
-	const std::vector<raw_t>& getRawData() const { return *rawData; }
-	const std::vector<Frame*>& getFrames() const { return *frames; }
-	const std::vector<Word*>& getWords() const { return *words; }
-
-	bool isPartOfWord(const Frame* frame) const;
-
-	void saveToFile(const std::string& file, const Word& word) const;
+	const std::vector<raw_t>* getRawData() const { return rawData; }
 
 private:
 	WavHeader               header;
-
 	std::vector<raw_t>*     rawData;
+
 	raw_t                   maxVal;
 	raw_t                   minVal;
 	length_t                numberOfSamples;
 
-	std::vector<Frame*>*    frames;
-	length_t                samplesPerFrame;
-
-	std::vector<Word*>*     words;
-	raw_t					maRmsMax;
-	double                 wordsThreshold;
-
 	WavData(WavHeader header) {
 		this->header = header;
-
 		this->rawData = new std::vector<raw_t>;
+
 		this->maxVal = 0;
 		this->minVal = 0;
 		this->numberOfSamples = 0;
-
-		this->frames = new std::vector<Frame*>;
-		this->samplesPerFrame = 0;
-
-		this->words = new std::vector<Word*>;
-		this->maRmsMax = 0;
-		this->wordsThreshold = 0;
 	}
 
 	static void checkHeader(const WavHeader& wav_header);
 	static void readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
-
-	void divideIntoFrames();
-
-	double getThresholdCandidate(double min, double avg, double max);
-	void divideIntoWords();
 };
 
 } // namespace audio
 } // namespace wtm
 
-#endif /* WAV_READER_H_ */
+#endif /* WAV_DATA_H_ */

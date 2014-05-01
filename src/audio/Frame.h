@@ -14,16 +14,25 @@ namespace audio {
 class Frame {
 
 public:
+	/**
+	 * Create a frame
+	 */
+	Frame(length_t id);
 
 	/**
-	 * Create a frame based on a part of wave data
+	 * Init the frame using a part of wave data
 	 */
-	Frame(length_t number, const std::vector<raw_t>& source, length_t start, length_t finish);
+	void init(const std::vector<raw_t>& source, length_t start, length_t finish);
 
 	/**
-	 * Calculate Root Mean Square for the frame
+	 * Get frame's serial number
 	 */
-	double calcRms() const;
+	length_t getId() const { return this->id; }
+
+	/**
+	 * Get Root Mean Square
+	 */
+	double getRms() const { return rms; }
 
 	/**
 	 * Get Moving Average value of RMS
@@ -32,34 +41,22 @@ public:
 	void setMaRms(double maRms) { this->maRms = maRms; }
 
 	/**
-	 * Get frame's serial number
+	 * Get Mel-frequency cepstral coefficients
+	 * @see http://habrahabr.ru/post/140828/
 	 */
-	length_t getNumber() const { return this->number; }
+	const double* getMFCC() const { return mfcc; }
 
-	length_t getStart() const { return this->start; }
-	length_t getFinish() const { return this->finish; }
 
 private:
+	const length_t id;
 
-	/**
-	 * Reference to the source (wav data)
-	 */
-	const std::vector<raw_t>& source;
-
-	/**
-	 * First and last sample of this frame
-	 */
-	const length_t start, finish;
-
-	/**
-	 * Index (serial) number
-	 */
-	const length_t number;
-
-	/**
-	 * Moving average RMS
-	 */
+	double rms;
 	double maRms;
+
+	double mfcc[8];
+
+	void calcRms(const std::vector<raw_t>& source, length_t start, length_t finish);
+	void calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish);
 };
 
 } /* namespace audio */

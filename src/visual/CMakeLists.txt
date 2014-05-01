@@ -4,7 +4,7 @@ project(visual)
 set(LIBPNG_MIN_VERSION "1.2.37")
 
 set(SOURCE
-   PngDrawer.cpp
+   Painter.cpp
 )
 
 add_library(visual STATIC ${SOURCE})

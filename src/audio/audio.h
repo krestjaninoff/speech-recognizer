@@ -1,4 +1,4 @@
-/*
+/**
  * Common objects for work with audio
  */
 

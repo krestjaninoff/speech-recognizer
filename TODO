@@ -1,17 +1,11 @@
 TODO:
 
-* Refactor visualization module
-** raw data, rms, maRms;
-** highlight words;
-** threshold line;
-
-* Refactor WavData class (it's too big)
-
-
-* Add console control module
+* Refactoring of Painter
 
 * MFCC transformation
+* Add console control module
 
+* HMM stuff
 
 
 Dinctionary:

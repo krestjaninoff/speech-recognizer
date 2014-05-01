@@ -2,7 +2,7 @@
 #include "png.h"
 #include "assert.h"
 #include <iostream>
-#include "PngDrawer.h"
+#include "Painter.h"
 #include "Frame.h"
 
 using namespace std;
@@ -12,16 +12,17 @@ namespace wtm {
 namespace visual {
 
 /**
- * Draw PNG visualization of raw data
+ * Draw visualization of raw data
  */
-void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
+void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
 
 	uint32_t imgWidth = IMAGE_WIDTH;
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
-	uint32_t xMax = wavData->getNumberOfSamples();
-	uint32_t yCorrection = wavData->getMinVal() < 0 ? -wavData->getMinVal() : 0;
-	uint32_t yMax = wavData->getMaxVal() + yCorrection;
+	uint32_t xMax = splitter->getWavData()->getNumberOfSamples();
+	uint32_t yCorrection = splitter->getWavData()->getMinVal() < 0 ?
+			-splitter->getWavData()->getMinVal() : 0;
+	uint32_t yMax = splitter->getWavData()->getMaxVal() + yCorrection;
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -32,8 +33,8 @@ void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (vector<raw_t>::const_iterator yCurr = wavData->getRawData().begin();
-			yCurr != wavData->getRawData().end(); ++yCurr) {
+	for (vector<raw_t>::const_iterator yCurr = splitter->getWavData()->getRawData()->begin();
+			yCurr != splitter->getWavData()->getRawData()->end(); ++yCurr) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
@@ -55,15 +56,15 @@ void PngDrawer::drawRawData(const WavDataPtr wavData, const string& file) {
 }
 
 /**
- * Draw PNG visualization of frames
+ * Draw visualization of frames
  */
-void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
+void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 
 	uint32_t imgWidth = IMAGE_WIDTH;
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
-	uint32_t xMax = wavData->getFrames().size();
-	uint32_t yMax = wavData->getMaRMSMax();
+	uint32_t xMax = splitter->getFrames()->size();
+	uint32_t yMax = splitter->getMaRMSMax();
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -75,8 +76,8 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 
 	// Draw maRMS for frames
 	uint32_t xCurr = 0;
-	for (vector<Frame*>::const_iterator frame = wavData->getFrames().begin();
-			frame != wavData->getFrames().end(); ++frame) {
+	for (vector<Frame*>::const_iterator frame = splitter->getFrames()->begin();
+			frame != splitter->getFrames()->end(); ++frame) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
@@ -89,7 +90,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
-		if (wavData->isPartOfWord(*frame)) {
+		if (splitter->isPartOfAWord(*frame)) {
 			image[index] = 2;
 		} else {
 			image[index] = 1;
@@ -99,7 +100,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 	}
 
 	// Draw word threshold
-	uint32_t thresholdY = (wavData->getWordsThreshold()) * (imgHeight - 1) / yMax;
+	uint32_t thresholdY = (splitter->getWordsThreshold()) * (imgHeight - 1) / yMax;
 	thresholdY = imgHeight - thresholdY - 1;
 	for (length_t x = 0; x < imgWidth; x++) {
 		image[x + thresholdY * imgWidth] = 3;
@@ -109,7 +110,7 @@ void PngDrawer::drawFrames(const WavDataPtr wavData, const string& file) {
 	free(image);
 }
 
-int PngDrawer::writeImage(const char* filename, uint8_t* image, uint32_t width, uint32_t height) {
+int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, uint32_t height) {
 	int code = 0;
 	FILE *fp;
 	png_structp png_ptr;

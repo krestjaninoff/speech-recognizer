@@ -13,11 +13,10 @@ namespace audio {
 class Word {
 
 public:
-
 	/**
 	 * Create a word based on set of frames
 	 */
-	Word(const std::vector<Frame*>* frames);
+	Word(length_t id);
 
 	/**
 	 * Text meaning of the word
@@ -25,20 +24,10 @@ public:
 	const std::string& getText() const { return text; };
 	void setText(const std::string& text) { this->text = text; }
 
-	/**
-	 * Get word's frames
-	 */
-	const std::vector<Frame*>* getFrames() const { return frames; }
-
-	/**
-	 * Current word length in frames
-	 */
-	length_t getFramesCount() const;
 
 private:
-
-	const std::vector<Frame*>* frames;
-	std::string                 text;
+	length_t id;
+	std::string text;
 };
 
 } /* namespace audio */
