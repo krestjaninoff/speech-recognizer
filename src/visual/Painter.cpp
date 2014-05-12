@@ -90,7 +90,7 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
-		if (splitter->isPartOfAWord(*frame)) {
+		if (splitter->isPartOfAWord(**frame)) {
 			image[index] = 2;
 		} else {
 			image[index] = 1;

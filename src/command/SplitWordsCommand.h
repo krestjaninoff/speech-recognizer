@@ -34,7 +34,7 @@ public:
 		for (vector<Word*>::const_iterator word = splitter->getWords()->begin();
 				word != splitter->getWords()->end(); ++word) {
 
-			string fileName = "sampleFile." + toString(counter) + ".wav";
+			string fileName = outputFolder + "/sampleFile." + toString(counter) + ".wav";
 			cout << fileName << endl;
 
 			splitter->saveWordAsAudio(fileName, *(*word));
@@ -44,7 +44,7 @@ public:
 
 private:
 	const string& outputFolder;
-	static const string& outputDefault = "out";
+	const string outputDefault = "out";
 };
 
 } /* namespace command */

@@ -40,7 +40,7 @@ void Splitter::divideIntoFrames() {
 		(getWavData()->getHeader().subchunk2Size / (getWavData()->getHeader().bitsPerSample / 8))
 			/ samplesPerNonOverlap;
 
-	frames->reserve(framesCount);
+	this->frames->reserve(framesCount);
 
 	length_t indexBegin = 0, indexEnd = 0;
 	for (length_t frameId = 0, size = getWavData()->getRawData()->size(); frameId < framesCount;
@@ -52,7 +52,7 @@ void Splitter::divideIntoFrames() {
 
 			Frame* frame = new Frame(frameId);
 			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd);
-			frames->push_back(frame);
+			(*frames)[frameId] = frame;
 			frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
 		} else {
 			break;
@@ -107,14 +107,13 @@ void Splitter::divideIntoWords() {
 	// If max value greater than min value more then 50% then we have the "silence" threshold.
 	// Otherwise, let's think that we have only one word.
 	double threshold = 0;
+	length_t wordId = 0;
+
 	if (maMax * 0.5 > maMin) {
 		threshold = thresholdCandidate;
 
 		// Divide frames into words
-		length_t wordId = 0;
 		long firstFrameInCurrentWordNumber = -1;
-		vector<Frame*>::const_iterator firstFrame;
-		vector<Frame*>::const_iterator lastFrame;
 		Word* lastWord = 0;
 		for (vector<Frame*>::const_iterator frame = frames->begin();
 				frame != frames->end(); ++frame) {
@@ -124,7 +123,7 @@ void Splitter::divideIntoWords() {
 
 				if (-1 == firstFrameInCurrentWordNumber) {
 					firstFrameInCurrentWordNumber = (*frame)->getId();
-					DEBUG("Word started at frame %d", firstFrameInCurrentWordNumber);
+					DEBUG("Word started at frame %d", (int) firstFrameInCurrentWordNumber);
 				}
 
 			// Got silence
@@ -134,16 +133,16 @@ void Splitter::divideIntoWords() {
 					// Let's find distance between start of the current word and end of the previous word
 					length_t distance = 0;
 					if (0 != lastWord) {
-						Frame* lastFrameInPreviousWord = lastWord->getFrames()->at(
-								lastWord->getFrames()->size() - 1);
-						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWord->getId();
+
+						length_t lastFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).second;
+						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
 					}
 
 					// We have a new word
 					if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
 						lastWord = new Word(wordId++);
 
-						wordToFrames->insert(make_pair(wordId,
+						this->wordToFrames->insert(make_pair(wordId,
 								make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
 						this->words->push_back(lastWord);
 
@@ -155,8 +154,8 @@ void Splitter::divideIntoWords() {
 
 						this->words->pop_back();
 						this->words->push_back(lastWord);
-						wordToFrames->insert(make_pair(wordId,
-								make_pair((*lastWord->getFrames()->begin())->getId(), (*frame)->getId())));
+						this->wordToFrames->insert(make_pair(wordId,
+								make_pair(wordToFrames->at(lastWord->getId()).first, (*frame)->getId())));
 
 						DEBUG("Word finished at frame %d and added to previous one", frame - frames->begin());
 					}
@@ -169,7 +168,7 @@ void Splitter::divideIntoWords() {
 		// Clean up short words
 		for (vector<Word*>::iterator word = this->words->begin();
 				word != this->words->end(); ++word) {
-			if ((*word)->getFramesCount() < WORD_MIN_SIZE) {
+			if (getFramesCount(**word) < WORD_MIN_SIZE) {
 				this->words->erase(word);
 			}
 		}
@@ -177,7 +176,10 @@ void Splitter::divideIntoWords() {
 
 	// Seems we have only one word
 	} else {
-		this->words->push_back(new Word(this->frames));
+
+		this->words->push_back(new Word(wordId));
+		this->wordToFrames->insert(make_pair(wordId,
+				make_pair(frames->at(0)->getId(), frames->at(frames->size() - 1)->getId())));
 	}
 }
 
@@ -188,6 +190,7 @@ void Splitter::divideIntoWords() {
  * The cluster center of "Min" cluster is used as a threshold candidate.
  */
 double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax) {
+	UNUSED(maAvg);
 	short currIter = 0, maxIterCnt = 30;
 	bool isCenterChanged = true;
 
@@ -196,7 +199,7 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 	double minClusterCenterNew = 0;
 	std::vector<Frame*>* minCluster = new std::vector<Frame*>();
 
-	// TODO May be maAvg will serve better?
+	// Just an empirical solution
 	double avgClusterCenter = maMax / 2;
 	double avgClusterCenterNew = 0;
 	std::vector<Frame*>* avgCluster = new std::vector<Frame*>();
@@ -321,12 +324,12 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 	return thresholdCandidate;
 }
 
-void Splitter::saveToFile(const std::string& file, const Word& word) const {
+void Splitter::saveWordAsAudio(const std::string& file, const Word& word) const {
 
 	// number of data bytes in the resulting wave file
 	unsigned int samplesPerNonOverlap =
 			static_cast<unsigned int>(samplesPerFrame * (1 - FRAME_OVERLAP));
-	unsigned int waveSize = word.getFrames()->size() * samplesPerNonOverlap * sizeof(raw_t);
+	unsigned int waveSize = getFramesCount(word) * samplesPerNonOverlap * sizeof(raw_t);
 
 	// prepare a new header and write it to file stream
 	WavHeader headerNew;
@@ -351,15 +354,17 @@ void Splitter::saveToFile(const std::string& file, const Word& word) const {
 	raw_t* data = new raw_t[waveSize / sizeof(raw_t)];
 
 	int frameNumber = 0;
-	for (vector<Frame*>::const_iterator frame = word.getFrames()->begin();
-			frame != word.getFrames()->end(); ++frame) {
+	length_t frameStart = -1;
+	for (length_t currentFrame = wordToFrames->at(word.getId()).first;
+			currentFrame <= wordToFrames->at(word.getId()).second; currentFrame++) {
+		frameStart = this->frameToRaw->at(currentFrame).first;
 
 		for (length_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
-					this->rawData->at((*frame)->getStart() + i);
+					this->wavData->getRawData()->at(frameStart + i);
 
 			DEBUG("Frame %d (%d): %d", frameNumber,
-					(*frame)->getStart() + i, this->rawData->at((*frame)->getStart() + i));
+					frameStart + i, this->wavData->getRawData()->at(frameStart + i));
 		}
 
 		frameNumber++;
@@ -370,17 +375,13 @@ void Splitter::saveToFile(const std::string& file, const Word& word) const {
 	delete [] data;
 }
 
-bool Splitter::isPartOfAWord(const Frame* frame) const {
+bool Splitter::isPartOfAWord(const Frame& frame) const {
 	bool isPartOfWord = false;
 
-	for (vector<Word*>::const_iterator word = this->words->begin();
-			word != this->words->end(); ++word) {
+	for (std::map<length_t, std::pair<length_t, length_t> >::const_iterator word = this->wordToFrames->begin();
+			word != this->wordToFrames->end(); ++word) {
 
-		length_t left = (*(*word)->getFrames()->begin())->getId();
-		length_t right = (*word)->getFrames()->at((*word)->getFrames()->size() - 1)->getId();
-
-		if (left <= frame->getNumber() && frame->getNumber() <= right) {
-
+		if (word->second.first <= frame.getId() && frame.getId() <= word->second.second) {
 			isPartOfWord = true;
 			break;
 		}
@@ -389,8 +390,8 @@ bool Splitter::isPartOfAWord(const Frame* frame) const {
 	return isPartOfWord;
 }
 
-length_t Splitter::getFramesCount() const {
-	return std::distance(this->frames->begin(), this->frames->end());
+length_t Splitter::getFramesCount(const Word& word) const {
+	return wordToFrames->at(word.getId()).second - wordToFrames->at(word.getId()).first;
 }
 
 } /* namespace audio */

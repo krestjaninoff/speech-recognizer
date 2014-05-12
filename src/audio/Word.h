@@ -1,8 +1,7 @@
 #ifndef WORD_H_
 #define WORD_H_
 
-#include <vector>
-#include "Frame.h"
+#include "audio.h"
 
 namespace wtm {
 namespace audio {
@@ -17,6 +16,11 @@ public:
 	 * Create a word based on set of frames
 	 */
 	Word(length_t id);
+
+	/**
+	 * Get frame's serial number
+	 */
+	length_t getId() const { return this->id; }
 
 	/**
 	 * Text meaning of the word

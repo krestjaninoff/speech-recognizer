@@ -1,6 +1,7 @@
 #ifndef SPLITTER_H_
 #define SPLITTER_H_
 
+#include "../common.h"
 #include <vector>
 #include <map>
 #include <utility>
@@ -8,6 +9,7 @@
 #include "WavData.h"
 #include "Frame.h"
 #include "Word.h"
+#include <memory>
 
 namespace wtm {
 namespace audio {
@@ -23,11 +25,11 @@ public:
 		this->wavData = wavData;
 
 		this->frames = new std::vector<Frame*>();
-		this->frameToRaw = new std::map<length_t, std::pair<length_t, length_t>>();
+		this->frameToRaw = new std::map<length_t, std::pair<length_t, length_t> >();
 		this->samplesPerFrame = 0;
 
 		this->words = new std::vector<Word*>();
-		this->wordToFrames = new std::map<length_t, std::pair<length_t, length_t>>();
+		this->wordToFrames = new std::map<length_t, std::pair<length_t, length_t> >();
 		this->maRmsMax = 0;
 		this->wordsThreshold = 0;
 	}
@@ -55,9 +57,8 @@ public:
 	double getWordsThreshold() const { return this->wordsThreshold; }
 	double getMaRMSMax() const { return this->maRmsMax; }
 
-	const std::vector<Frame*>* getFramesOfWord(length_t wordId) const;
-	length_t getFramesCntForWOrd(length_t wordId) const;
-	bool isPartOfAWord(const Frame* frame) const;
+	bool isPartOfAWord(const Frame& frame) const;
+	length_t getFramesCount(const Word& word) const;
 
 	void saveWordAsAudio(const std::string& file, const Word& word) const;
 
@@ -65,11 +66,11 @@ private:
 	WavData* wavData;
 
 	std::vector<Frame*>* frames;
-	std::map<length_t, std::pair<length_t, length_t>>* frameToRaw;
+	std::map<length_t, std::pair<length_t, length_t> >* frameToRaw;
 	length_t samplesPerFrame;
 
 	std::vector<Word*>* words;
-	std::map<length_t, std::pair<length_t, length_t>>* wordToFrames;
+	std::map<length_t, std::pair<length_t, length_t> >* wordToFrames;
 	raw_t maRmsMax;
 	double wordsThreshold;
 
@@ -79,7 +80,8 @@ private:
 	void divideIntoWords();
 };
 
-typedef std::unique_ptr<Splitter> SplitterPtr;
+//typedef std::unique_ptr<Splitter> SplitterPtr;
+typedef Splitter* SplitterPtr;
 
 } /* namespace audio */
 } /* namespace wtm */

@@ -4,9 +4,22 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string>
+#include "../audio/WavData.h"
 
 namespace wtm {
 namespace command {
+
+	/**
+	 * Commands map
+	 */
+	static struct option longOptions[] = {
+		{ "help", no_argument, NULL, 'h' },
+		{ "input", required_argument, NULL, 'i' },
+		{ "draw", optional_argument, NULL, 'd' },
+		{ "split", optional_argument, NULL, 's' },
+		{0, 0, 0, 0}
+	};
+	static const char* const optionsStop = "h:id:is:";
 
 	bool CommandProcessor::process() {
 
@@ -39,7 +52,8 @@ namespace command {
 				break;
 
 			default:
-				abort();
+				cout << "Invalid parameter: " << (char) c << endl;
+				return false;
 			}
 		}
 

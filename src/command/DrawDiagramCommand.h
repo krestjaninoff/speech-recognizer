@@ -25,12 +25,12 @@ public:
 			file = outputFile;
 		}
 
-		Painter::drawFrames(context.splitter, file);
+		Painter::drawFrames(context.splitter, file.c_str());
 	};
 
 private:
 	const string& outputFile;
-	static const string& outputDefault = "diagram.png";
+	const string outputDefault = "diagram.png";
 };
 
 } /* namespace command */

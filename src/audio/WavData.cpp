@@ -122,7 +122,7 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 			minValue = value;
 		}
 
-		wavFile.rawData->push_back(value);
+		(*wavFile.rawData)[sampleNumber] = value;
 	}
 	assert(sampleNumber > 0);
 

@@ -15,6 +15,7 @@ namespace command {
 class HelpCommand : ICommand {
 public:
 	void execute(Context& context) {
+		UNUSED(context);
 
 		cout << "Help info" << endl;
 	};

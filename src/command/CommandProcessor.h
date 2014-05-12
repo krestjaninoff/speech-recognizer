@@ -39,18 +39,6 @@ private:
 	char** argv;
 
 	/**
-	 * Commands map
-	 */
-	static struct option longOptions[] = {
-		{ "help", no_argument, NULL, 'h' },
-		{ "input", required_argument, NULL, 'i' },
-		{ "draw", optional_argument, NULL, 'd' },
-		{ "split", optional_argument, NULL, 's' },
-		{0, 0, 0, 0}};
-
-	static char* optionsStop = "h:id:is:";
-
-	/**
 	 * Current execution context
 	 */
 	Context* context;
