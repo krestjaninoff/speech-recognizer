@@ -29,13 +29,15 @@ WavData* WavData::readFromFile(const std::string& file) {
 	fs.open(file.c_str(), std::ios::in | std::ios::binary);
 
 	if (!fs.good()) {
-		fprintf(stderr, "Can't open the wave file\n");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, "Input file not found\n");
+		return NULL;
 	}
 
 	// Read header
 	fs.read((char*)(&wavHeader), sizeof(WavHeader));
-	checkHeader(wavHeader);
+	if (!checkHeader(wavHeader)) {
+		return NULL;
+	}
 
 	// Read raw data
 	WavData* wavData = new WavData(wavHeader);
@@ -48,35 +50,37 @@ WavData* WavData::readFromFile(const std::string& file) {
 /**
  * Checks a set of restrictions
  */
-void WavData::checkHeader(const WavHeader& wavHeader) {
+bool WavData::checkHeader(const WavHeader& wavHeader) {
 
 	if (0 != strncmp(wavHeader.riff, "RIFF", sizeof(wavHeader.riff))
 			|| 0 != strncmp(wavHeader.wave, "WAVE", sizeof(wavHeader.wave))) {
 		fprintf(stderr, "Invalid RIFF/WAVE format\n");
-		exit(EXIT_FAILURE);
+		return false;
 	}
 
 	if (1 != wavHeader.audioFormat) {
 		fprintf(stderr, "Invalid WAV format: only PCM audio format is supported\n");
-		exit(EXIT_FAILURE);
+		return false;
 	}
 
 	if (wavHeader.numOfChan > 2) {
 		fprintf(stderr, "Invalid WAV format: only 1 or 2 channels audio is supported\n");
-		exit(EXIT_FAILURE);
+		return false;
 	}
 
 	unsigned long bitsPerChannel = wavHeader.bitsPerSample / wavHeader.numOfChan;
 	if (8 != bitsPerChannel && 16 != bitsPerChannel) {
 		fprintf(stderr, "Invalid WAV format: only 8 and 16-bit per channel is supported\n");
-		exit(EXIT_FAILURE);
+		return false;
 	}
 
 	assert(wavHeader.subchunk2Size > 0);
 	if (wavHeader.subchunk2Size > LONG_MAX) {
 		fprintf(stderr, "File too big\n");
-		exit(EXIT_FAILURE);
+		return false;
 	}
+
+	return true;
 }
 
 void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile) {
@@ -122,7 +126,8 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 			minValue = value;
 		}
 
-		(*wavFile.rawData)[sampleNumber] = value;
+		//wavFile.rawData->push_back(value);
+		wavFile.rawData->insert(wavFile.rawData->begin() + sampleNumber, value);
 	}
 	assert(sampleNumber > 0);
 

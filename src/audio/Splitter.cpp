@@ -24,8 +24,8 @@ void Splitter::split() {
 			getWavData()->getHeader().bytesPerSec * FRAME_LENGTH / 1000.0);
 	length_t bytesPerSample = static_cast<uint32_t>(
 			getWavData()->getHeader().bitsPerSample / 8);
-	samplesPerFrame = static_cast<length_t>(bytesPerFrame / bytesPerSample);
-	assert(samplesPerFrame > 0);
+	this->samplesPerFrame = static_cast<length_t>(bytesPerFrame / bytesPerSample);
+	assert(this->samplesPerFrame > 0);
 
 	// The main part of splitting
 	divideIntoFrames();
@@ -35,7 +35,7 @@ void Splitter::split() {
 void Splitter::divideIntoFrames() {
 
 	unsigned int samplesPerNonOverlap =
-		static_cast<unsigned int>(samplesPerFrame * (1 - FRAME_OVERLAP));
+		static_cast<unsigned int>(this->samplesPerFrame * (1 - FRAME_OVERLAP));
 	unsigned int framesCount =
 		(getWavData()->getHeader().subchunk2Size / (getWavData()->getHeader().bitsPerSample / 8))
 			/ samplesPerNonOverlap;
@@ -52,8 +52,9 @@ void Splitter::divideIntoFrames() {
 
 			Frame* frame = new Frame(frameId);
 			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd);
-			(*frames)[frameId] = frame;
-			frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
+
+			this->frames->insert(this->frames->begin() + frameId, frame);
+			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
 		} else {
 			break;
 		}
@@ -70,16 +71,16 @@ void Splitter::divideIntoWords() {
 
 	// Let's use Moving Average value to avoid spikes
 	unsigned short maShift = MOVING_AVERAGE_SIZE / 2;
-	maAvg = maMin = frames->at(0)->getRms();
+	maAvg = maMin = this->frames->at(0)->getRms();
 	length_t iFrame;
-	for (iFrame = maShift; iFrame < frames->size() - maShift; ++iFrame) {
+	for (iFrame = maShift; iFrame < this->frames->size() - maShift; ++iFrame) {
 
 		ma = 0;
 		for (unsigned short iMa = iFrame - maShift; iMa <= iFrame + maShift; iMa++) {
-			ma += frames->at(iMa)->getRms();
+			ma += this->frames->at(iMa)->getRms();
 		}
 		ma /= MOVING_AVERAGE_SIZE;
-		frames->at(iFrame)->setMaRms(ma);
+		this->frames->at(iFrame)->setMaRms(ma);
 
 		if (maMin > ma) {
 			maMin = ma;
@@ -95,9 +96,9 @@ void Splitter::divideIntoWords() {
 
 	// A little hack to calculate bound values
 	for (length_t iFrame = 0; iFrame < maShift; ++iFrame) {
-		frames->at(iFrame)->setMaRms(frames->at(iFrame)->getRms());
-		frames->at(frames->size() - 1 - iFrame)->setMaRms(
-				frames->at(frames->size() - 1 - iFrame)->getRms());
+		this->frames->at(iFrame)->setMaRms(this->frames->at(iFrame)->getRms());
+		this->frames->at(this->frames->size() - 1 - iFrame)->setMaRms(
+				this->frames->at(this->frames->size() - 1 - iFrame)->getRms());
 	}
 
 	// Tries to guess the best threshold value
@@ -107,7 +108,7 @@ void Splitter::divideIntoWords() {
 	// If max value greater than min value more then 50% then we have the "silence" threshold.
 	// Otherwise, let's think that we have only one word.
 	double threshold = 0;
-	length_t wordId = 0;
+	length_t wordId = -1;
 
 	if (maMax * 0.5 > maMin) {
 		threshold = thresholdCandidate;
@@ -115,8 +116,10 @@ void Splitter::divideIntoWords() {
 		// Divide frames into words
 		long firstFrameInCurrentWordNumber = -1;
 		Word* lastWord = 0;
-		for (vector<Frame*>::const_iterator frame = frames->begin();
-				frame != frames->end(); ++frame) {
+
+		DEBUG("_");
+		for (vector<Frame*>::const_iterator frame = this->frames->begin();
+				frame != this->frames->end(); ++frame) {
 
 			// Got a sound
 			if ((*frame)->getMaRms() > threshold) {
@@ -134,44 +137,50 @@ void Splitter::divideIntoWords() {
 					length_t distance = 0;
 					if (0 != lastWord) {
 
-						length_t lastFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).second;
+						length_t lastFrameInPreviousWordNumber = this->wordToFrames->at(lastWord->getId()).second;
 						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
 					}
 
 					// We have a new word
 					if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
-						lastWord = new Word(wordId++);
+						wordId++;
+						lastWord = new Word(wordId);
 
 						this->wordToFrames->insert(make_pair(wordId,
 								make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
 						this->words->push_back(lastWord);
 
-						DEBUG("Word finished at frame %d", (*frame)->getId());
+						DEBUG("We have a word %d (%d-%d)", lastWord->getId(), firstFrameInCurrentWordNumber, (*frame)->getId());
 
 					// We need to add the current word to the previous one
 					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-						lastWord = new Word(wordId);
 
-						this->words->pop_back();
-						this->words->push_back(lastWord);
 						this->wordToFrames->insert(make_pair(wordId,
 								make_pair(wordToFrames->at(lastWord->getId()).first, (*frame)->getId())));
 
-						DEBUG("Word finished at frame %d and added to previous one", frame - frames->begin());
+						DEBUG("Word %d will be extended (%d-%d)", lastWord->getId(),
+								wordToFrames->at(lastWord->getId()).first, (*frame)->getId());
 					}
 
 					firstFrameInCurrentWordNumber = -1;
 				}
 			}
 		}
+		DEBUG("_");
 
 		// Clean up short words
+		DEBUG("_");
 		for (vector<Word*>::iterator word = this->words->begin();
 				word != this->words->end(); ++word) {
+
 			if (getFramesCount(**word) < WORD_MIN_SIZE) {
+				DEBUG("Word %d is too short and will be avoided", (*word)->getId());
+
+				this->wordToFrames->erase((*word)->getId());
 				this->words->erase(word);
 			}
 		}
+		DEBUG("_");
 
 
 	// Seems we have only one word
@@ -209,8 +218,8 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 	std::vector<Frame*>* maxCluster = new std::vector<Frame*>();
 
 	double maRms;
-	for (vector<Frame*>::const_iterator frame = frames->begin();
-		frame != frames->end(); ++frame) {
+	for (vector<Frame*>::const_iterator frame = this->frames->begin();
+		frame != this->frames->end(); ++frame) {
 
 		maRms = (*frame)->getMaRms();
 
@@ -230,10 +239,10 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 	// Iterate
 	while (currIter < maxIterCnt && isCenterChanged) {
 
-		DEBUG("Min center: %f, size: %d", minClusterCenter, minCluster->size());
-		DEBUG("Avg center: %f, size: %d", avgClusterCenter, avgCluster->size());
-		DEBUG("Max center: %f, size: %d", maxClusterCenter, maxCluster->size());
-		DEBUG("_");
+		//DEBUG("Min center: %f, size: %d", minClusterCenter, minCluster->size());
+		//DEBUG("Avg center: %f, size: %d", avgClusterCenter, avgCluster->size());
+		//DEBUG("Max center: %f, size: %d", maxClusterCenter, maxCluster->size());
+		//DEBUG("_");
 
 		// Calculates new cluster centers
 		if (minCluster->size() > 0) {
@@ -293,8 +302,8 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 		avgCluster->clear();
 		maxCluster->clear();
 
-		for (vector<Frame*>::const_iterator frame = frames->begin();
-				frame != frames->end(); ++frame) {
+		for (vector<Frame*>::const_iterator frame = this->frames->begin();
+				frame != this->frames->end(); ++frame) {
 
 			if (fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - avgClusterCenter)
 					&& fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - maxClusterCenter)) {
@@ -328,7 +337,7 @@ void Splitter::saveWordAsAudio(const std::string& file, const Word& word) const 
 
 	// number of data bytes in the resulting wave file
 	unsigned int samplesPerNonOverlap =
-			static_cast<unsigned int>(samplesPerFrame * (1 - FRAME_OVERLAP));
+			static_cast<unsigned int>(this->samplesPerFrame * (1 - FRAME_OVERLAP));
 	unsigned int waveSize = getFramesCount(word) * samplesPerNonOverlap * sizeof(raw_t);
 
 	// prepare a new header and write it to file stream
@@ -355,16 +364,16 @@ void Splitter::saveWordAsAudio(const std::string& file, const Word& word) const 
 
 	int frameNumber = 0;
 	length_t frameStart = -1;
-	for (length_t currentFrame = wordToFrames->at(word.getId()).first;
-			currentFrame <= wordToFrames->at(word.getId()).second; currentFrame++) {
+	for (length_t currentFrame = this->wordToFrames->at(word.getId()).first;
+			currentFrame < this->wordToFrames->at(word.getId()).second; currentFrame++) {
 		frameStart = this->frameToRaw->at(currentFrame).first;
 
 		for (length_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
 					this->wavData->getRawData()->at(frameStart + i);
 
-			DEBUG("Frame %d (%d): %d", frameNumber,
-					frameStart + i, this->wavData->getRawData()->at(frameStart + i));
+			//DEBUG("Frame %d (%d): %d", frameNumber,
+			//		frameStart + i, this->wavData->getRawData()->at(frameStart + i));
 		}
 
 		frameNumber++;
@@ -391,7 +400,8 @@ bool Splitter::isPartOfAWord(const Frame& frame) const {
 }
 
 length_t Splitter::getFramesCount(const Word& word) const {
-	return wordToFrames->at(word.getId()).second - wordToFrames->at(word.getId()).first;
+	 length_t cnt = this->wordToFrames->at(word.getId()).second - this->wordToFrames->at(word.getId()).first;
+	 return cnt;
 }
 
 } /* namespace audio */

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string>
-#include "../audio/WavData.h"
+#include "../common.h"
 
 namespace wtm {
 namespace command {
@@ -13,58 +13,92 @@ namespace command {
 	 * Commands map
 	 */
 	static struct option longOptions[] = {
-		{ "help", no_argument, NULL, 'h' },
-		{ "input", required_argument, NULL, 'i' },
-		{ "draw", optional_argument, NULL, 'd' },
-		{ "split", optional_argument, NULL, 's' },
+		{ "version", no_argument, 0, 'v' },
+		{ "help", no_argument, 0, 'h' },
+		{ "input", required_argument, 0, 'i' },
+		{ "draw", optional_argument, 0, 'd' },
+		{ "split", optional_argument, 0, 's' },
 		{0, 0, 0, 0}
 	};
-	static const char* const optionsStop = "h:id:is:";
+	static const char* const shortOptions = "vhi:d::s::";
+
+	/**
+	 * Help info
+	 */
+	static const char* const helpInfo =	EOL
+		"Usage: wtm [options]" EOL
+		EOL
+		"Options:" EOL
+		"-v, --version \t\t Display version information" EOL
+		"-h, --help \t\t Display help information (this manual)" EOL
+		"-i, --input \t\t Read WAV data for post-processing" EOL
+		"-d<filename>, --draw=<filename> \t Create the RMS diagram based on the WAV data (requires -i) and store into the specified file (file name is optional)" EOL
+		"-s<filename>, --split=<dirname> \t Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
+		EOL
+		"Notice, because of GetOpt restriction you must set optional parameters in the same way which you see in this manual."
+		EOL;
 
 	bool CommandProcessor::process() {
 
-		int c;
-		while (1) {
+		if (argc > 1) {
 
-			int optionIndex = 0;
-			c = getopt_long(argc, argv, optionsStop, longOptions, &optionIndex);
+			bool isLast = false;
+			while (!isLast) {
+				int optionIndex = 0;
+				int c = getopt_long(argc, argv, shortOptions, longOptions, &optionIndex);
 
-			/* Detect the end of the options. */
-			if (c == -1)
-				break;
+				/* Detect the end of the options. */
+				if (c == -1)
+					break;
 
-			switch (c) {
+				switch (c) {
 
-			case 'h':
-				(new HelpCommand())->execute(*this->context);
-				break;
+					case 'v':
+						printVersion();
 
-			case 'i':
-				this->readWavData(optarg);
-				break;
+						isLast = true;
+						break;
 
-			case 'd':
-				(new DrawDiagramCommand(optarg))->execute(*this->context);
-				break;
+					case 'h':
+						printVersion();
+						printHelp();
 
-			case 's':
-				(new SplitWordsCommand(optarg))->execute(*this->context);
-				break;
+						isLast = true;
+						break;
 
-			default:
-				cout << "Invalid parameter: " << (char) c << endl;
-				return false;
+					case 'i':
+						isLast = !(new ReadWavDataCommand(optarg))->execute(*this->context);
+						break;
+
+					case 'd':
+						isLast = !(new DrawDiagramCommand(optarg))->execute(*this->context);
+						break;
+
+					case 's':
+						isLast = !(new SplitWordsCommand(optarg))->execute(*this->context);
+						break;
+
+					default:
+						cout << "Invalid parameter: " << (char) c << endl;
+						cout << "Please, use -h (--help) for details." << (char) c << endl;
+						return false;
+				}
 			}
+
+		} else {
+			cout << "No input parameters specified. Please take a look on the help info for details: " << endl;
+			printHelp();
 		}
 
 		return true;
 	}
 
-	void CommandProcessor::readWavData(const string& source) {
-		//string sampleFile = "samples/female1.wav";
+	void CommandProcessor::printVersion() {
+		cout << PROJECT_NAME << " version " << PROJECT_VERSION << endl;
+	}
 
-		audio::WavData* wavData = audio::WavData::readFromFile(source);
-		this->context->wavData = wavData;
+	void CommandProcessor::printHelp() {
+		cout << helpInfo << endl;
 	}
 
 } /* namespace cpmmand */

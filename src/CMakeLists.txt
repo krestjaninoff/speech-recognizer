@@ -14,7 +14,7 @@ add_subdirectory(visual)
 include_directories(command)
 add_subdirectory(command)
                        
-add_executable(main ${SOURCE})
-target_link_libraries(main command visual audio)
+add_executable(wtm ${SOURCE})
+target_link_libraries(wtm command visual audio)
 
 file(COPY ${CMAKE_SOURCE_DIR}/../samples DESTINATION .)

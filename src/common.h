@@ -12,11 +12,20 @@
 
 namespace wtm {
 
+	// Build information
+
+	#define PROJECT_NAME "WavToMe"
+	#define PROJECT_VERSION "0.0.1"
+
+
+	// Helpers
+
 	#define DEBUG_ENABLED true
 	#define DEBUG(...) if (DEBUG_ENABLED) {fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");}
 
 	#define UNUSED(expr) do { (void)(expr); } while (0)
 
+	#define EOL "\n"
 	#define toString( x ) dynamic_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 

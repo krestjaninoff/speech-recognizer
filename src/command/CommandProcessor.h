@@ -3,9 +3,9 @@
 
 #include <getopt.h>
 #include "ICommand.h"
+#include "ReadWavDataCommand.h"
 #include "DrawDiagramCommand.h"
 #include "SplitWordsCommand.h"
-#include "HelpCommand.h"
 
 namespace wtm {
 namespace command {
@@ -43,10 +43,8 @@ private:
 	 */
 	Context* context;
 
-	/**
-	 * Load an audio file
-	 */
-	void readWavData(const string& source);
+	void printVersion();
+	void printHelp();
 };
 
 } /* namespace command */

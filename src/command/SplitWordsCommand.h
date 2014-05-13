@@ -1,7 +1,12 @@
 #ifndef SPLITWORDSCOMMAND_H_
 #define SPLITWORDSCOMMAND_H_
 
+#include <stdio.h>
 #include <iostream>
+#include <fstream>
+//#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "ICommand.h"
 #include "../audio/Word.h"
 #include "../audio/Splitter.h"
@@ -17,13 +22,33 @@ namespace command {
  */
 class SplitWordsCommand : public ICommand {
 public:
-	SplitWordsCommand(const string& outputFolder) : outputFolder(outputFolder) {};
+	SplitWordsCommand(const char* outputFolder) : outputFolder(outputFolder) {};
 
-	void execute(Context& context) {
+	bool execute(Context& context) {
 		int counter = 1;
+		cout << "Splitting data into separate words..." << endl;
+
+		// Check pre-requirements
+		if (NULL == context.wavData) {
+			cout << "Input data is not specified :(" << endl;
+			return false;
+		}
+
+		// Determine results directory name
+		string folder = outputFolderDefault;
+		if (NULL != outputFolder) {
+			string outputFolderStr(outputFolder);
+			folder = outputFolderStr;
+		}
+		cout << "Output directory is " << folder << "..." << endl;
+
+		// Check if output directory exists or can be created
+		if (!checkOutput(outputFolder)) {
+			return false;
+		}
 
 		// Create the splitter
-		audio::SplitterPtr splitter = audio::SplitterPtr(new Splitter(context.wavData));
+		audio::Splitter* splitter = new Splitter(context.wavData);
 		context.splitter = splitter;
 
 		// Split wav data into words
@@ -34,17 +59,48 @@ public:
 		for (vector<Word*>::const_iterator word = splitter->getWords()->begin();
 				word != splitter->getWords()->end(); ++word) {
 
-			string fileName = outputFolder + "/sampleFile." + toString(counter) + ".wav";
+			string fileName = folder + "/sampleFile." + toString(counter) + ".wav";
 			cout << fileName << endl;
 
 			splitter->saveWordAsAudio(fileName, *(*word));
 			counter++;
 		}
+
+		cout << "Complete!" << endl;
+		return true;
 	};
 
 private:
-	const string& outputFolder;
-	const string outputDefault = "out";
+	const char* outputFolder;
+	const string outputFolderDefault = "out";
+
+	bool checkOutput(const string& outputFolder) {
+
+		// FIXME Compilation error in io.h (MinGW)
+		/*
+		struct stat info;
+
+		if (0 != stat( outputFolder.c_str(), &info )) {
+			int success = mkdir(outputFolder.c_str());
+
+			if (0 != success) {
+				fprintf(stderr, "Directory %s can't be created\n", outputFolder.c_str());
+				return false;
+			} else {
+				return true;
+			}
+
+		} else if (info.st_mode & S_IFDIR) {
+			return true;
+
+		} else {
+			fprintf(stderr, "File %s is not a directory\n", outputFolder.c_str());
+			return false;
+		}
+		*/
+
+		return true;
+	}
 };
 
 } /* namespace command */

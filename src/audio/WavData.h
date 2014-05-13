@@ -87,7 +87,7 @@ private:
 		this->numberOfSamples = 0;
 	}
 
-	static void checkHeader(const WavHeader& wav_header);
+	static bool checkHeader(const WavHeader& wav_header);
 	static void readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
 };
 

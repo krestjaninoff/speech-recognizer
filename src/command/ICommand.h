@@ -18,7 +18,7 @@ public:
 	/**
 	 * The place for command's logic
 	 */
-	virtual void execute(Context& context) = 0;
+	virtual bool execute(Context& context) = 0;
 };
 
 } /* namespace command */

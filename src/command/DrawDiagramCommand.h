@@ -1,6 +1,7 @@
 #ifndef DRAWDIAGRAMCOMMAND_H_
 #define DRAWDIAGRAMCOMMAND_H_
 
+#include <stdio.h>
 #include <string>
 #include "ICommand.h"
 #include "../visual/Painter.h"
@@ -16,20 +17,41 @@ namespace command {
  */
 class DrawDiagramCommand : ICommand {
 public:
-	DrawDiagramCommand(const string& outputFile) : outputFile(outputFile) {};
+	DrawDiagramCommand(const char* outputFile) : outputFile(outputFile) {};
 
-	void execute(Context& context) {
+	bool execute(Context& context) {
+		cout << "Creating a diagram..." << endl;
 
-		string file = outputDefault;
-		if (!outputFile.empty()) {
-			file = outputFile;
+		// Check pre-requirements
+		if (NULL == context.wavData) {
+			cout << "Input data is not specified :(" << endl;
+			return false;
 		}
 
+		// Determine results file name
+		string file = outputDefault;
+		if (NULL != outputFile) {
+			string outputFileStr(outputFile);
+			file = outputFileStr;
+		}
+		cout << "Diagram file is: " << file << "..." << endl;
+
+		// Create the splitter
+		audio::Splitter* splitter = new Splitter(context.wavData);
+		context.splitter = splitter;
+
+		// Split wav data into words
+		splitter->split();
+
+		// Draw the diagram
 		Painter::drawFrames(context.splitter, file.c_str());
+
+		cout << "Complete!" << endl;
+		return true;
 	};
 
 private:
-	const string& outputFile;
+	const char* outputFile;
 	const string outputDefault = "diagram.png";
 };
 
