@@ -146,20 +146,23 @@ void Splitter::divideIntoWords() {
 						wordId++;
 						lastWord = new Word(wordId);
 
-						this->wordToFrames->insert(make_pair(wordId,
+						this->wordToFrames->insert(make_pair(lastWord->getId(),
 								make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
 						this->words->push_back(lastWord);
 
-						DEBUG("We have a word %d (%d-%d)", lastWord->getId(), firstFrameInCurrentWordNumber, (*frame)->getId());
+						DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
+								(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
 
 					// We need to add the current word to the previous one
 					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
+						length_t firstFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).first;
 
-						this->wordToFrames->insert(make_pair(wordId,
-								make_pair(wordToFrames->at(lastWord->getId()).first, (*frame)->getId())));
+						this->wordToFrames->erase(lastWord->getId());
+						this->wordToFrames->insert(make_pair(lastWord->getId(),
+								make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
 
-						DEBUG("Word %d will be extended (%d-%d)", lastWord->getId(),
-								wordToFrames->at(lastWord->getId()).first, (*frame)->getId());
+						DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
+								(int) wordToFrames->at(lastWord->getId()).first, (int) (*frame)->getId());
 					}
 
 					firstFrameInCurrentWordNumber = -1;
@@ -174,7 +177,7 @@ void Splitter::divideIntoWords() {
 				word != this->words->end(); ++word) {
 
 			if (getFramesCount(**word) < WORD_MIN_SIZE) {
-				DEBUG("Word %d is too short and will be avoided", (*word)->getId());
+				DEBUG("Word %d is too short and will be avoided", (int) (*word)->getId());
 
 				this->wordToFrames->erase((*word)->getId());
 				this->words->erase(word);

@@ -21,7 +21,8 @@ namespace wtm {
 	// Helpers
 
 	#define DEBUG_ENABLED true
-	#define DEBUG(...) if (DEBUG_ENABLED) {fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n");}
+	#define DEBUG(...)  \
+		do { if (DEBUG_ENABLED) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } } while (0)
 
 	#define UNUSED(expr) do { (void)(expr); } while (0)
 

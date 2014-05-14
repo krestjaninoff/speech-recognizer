@@ -1,7 +1,8 @@
+#include <stdio.h>
 #include <cstdlib>
-#include "png.h"
 #include "assert.h"
 #include <iostream>
+#include "png.h"
 #include "Painter.h"
 #include "Frame.h"
 
@@ -10,6 +11,8 @@ using namespace wtm::audio;
 
 namespace wtm {
 namespace visual {
+
+enum Color { BLACK, RED, GREEN, BLUE };
 
 /**
  * Draw visualization of raw data
@@ -27,7 +30,7 @@ void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
 	if (image == NULL) {
-		fprintf(stderr, "Could not create image buffer\n");
+		cerr << "Could not create image buffer" << endl;
 		return;
 	}
 	memset(image, 0, bufferSize);
@@ -47,7 +50,7 @@ void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
-		image[index] = true;
+		image[index] = GREEN;
 		xCurr++;
 	}
 
@@ -69,7 +72,7 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
 	if (image == NULL) {
-		fprintf(stderr, "Could not create image buffer\n");
+		cerr << "Could not create image buffer" << endl;
 		return;
 	}
 	memset(image, 0, bufferSize);
@@ -91,9 +94,9 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 		assert(index <= imgWidth * imgHeight);
 
 		if (splitter->isPartOfAWord(**frame)) {
-			image[index] = 2;
+			image[index] = GREEN;
 		} else {
-			image[index] = 1;
+			image[index] = RED;
 		}
 
 		xCurr++;
@@ -103,7 +106,7 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 	uint32_t thresholdY = (splitter->getWordsThreshold()) * (imgHeight - 1) / yMax;
 	thresholdY = imgHeight - thresholdY - 1;
 	for (length_t x = 0; x < imgWidth; x++) {
-		image[x + thresholdY * imgWidth] = 3;
+		image[x + thresholdY * imgWidth] = BLUE;
 	}
 
 	writeImage(file.c_str(), image, imgWidth, imgHeight);
@@ -121,7 +124,7 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 	// Open file for writing (binary mode)
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {
-		fprintf(stderr, "Could not open file %s for writing\n", filename);
+		cerr << "Could not open file %s for writing" << endl;
 		code = 1;
 		goto finalise;
 	}
@@ -129,7 +132,7 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 	// Initialize write structure
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (png_ptr == NULL) {
-		fprintf(stderr, "Could not allocate write struct\n");
+		cerr << "Could not allocate write struct" << endl;
 		code = 1;
 		goto finalise;
 	}
@@ -137,14 +140,14 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 	// Initialize info structure
 	info_ptr = png_create_info_struct(png_ptr);
 	if (info_ptr == NULL) {
-		fprintf(stderr, "Could not allocate info struct\n");
+		cerr << "Could not allocate info struct" << endl;
 		code = 1;
 		goto finalise;
 	}
 
 	// Setup Exception handling
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		fprintf(stderr, "Error during png creation\n");
+		cerr << "Error during png creation" << endl;
 		code = 1;
 		goto finalise;
 	}
@@ -168,17 +171,16 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 	for (y = 0; y < height; y++) {
 		memset(row, 0, rowSize);
 
-		// TODO Refactor me
 		for (x = 0; x < width; x ++) {
-			if (1 == image[x + y * width]) {
+			if (RED == image[x + y * width]) {
 				row[3*x] = 255;
 				row[3*x + 1] = 0;
 				row[3*x + 2] = 0;
-			} else if (2 == image[x + y * width]) {
+			} else if (GREEN == image[x + y * width]) {
 				row[3*x] = 0;
 				row[3*x + 1] = 255;
 				row[3*x + 2] = 0;
-			} else if (3 == image[x + y * width]) {
+			} else if (BLUE == image[x + y * width]) {
 				row[3*x] = 0;
 				row[3*x + 1] = 0;
 				row[3*x + 2] = 255;

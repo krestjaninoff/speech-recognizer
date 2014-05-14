@@ -28,7 +28,10 @@ namespace audio {
 	}
 
 	void Frame::calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish) {
-		// TODO Implement me
+		UNUSED(source);
+		UNUSED(start);
+		UNUSED(finish);
+		// TODO Add MFCC calculation
 	}
 
 } /* namespace audio */

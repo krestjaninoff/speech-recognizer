@@ -47,6 +47,8 @@ public:
 			return false;
 		}
 
+		// TODO Clean up the directory
+
 		// Create the splitter
 		audio::Splitter* splitter = new Splitter(context.wavData);
 		context.splitter = splitter;
@@ -75,6 +77,7 @@ private:
 	const string outputFolderDefault = "out";
 
 	bool checkOutput(const string& outputFolder) {
+		UNUSED(outputFolder);
 
 		// FIXME Compilation error in io.h (MinGW)
 		/*
