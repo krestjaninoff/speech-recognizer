@@ -24,18 +24,13 @@ int main() {
 	f->push_back((raw_t) 2);
 	f->push_back((raw_t) 3);
 
-	int val = f->at(1);
-	cout << val << endl;
-
-	/*
-	const double* mfcc = MFCC::transform(*f, 0, 9);
+	const double* mfcc = MFCC::fourierTransform(*f, 0, 9);
 
 	for (int i = 0; i < 10; i++) {
 		cout << mfcc[i] << endl;
 	}
 
 	delete [] mfcc;
-	*/
 
 	return EXIT_SUCCESS;
 }

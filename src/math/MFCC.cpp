@@ -30,18 +30,12 @@ const double* MFCC::fourierTransform(const vector<raw_t>& source, length_t start
 	for (length_t k = 0; k < size; k++) {
 		fourierRaw[k] = 0;
 
-		for (length_t n = 0; n < size; n++) {
+		for (length_t n = 0; n < MFCC_SIZE; n++) {
 			raw_t sample = static_cast<double>(source[start + n]);
 
 			double x = sample * pow(EXP, -2. * PI * k * n / size);
 			double w = 1;//0.54 + 0.46 * cos(2 * PI * (size - n) / (size - 1));  // Hamming window
 			fourierRaw[k] += x * w;
-		}
-	}
-
-	if (DEBUG_ENABLED) {
-		for (int i = 0; i < 10; i++) {
-			cout << fourierRaw[i] << endl;
 		}
 	}
 

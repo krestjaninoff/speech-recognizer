@@ -26,7 +26,8 @@ public:
 	 */
 	static const double* transform(const std::vector<raw_t>& source, length_t start, length_t finish);
 
-private:
+// The methods below should be private, but for testing purposes they are public now
+// private:
 
 	/**
 	 * Perform short-time fourier transform with Hamming windows
