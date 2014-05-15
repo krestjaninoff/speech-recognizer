@@ -1,11 +1,12 @@
 #include <cmath>
 #include <Frame.h>
+#include "../math/MFCC.h"
 
 namespace wtm {
 namespace audio {
 
 	Frame::Frame(length_t id):
-		id(id), rms(0), maRms(0) {
+		id(id), rms(0), maRms(0), mfcc(0) {
 	}
 
 	void Frame::init(const std::vector<raw_t>& source, length_t start, length_t finish) {
@@ -28,10 +29,12 @@ namespace audio {
 	}
 
 	void Frame::calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish) {
-		UNUSED(source);
-		UNUSED(start);
-		UNUSED(finish);
-		// TODO Add MFCC calculation
+
+		this->mfcc = MFCC::transform(source, start, finish);
+	}
+
+	Frame::~Frame() {
+		delete [] this->mfcc;
 	}
 
 } /* namespace audio */

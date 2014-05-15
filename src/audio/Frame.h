@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <vector>
 #include "audio.h"
+#include "../math/matf.h"
+
+using namespace wtm::math;
 
 namespace wtm {
 namespace audio {
@@ -18,6 +21,7 @@ public:
 	 * Create a frame
 	 */
 	Frame(length_t id);
+	~Frame();
 
 	/**
 	 * Init the frame using a part of wave data
@@ -53,7 +57,7 @@ private:
 	double rms;
 	double maRms;
 
-	double mfcc[8];
+	const double* mfcc;
 
 	void calcRms(const std::vector<raw_t>& source, length_t start, length_t finish);
 	void calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish);
