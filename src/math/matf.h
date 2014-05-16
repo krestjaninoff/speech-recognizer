@@ -13,7 +13,13 @@ namespace math {
 	/**
 	 * MFCC vector size
 	 */
-	const short MFCC_SIZE = 8;
+	const short MFCC_SIZE = 12;
+
+	/**
+	 * Frequency bounds
+	 */
+	const short FREQ_MIN = 300;
+	const short FREQ_MAX = 8000;
 
 	/**
 	 * Math constants

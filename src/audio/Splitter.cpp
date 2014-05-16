@@ -51,7 +51,7 @@ void Splitter::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd);
+			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd, getWavData()->getHeader().samplesPerSec);
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));

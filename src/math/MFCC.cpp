@@ -1,20 +1,25 @@
-#include <stdlib.h>
-#include <math.h>
 #include "MFCC.h"
 
 namespace wtm {
 namespace math {
 
-const double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t finish) {
+double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t finish, uint32_t frequency) {
 
-	const double* fourierRaw = fourierTransform(source, start, finish);
-	const double* melFreqData = melFreq(fourierRaw, finish - start + 1, MFCC_SIZE);
-	const double* logPowerData = logPower(melFreqData, MFCC_SIZE);
-	const double* dstTransformData = dstTransform(logPowerData, MFCC_SIZE);
+	// Calc
+	length_t size = finish - start + 1;
+	double* fourierRaw = fourierTransform(source, start, finish, false);
+	double** melFilters = getMelFilters(size, frequency);
+	double* logPower = calcPower(fourierRaw, melFilters, size);
+	double* dstTransformData = dstTransform(logPower);
 
-	delete [] melFreqData;
-	delete [] logPowerData;
+	// Clean up
+	delete [] logPower;
 	delete [] fourierRaw;
+
+	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
+		delete [] melFilters[m];
+	}
+	delete [] melFilters;
 
 	return dstTransformData;
 }
@@ -22,7 +27,7 @@ const double* MFCC::transform(const vector<raw_t>& source, length_t start, lengt
 /**
  * Perform short-time fourier transform with Hamming windows
  */
-const double* MFCC::fourierTransform(const vector<raw_t>& source, length_t start, length_t finish) {
+double* MFCC::fourierTransform(const vector<raw_t>& source, length_t start, length_t finish, bool useWindow) {
 
 	uint32_t size = finish - start + 1;
 	double* fourierRaw = new double[size];
@@ -30,74 +35,108 @@ const double* MFCC::fourierTransform(const vector<raw_t>& source, length_t start
 	for (length_t k = 0; k < size; k++) {
 		fourierRaw[k] = 0;
 
-		for (length_t n = 0; n < MFCC_SIZE; n++) {
+		for (length_t n = 0; n < size; n++) {
 			raw_t sample = static_cast<double>(source[start + n]);
 
-			double x = sample * pow(EXP, -2. * PI * k * n / size);
-			double w = 1;//0.54 + 0.46 * cos(2 * PI * (size - n) / (size - 1));  // Hamming window
-			fourierRaw[k] += x * w;
+			// e^(ix) = cos(x) + i*sin(x)
+			double x = -2. * PI * k * n / size;
+			double f = sample * (cos(x) + sin(x));
+
+			double w = 1;
+			if (useWindow) {
+				// Hamming window
+				w = 0.54 + 0.46 * cos(2 * PI * n / (size - 1));
+			}
+			fourierRaw[k] += f * w;
 		}
+
+		fourierRaw[k] = fabs(fourierRaw[k]);
 	}
 
 	return fourierRaw;
 }
 
 /**
- * Map the powers of the spectrum obtained above onto the mel scale, using triangular overlapping windows
+ * Create mel filters, using triangular overlapping windows
  */
-const double* MFCC::melFreq(const double* fourierRaw, uint32_t size, uint8_t mfccSize) {
+double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 
-	double* melFreq = new double[mfccSize];
-	uint8_t M = mfccSize;
+	// Create points for filter banks
+	double* fb = new double[MFCC_SIZE + 2];
+	fb[0] = convertToMel(FREQ_MIN);
+	fb[MFCC_SIZE + 1] = convertToMel(FREQ_MAX);
 
-	// Creating mel scale on triangular windows
-	double* melWindow = new double[size];
-	for (length_t m = 0; m < mfccSize; m++) {
-		//double mel = 700. * (exp( x / 1125.) - 1.);
-
-		double mel = 1125. * log(1. + m / 700.);
-		double triangWindow = 1 - fabs(((M - m) - (M - 1) / 2) / M);
-		melWindow[m] = mel * triangWindow;
+	// Create mel bin
+	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {
+		fb[m] = fb[0] + m * (fb[MFCC_SIZE - 1] - fb[0]) / (MFCC_SIZE + 1);
 	}
 
-	// Mapping
-	for (length_t m = 0; m < mfccSize; m++) {
-		melFreq[m] = 0;
+	for (unsigned short m = 0; m < MFCC_SIZE + 2; m++) {
 
-		for (length_t k = 0; k < size; k++) {
-			melFreq[m] += fourierRaw[k] * melWindow[m];
+		// Convert them from mel to frequency
+		fb[m] = convertFromMel(fb[m]);
+
+		// Round those frequencies to the nearest DFT bin
+		fb[m] = floor((fourierLength+1) * fb[m] / frequency);
+	}
+
+	// Calc filter banks
+	double** filterBanks = new double*[MFCC_SIZE];
+	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
+		filterBanks[m] =  new double[fourierLength];
+	}
+
+	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {
+		for (uint32_t k = 0; k < fourierLength; k++) {
+
+			if (fb[m - 1] <= k && k <= fb[m]) {
+				filterBanks[m - 1][k] = (k - fb[m - 1]) / (fb[m] - fb[m - 1]);
+
+			} else if (fb[m] < k && k <= fb[m + 1]) {
+				filterBanks[m - 1][k] = (fb[m + 1] - k) / (fb[m + 1] - fb[m]);
+
+			} else {
+				filterBanks[m - 1][k] = 0;
+			}
 		}
 	}
 
-	delete [] melWindow;
+	delete [] fb;
 
-	return melFreq;
+	return filterBanks;
 }
 
 /**
  * Take the logs of the powers at each of the mel frequencies
  */
-const double* MFCC::logPower(const double* melFreq, uint8_t mfccSize) {
+double* MFCC::calcPower(double* fourierRaw, double** melFilters, uint32_t fourierLength) {
 
-	double* logPower = new double[mfccSize];
+	double* logPower = new double[MFCC_SIZE];
 
-	for (length_t k = 0; k < mfccSize; k++) {
-		logPower[k] = log(pow(melFreq[k], 2));
+	for (length_t m = 0; m < MFCC_SIZE; m++) {
+		logPower[m] = 0.;
+
+		for (length_t k = 0; k < fourierLength; k++) {
+			logPower[m] += fourierRaw[k] * fourierRaw[k] * melFilters[m][k];
+		}
+		logPower[m] = log(logPower[m]);
 	}
 
 	return logPower;
 }
 
-const double* MFCC::dstTransform(const double* logPower, uint8_t mfccSize) {
+/**
+ * Take the discrete cosine transform of the list of mel log powers
+ */
+double* MFCC::dstTransform(double* logPower) {
 
-	double* dstTransform = new double[mfccSize];
-	//log(pow(melScale[n], 2)
+	double* dstTransform = new double[MFCC_SIZE];
 
-	for (length_t k = 0; k < mfccSize; k++) {
-		dstTransform[k] = 0;
+	for (length_t n = 0; n < MFCC_SIZE; n++) {
+		dstTransform[n] = 0;
 
-		for (length_t n = 0; n < mfccSize; n++) {
-			dstTransform[k] += logPower[n] * cos(PI * k * (n + 1./2.) / mfccSize);
+		for (length_t m = 0; m < MFCC_SIZE; m++) {
+			dstTransform[n] += logPower[m] * cos(PI * n * (m + 1./2.) / MFCC_SIZE);
 		}
 	}
 
