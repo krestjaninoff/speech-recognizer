@@ -29,6 +29,7 @@ public:
 		}
 
 		// Determine results file name
+		const char* outputDefault = "diagram.png";
 		string file = outputDefault;
 		if (NULL != outputFile) {
 			string outputFileStr(outputFile);
@@ -52,7 +53,6 @@ public:
 
 private:
 	const char* outputFile;
-	const string outputDefault = "diagram.png";
 };
 
 } /* namespace command */

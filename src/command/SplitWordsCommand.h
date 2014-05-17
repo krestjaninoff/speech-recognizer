@@ -35,6 +35,7 @@ public:
 		}
 
 		// Determine results directory name
+		const char* outputFolderDefault = "out";
 		string folder = outputFolderDefault;
 		if (NULL != outputFolder) {
 			string outputFolderStr(outputFolder);
@@ -74,7 +75,6 @@ public:
 
 private:
 	const char* outputFolder;
-	const string outputFolderDefault = "out";
 
 	bool checkOutput(const string& outputFolder) {
 		UNUSED(outputFolder);
