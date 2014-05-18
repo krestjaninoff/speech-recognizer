@@ -7,7 +7,7 @@ double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t fi
 
 	// Calc
 	length_t size = finish - start + 1;
-	double* fourierRaw = fourierTransform(source, start, finish, false);
+	double* fourierRaw = fourierTransform(source, start, finish, true);
 	double** melFilters = getMelFilters(size, frequency);
 	double* logPower = calcPower(fourierRaw, melFilters, size);
 	double* dstTransformData = dstTransform(logPower);
@@ -68,7 +68,7 @@ double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 
 	// Create mel bin
 	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {
-		fb[m] = fb[0] + m * (fb[MFCC_SIZE - 1] - fb[0]) / (MFCC_SIZE + 1);
+		fb[m] = fb[0] + m * (fb[MFCC_SIZE + 1] - fb[0]) / (MFCC_SIZE + 1);
 	}
 
 	for (unsigned short m = 0; m < MFCC_SIZE + 2; m++) {
@@ -77,7 +77,7 @@ double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 		fb[m] = convertFromMel(fb[m]);
 
 		// Round those frequencies to the nearest DFT bin
-		fb[m] = floor((fourierLength+1) * fb[m] / frequency);
+		fb[m] = floor((fourierLength + 1) * fb[m] / frequency);
 	}
 
 	// Calc filter banks
@@ -113,7 +113,7 @@ double* MFCC::calcPower(double* fourierRaw, double** melFilters, uint32_t fourie
 
 	double* logPower = new double[MFCC_SIZE];
 
-	for (length_t m = 0; m < MFCC_SIZE; m++) {
+	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
 		logPower[m] = 0.;
 
 		for (length_t k = 0; k < fourierLength; k++) {
@@ -132,10 +132,10 @@ double* MFCC::dstTransform(double* logPower) {
 
 	double* dstTransform = new double[MFCC_SIZE];
 
-	for (length_t n = 0; n < MFCC_SIZE; n++) {
+	for (unsigned short n = 0; n < MFCC_SIZE; n++) {
 		dstTransform[n] = 0;
 
-		for (length_t m = 0; m < MFCC_SIZE; m++) {
+		for (unsigned short m = 0; m < MFCC_SIZE; m++) {
 			dstTransform[n] += logPower[m] * cos(PI * n * (m + 1./2.) / MFCC_SIZE);
 		}
 	}
