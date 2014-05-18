@@ -56,6 +56,17 @@ namespace audio {
 	 */
 	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.70;
 
+	/**
+	 * MFCC vector size
+	 */
+	const unsigned short MFCC_SIZE = 12;
+
+	/**
+	 * Frequency bounds
+	 */
+	const short MFCC_FREQ_MIN = 300;
+	const short MFCC_FREQ_MAX = 8000;
+
 } // namespace audio
 } // namespace wtm
 

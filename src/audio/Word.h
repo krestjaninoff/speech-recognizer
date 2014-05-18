@@ -16,6 +16,7 @@ public:
 	 * Create a word based on set of frames
 	 */
 	Word(length_t id);
+	~Word();
 
 	/**
 	 * Get frame's serial number
@@ -25,13 +26,20 @@ public:
 	/**
 	 * Text meaning of the word
 	 */
-	const std::string& getText() const { return text; };
 	void setText(const std::string& text) { this->text = text; }
+	const std::string& getText() const { return text; };
 
+	void setMfcc(double* mfcc, unsigned int size) {
+		this->mfcc = mfcc; this->mfccSize = size; }
+	double* getMfcc() { return this->mfcc; }
+	unsigned int getMfccSize() { return this->mfccSize; }
 
 private:
 	length_t id;
 	std::string text;
+
+	unsigned int mfccSize;
+	double* mfcc;
 };
 
 } /* namespace audio */

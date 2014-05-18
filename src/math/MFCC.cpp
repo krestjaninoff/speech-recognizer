@@ -63,8 +63,8 @@ double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 
 	// Create points for filter banks
 	double* fb = new double[MFCC_SIZE + 2];
-	fb[0] = convertToMel(FREQ_MIN);
-	fb[MFCC_SIZE + 1] = convertToMel(FREQ_MAX);
+	fb[0] = convertToMel(MFCC_FREQ_MIN);
+	fb[MFCC_SIZE + 1] = convertToMel(MFCC_FREQ_MAX);
 
 	// Create mel bin
 	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {

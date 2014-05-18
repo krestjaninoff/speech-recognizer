@@ -9,11 +9,9 @@ namespace audio {
 		id(id), rms(0), maRms(0), mfcc(0) {
 	}
 
-	void Frame::init(const std::vector<raw_t>& source, length_t start, length_t finish, uint32_t fourierLength) {
+	void Frame::init(const std::vector<raw_t>& source, length_t start, length_t finish) {
 
 		this->calcRms(source, start, finish);
-		this->calcMFCC(source, start, finish, fourierLength);
-
 		this->maRms = this->rms;
 	}
 
@@ -28,9 +26,11 @@ namespace audio {
 		this->rms = sqrt(value);
 	}
 
-	void Frame::calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish, uint32_t fourierLength) {
+	double* Frame::initMFCC(const std::vector<raw_t>& source, length_t start,
+			length_t finish, uint32_t fourierLength) {
 
 		this->mfcc = MFCC::transform(source, start, finish, fourierLength);
+		return this->mfcc;
 	}
 
 	Frame::~Frame() {

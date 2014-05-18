@@ -1,11 +1,11 @@
 TODO:
 
-* Refactoring of Painter
+* Fix bugs:
+** Invalid splitting for m2, m3
+** Do not trim frames in samples!
 
-* MFCC transformation
-* Add console control module
-
-* HMM stuff
+* Implement model storage
+* Add DTW algorithm (http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf)
 
 
 Dinctionary:

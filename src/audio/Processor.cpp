@@ -51,8 +51,7 @@ void Processor::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd,
-					getWavData()->getHeader().samplesPerSec);
+			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd);
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -335,6 +334,39 @@ double Processor::getThresholdCandidate(double maMin, double maAvg, double maMax
 	delete maxCluster;
 
 	return thresholdCandidate;
+}
+
+void Processor::initMfcc(Word& word) {
+
+	length_t firstId = this->wordToFrames->at(word.getId()).first;
+	length_t lastId = this->wordToFrames->at(word.getId()).second;
+
+	length_t framesCnt = lastId - firstId + 1;
+	double* mfcc = new double[MFCC_SIZE * framesCnt];
+
+	for (uint32_t i = 0; i < framesCnt; i++) {
+		length_t rawBegin = this->frameToRaw->at(firstId + i).first;
+		length_t rawFinsh = this->frameToRaw->at(firstId + i).second;
+
+		double* frameMfcc = this->frames->at(firstId + i)->initMFCC(
+				*getWavData()->getRawData(), rawBegin, rawFinsh,
+				getWavData()->getHeader().samplesPerSec);
+
+		for (uint32_t j = 0; j < MFCC_SIZE; j++) {
+			mfcc[i * MFCC_SIZE  + j] = frameMfcc[j];
+		}
+	}
+
+	word.setMfcc(mfcc, MFCC_SIZE * framesCnt);
+
+	if (DEBUG_ENABLED) {
+		DEBUG("MFCC for %d are: ", (int) word.getId());
+		for (uint32_t i = 0; i < word.getMfccSize(); i++) {
+			//DEBUG("%f ", word.getMfcc()[i]);
+			cout << word.getMfcc()[i] << endl;
+		}
+		DEBUG("_");
+	}
 }
 
 void Processor::saveWordAsAudio(const std::string& file, const Word& word) const {

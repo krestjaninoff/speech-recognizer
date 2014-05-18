@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include "audio.h"
-#include "../math/matf.h"
+#include "../math/MFCC.h"
 
 using namespace wtm::math;
 
@@ -26,8 +26,7 @@ public:
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const std::vector<raw_t>& source, length_t start, length_t finish,
-			uint32_t fourierLength);
+	void init(const std::vector<raw_t>& source, length_t start, length_t finish);
 
 	/**
 	 * Get frame's serial number
@@ -47,9 +46,10 @@ public:
 
 	/**
 	 * Get Mel-frequency cepstral coefficients
-	 * @see http://habrahabr.ru/post/140828/
 	 */
-	const double* getMFCC() const { return mfcc; }
+	double* getMFCC() const { return mfcc; }
+	double* initMFCC(const std::vector<raw_t>& source, length_t start,
+			length_t finish, uint32_t fourierLength);
 
 
 private:
@@ -58,10 +58,9 @@ private:
 	double rms;
 	double maRms;
 
-	const double* mfcc;
+	double* mfcc;
 
 	void calcRms(const std::vector<raw_t>& source, length_t start, length_t finish);
-	void calcMFCC(const std::vector<raw_t>& source, length_t start, length_t finish, uint32_t fourierLength);
 };
 
 } /* namespace audio */

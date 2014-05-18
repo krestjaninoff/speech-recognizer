@@ -6,6 +6,7 @@
 #include "ReadWavDataCommand.h"
 #include "DrawDiagramCommand.h"
 #include "SplitWordsCommand.h"
+#include "ModelCommand.h"
 
 namespace wtm {
 namespace command {

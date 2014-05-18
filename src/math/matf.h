@@ -11,17 +11,6 @@ namespace wtm {
 namespace math {
 
 	/**
-	 * MFCC vector size
-	 */
-	const short MFCC_SIZE = 12;
-
-	/**
-	 * Frequency bounds
-	 */
-	const short FREQ_MIN = 300;
-	const short FREQ_MAX = 8000;
-
-	/**
 	 * Math constants
 	 */
 	const double PI = 3.14159265358979323846;

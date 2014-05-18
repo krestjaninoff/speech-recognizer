@@ -18,9 +18,10 @@ namespace command {
 		{ "input", required_argument, 0, 'i' },
 		{ "draw", optional_argument, 0, 'd' },
 		{ "split", optional_argument, 0, 's' },
+		{ "add-model", optional_argument, 0, 'a' },
 		{0, 0, 0, 0}
 	};
-	static const char* const shortOptions = "vhi:d::s::";
+	static const char* const shortOptions = "vhi:d::s::a::";
 
 	/**
 	 * Help info
@@ -76,6 +77,10 @@ namespace command {
 
 					case 's':
 						isLast = !(new SplitWordsCommand(optarg))->execute(*this->context);
+						break;
+
+					case 'a':
+						isLast = !(new ModelCommand())->execute(*this->context);
 						break;
 
 					default:
