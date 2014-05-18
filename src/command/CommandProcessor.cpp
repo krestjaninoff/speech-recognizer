@@ -68,19 +68,19 @@ namespace command {
 						break;
 
 					case 'i':
-						isLast = !(new ReadWavDataCommand(optarg))->execute(*this->context);
+						isLast = !(new AudioDataCommand())->readData(*this->context, optarg);
 						break;
 
 					case 'd':
-						isLast = !(new DrawDiagramCommand(optarg))->execute(*this->context);
+						isLast = !(new VisualizationCommand(optarg))->createDiagram(*this->context);
 						break;
 
 					case 's':
-						isLast = !(new SplitWordsCommand(optarg))->execute(*this->context);
+						isLast = !(new AudioDataCommand())->splitIntoFiles(*this->context, optarg);
 						break;
 
 					case 'a':
-						isLast = !(new ModelCommand())->execute(*this->context);
+						isLast = !(new ModelCommand())->addModel(*this->context);
 						break;
 
 					default:

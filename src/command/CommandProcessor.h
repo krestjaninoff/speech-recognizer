@@ -2,10 +2,9 @@
 #define COMMANDPROCESSOR_H_
 
 #include <getopt.h>
-#include "ICommand.h"
-#include "ReadWavDataCommand.h"
-#include "DrawDiagramCommand.h"
-#include "SplitWordsCommand.h"
+#include "Context.h"
+#include "AudioDataCommand.h"
+#include "VisualizationCommand.h"
 #include "ModelCommand.h"
 
 namespace wtm {

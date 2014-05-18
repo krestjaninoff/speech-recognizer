@@ -1,5 +1,5 @@
-#ifndef SPLITWORDSCOMMAND_H_
-#define SPLITWORDSCOMMAND_H_
+#ifndef AUDIODATACOMMAND_H_
+#define AUDIODATACOMMAND_H_
 
 #include <stdio.h>
 #include <iostream>
@@ -7,7 +7,7 @@
 //#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "ICommand.h"
+#include "Context.h"
 #include "../audio/Word.h"
 #include "../audio/Processor.h"
 
@@ -20,11 +20,22 @@ namespace command {
 /**
  * Split a sample into several words and store them into files
  */
-class SplitWordsCommand : public ICommand {
+class AudioDataCommand {
 public:
-	SplitWordsCommand(const char* outputFolder) : outputFolder(outputFolder) {};
 
-	bool execute(Context& context) {
+	bool readData(Context& context, const char* inputFile) {
+		cout << "Reading WAV data..." << endl;
+
+		audio::WavData* wavData = audio::WavData::readFromFile(inputFile);
+
+		if (NULL != wavData) {
+			context.wavData = wavData;
+		}
+
+		return NULL != wavData;
+	};
+
+	bool splitIntoFiles(Context& context, const char* outputFolder) {
 		int counter = 1;
 		cout << "Splitting data into separate words..." << endl;
 
@@ -109,4 +120,4 @@ private:
 } /* namespace command */
 } /* namespace wtm */
 
-#endif /* SPLITWORDSCOMMAND_H_ */
+#endif /* AUDIODATACOMMAND_H_ */

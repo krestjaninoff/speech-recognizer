@@ -1,11 +1,14 @@
 TODO:
 
+* Finish with AudioDataCommand (work with directories)
+
 * Fix bugs:
 ** Invalid splitting for m2, m3
 ** Do not trim frames in samples!
 
 * Implement model storage
-* Add DTW algorithm (http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf)
+
+* Add Dynamic Time Warpimg algorithm (http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf)
 
 
 Dinctionary:

@@ -1,9 +1,9 @@
-#ifndef DRAWDIAGRAMCOMMAND_H_
-#define DRAWDIAGRAMCOMMAND_H_
+#ifndef VIZUALIZATIONCOMMAND_H_
+#define VIZUALIZATIONCOMMAND_H_
 
 #include <stdio.h>
 #include <string>
-#include "ICommand.h"
+#include "Context.h"
 #include "../visual/Painter.h"
 
 using namespace std;
@@ -15,11 +15,11 @@ namespace command {
 /**
  * Create a diagram and store it into a file
  */
-class DrawDiagramCommand : ICommand {
+class VisualizationCommand {
 public:
-	DrawDiagramCommand(const char* outputFile) : outputFile(outputFile) {};
+	VisualizationCommand(const char* outputFile) : outputFile(outputFile) {};
 
-	bool execute(Context& context) {
+	bool createDiagram(Context& context) {
 		cout << "Creating a diagram..." << endl;
 
 		// Check pre-requirements
@@ -58,4 +58,4 @@ private:
 } /* namespace command */
 } /* namespace wtm */
 
-#endif /* DRAWDIAGRAMCOMMAND_H_ */
+#endif /* VIZUALIZATIONCOMMAND_H_ */

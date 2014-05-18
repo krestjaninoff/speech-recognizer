@@ -4,10 +4,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-//#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "ICommand.h"
+#include "Context.h"
 #include "../audio/Word.h"
 #include "../audio/Processor.h"
 
@@ -20,11 +19,10 @@ namespace command {
 /**
  * Work with models
  */
-class ModelCommand : public ICommand {
+class ModelCommand {
 public:
 
-	bool execute(Context& context) {
-		int counter = 1;
+	bool addModel(Context& context) {
 		cout << "Splitting data into separate words..." << endl;
 
 		// Check pre-requirements
