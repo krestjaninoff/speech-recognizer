@@ -1,5 +1,5 @@
-#ifndef SPLITTER_H_
-#define SPLITTER_H_
+#ifndef Processor_H_
+#define Processor_H_
 
 #include "../common.h"
 #include <vector>
@@ -15,13 +15,13 @@ namespace wtm {
 namespace audio {
 
 /**
- * Splitter is a mediator which splits raw data into frames and words
+ * Processor is a mediator which splits raw data into frames and words
  * and keeps relations between these objects
  */
-class Splitter {
+class Processor {
 public:
 
-	Splitter(WavData* wavData) {
+	Processor(WavData* wavData) {
 		this->wavData = wavData;
 
 		this->frames = new std::vector<Frame*>();
@@ -34,7 +34,7 @@ public:
 		this->wordsThreshold = 0;
 	}
 
-	~Splitter() {
+	~Processor() {
 		if (this->words) {
 			delete this->words;
 			delete this->wordToFrames;
@@ -80,10 +80,10 @@ private:
 	void divideIntoWords();
 };
 
-//typedef std::unique_ptr<Splitter> SplitterPtr;
-typedef Splitter* SplitterPtr;
+//typedef std::unique_ptr<Processor> ProcessorPtr;
+typedef Processor* ProcessorPtr;
 
 } /* namespace audio */
 } /* namespace wtm */
 
-#endif /* SPLITTER_H_ */
+#endif /* Processor_H_ */

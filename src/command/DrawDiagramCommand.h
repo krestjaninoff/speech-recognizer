@@ -37,15 +37,15 @@ public:
 		}
 		cout << "Diagram file is: " << file << "..." << endl;
 
-		// Create the splitter
-		audio::Splitter* splitter = new Splitter(context.wavData);
-		context.splitter = splitter;
+		// Create the Processor
+		audio::Processor* processor = new Processor(context.wavData);
+		context.processor = processor;
 
 		// Split wav data into words
-		splitter->split();
+		processor->split();
 
 		// Draw the diagram
-		Painter::drawFrames(context.splitter, file.c_str());
+		Painter::drawFrames(context.processor, file.c_str());
 
 		cout << "Complete!" << endl;
 		return true;

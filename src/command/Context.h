@@ -2,7 +2,7 @@
 #define CONTEXT_H_
 
 #include "../audio/WavData.h"
-#include "../audio/Splitter.h"
+#include "../audio/Processor.h"
 
 using namespace wtm::audio;
 
@@ -15,7 +15,7 @@ namespace command {
 class Context {
 public:
 	WavData* wavData;
-	SplitterPtr splitter;
+	Processor* processor;
 };
 
 } /* namespace command */

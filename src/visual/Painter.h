@@ -5,7 +5,7 @@
 #include "../common.h"
 #include "visual.h"
 #include "../audio/audio.h"
-#include "../audio/Splitter.h"
+#include "../audio/Processor.h"
 
 namespace wtm {
 namespace visual {
@@ -19,8 +19,8 @@ namespace visual {
 class Painter {
 
 public:
-	static void drawRawData(const audio::SplitterPtr splitter, const std::string& file);
-	static void drawFrames(const audio::SplitterPtr splitter, const std::string& file);
+	static void drawRawData(const audio::Processor* Processor, const std::string& file);
+	static void drawFrames(const audio::Processor* Processor, const std::string& file);
 
 private:
 	static int writeImage(const char* filename, uint8_t* buffer, uint32_t width,

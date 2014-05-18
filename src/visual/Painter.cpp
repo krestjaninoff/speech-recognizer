@@ -17,15 +17,15 @@ enum Color { BLACK, RED, GREEN, BLUE };
 /**
  * Draw visualization of raw data
  */
-void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
+void Painter::drawRawData(const Processor* processor, const string& file) {
 
 	uint32_t imgWidth = IMAGE_WIDTH;
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
-	uint32_t xMax = splitter->getWavData()->getNumberOfSamples();
-	uint32_t yCorrection = splitter->getWavData()->getMinVal() < 0 ?
-			-splitter->getWavData()->getMinVal() : 0;
-	uint32_t yMax = splitter->getWavData()->getMaxVal() + yCorrection;
+	uint32_t xMax = processor->getWavData()->getNumberOfSamples();
+	uint32_t yCorrection = processor->getWavData()->getMinVal() < 0 ?
+			-processor->getWavData()->getMinVal() : 0;
+	uint32_t yMax = processor->getWavData()->getMaxVal() + yCorrection;
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -36,8 +36,8 @@ void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (vector<raw_t>::const_iterator yCurr = splitter->getWavData()->getRawData()->begin();
-			yCurr != splitter->getWavData()->getRawData()->end(); ++yCurr) {
+	for (vector<raw_t>::const_iterator yCurr = processor->getWavData()->getRawData()->begin();
+			yCurr != processor->getWavData()->getRawData()->end(); ++yCurr) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
@@ -61,13 +61,13 @@ void Painter::drawRawData(const SplitterPtr splitter, const string& file) {
 /**
  * Draw visualization of frames
  */
-void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
+void Painter::drawFrames(const Processor* processor, const string& file) {
 
 	uint32_t imgWidth = IMAGE_WIDTH;
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
-	uint32_t xMax = splitter->getFrames()->size();
-	uint32_t yMax = splitter->getMaRMSMax();
+	uint32_t xMax = processor->getFrames()->size();
+	uint32_t yMax = processor->getMaRMSMax();
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -79,8 +79,8 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 
 	// Draw maRMS for frames
 	uint32_t xCurr = 0;
-	for (vector<Frame*>::const_iterator frame = splitter->getFrames()->begin();
-			frame != splitter->getFrames()->end(); ++frame) {
+	for (vector<Frame*>::const_iterator frame = processor->getFrames()->begin();
+			frame != processor->getFrames()->end(); ++frame) {
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
@@ -93,7 +93,7 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 		uint32_t index = x + y * imgWidth;
 		assert(index <= imgWidth * imgHeight);
 
-		if (splitter->isPartOfAWord(**frame)) {
+		if (processor->isPartOfAWord(**frame)) {
 			image[index] = GREEN;
 		} else {
 			image[index] = RED;
@@ -103,7 +103,7 @@ void Painter::drawFrames(const SplitterPtr splitter, const string& file) {
 	}
 
 	// Draw word threshold
-	uint32_t thresholdY = (splitter->getWordsThreshold()) * (imgHeight - 1) / yMax;
+	uint32_t thresholdY = (processor->getWordsThreshold()) * (imgHeight - 1) / yMax;
 	thresholdY = imgHeight - thresholdY - 1;
 	for (length_t x = 0; x < imgWidth; x++) {
 		image[x + thresholdY * imgWidth] = BLUE;

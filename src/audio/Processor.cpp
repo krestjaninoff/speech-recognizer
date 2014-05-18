@@ -10,14 +10,14 @@
 #include <math.h>
 #include <string>
 #include <cassert>
-#include <Splitter.h>
+#include <Processor.h>
 
 using namespace std;
 
 namespace wtm {
 namespace audio {
 
-void Splitter::split() {
+void Processor::split() {
 
 	// Init "samples per frame" measure
 	length_t bytesPerFrame = static_cast<length_t>(
@@ -32,7 +32,7 @@ void Splitter::split() {
 	divideIntoWords();
 }
 
-void Splitter::divideIntoFrames() {
+void Processor::divideIntoFrames() {
 
 	unsigned int samplesPerNonOverlap =
 		static_cast<unsigned int>(this->samplesPerFrame * (1 - FRAME_OVERLAP));
@@ -51,7 +51,8 @@ void Splitter::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd, getWavData()->getHeader().samplesPerSec);
+			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd,
+					getWavData()->getHeader().samplesPerSec);
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -61,7 +62,7 @@ void Splitter::divideIntoFrames() {
 	}
 }
 
-void Splitter::divideIntoWords() {
+void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
 	double maMin = 0;
@@ -201,7 +202,7 @@ void Splitter::divideIntoWords() {
  * Method divides data into 3 clusters (using something like k-means algorithm).
  * The cluster center of "Min" cluster is used as a threshold candidate.
  */
-double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax) {
+double Processor::getThresholdCandidate(double maMin, double maAvg, double maMax) {
 	UNUSED(maAvg);
 	short currIter = 0, maxIterCnt = 30;
 	bool isCenterChanged = true;
@@ -336,7 +337,7 @@ double Splitter::getThresholdCandidate(double maMin, double maAvg, double maMax)
 	return thresholdCandidate;
 }
 
-void Splitter::saveWordAsAudio(const std::string& file, const Word& word) const {
+void Processor::saveWordAsAudio(const std::string& file, const Word& word) const {
 
 	// number of data bytes in the resulting wave file
 	unsigned int samplesPerNonOverlap =
@@ -387,7 +388,7 @@ void Splitter::saveWordAsAudio(const std::string& file, const Word& word) const 
 	delete [] data;
 }
 
-bool Splitter::isPartOfAWord(const Frame& frame) const {
+bool Processor::isPartOfAWord(const Frame& frame) const {
 	bool isPartOfWord = false;
 
 	for (std::map<length_t, std::pair<length_t, length_t> >::const_iterator word = this->wordToFrames->begin();
@@ -402,7 +403,7 @@ bool Splitter::isPartOfAWord(const Frame& frame) const {
 	return isPartOfWord;
 }
 
-length_t Splitter::getFramesCount(const Word& word) const {
+length_t Processor::getFramesCount(const Word& word) const {
 	 length_t cnt = this->wordToFrames->at(word.getId()).second - this->wordToFrames->at(word.getId()).first;
 	 return cnt;
 }

@@ -5,7 +5,7 @@ set(SOURCE
 	WavData.cpp
 	Frame.cpp
 	Word.cpp
-	Splitter.cpp
+	Processor.cpp
 )
 
 add_library(audio STATIC ${SOURCE})

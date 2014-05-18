@@ -26,7 +26,8 @@ public:
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const std::vector<raw_t>& source, length_t start, length_t finish, uint32_t fourierLength);
+	void init(const std::vector<raw_t>& source, length_t start, length_t finish,
+			uint32_t fourierLength);
 
 	/**
 	 * Get frame's serial number

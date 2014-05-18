@@ -11,6 +11,7 @@ using namespace wtm::math;
  */
 int main() {
 
+	/*
 	std::vector<raw_t>* f = new std::vector<raw_t>();
 
 	f->push_back((raw_t) 8);
@@ -24,12 +25,14 @@ int main() {
 	}
 
 	cout << endl;
+	*/
 
 	double** melFreq = MFCC::getMelFilters(400, 16000);
 	for (int m = 0; m <= MFCC_SIZE; m++) {
 		for (int i = 0; i <= 400; i++) {
 			cout << melFreq[m][i] << endl;
 		}
+		cout << endl << endl;
 	}
 
 	delete [] melFreq;

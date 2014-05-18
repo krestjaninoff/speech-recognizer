@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include "ICommand.h"
 #include "../audio/Word.h"
-#include "../audio/Splitter.h"
+#include "../audio/Processor.h"
 
 using namespace std;
 using namespace wtm::audio;
@@ -50,22 +50,22 @@ public:
 
 		// TODO Clean up the directory
 
-		// Create the splitter
-		audio::Splitter* splitter = new Splitter(context.wavData);
-		context.splitter = splitter;
+		// Create the Processor
+		audio::Processor* processor = new Processor(context.wavData);
+		context.processor = processor;
 
 		// Split wav data into words
-		splitter->split();
+		processor->split();
 
 		// Save results
-		DEBUG("Words: %d", splitter->getWords()->size());
-		for (vector<Word*>::const_iterator word = splitter->getWords()->begin();
-				word != splitter->getWords()->end(); ++word) {
+		DEBUG("Words: %d", processor->getWords()->size());
+		for (vector<Word*>::const_iterator word = processor->getWords()->begin();
+				word != processor->getWords()->end(); ++word) {
 
 			string fileName = folder + "/sampleFile." + toString(counter) + ".wav";
 			cout << fileName << endl;
 
-			splitter->saveWordAsAudio(fileName, *(*word));
+			processor->saveWordAsAudio(fileName, *(*word));
 			counter++;
 		}
 
