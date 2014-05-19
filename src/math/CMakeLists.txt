@@ -3,6 +3,7 @@ project(math)
 
 set(SOURCE
 	MFCC.cpp
+	DTW.cpp
 )
 
 add_library(math STATIC ${SOURCE})
