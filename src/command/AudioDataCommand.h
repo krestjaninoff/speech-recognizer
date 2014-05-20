@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-//#include <io.h>
+#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "Context.h"
@@ -55,11 +55,9 @@ public:
 		cout << "Output directory is " << folder << "..." << endl;
 
 		// Check if output directory exists or can be created
-		if (!checkOutput(outputFolder)) {
+		if (!initOutputDirectory(outputFolder)) {
 			return false;
 		}
-
-		// TODO Clean up the directory
 
 		// Create the Processor
 		audio::Processor* processor = new Processor(context.wavData);
@@ -87,19 +85,22 @@ public:
 private:
 	const char* outputFolder;
 
-	bool checkOutput(const string& outputFolder) {
-		UNUSED(outputFolder);
-
-		// FIXME Compilation error in io.h (MinGW)
-		/*
+	bool initOutputDirectory(const string& outputFolder) {
 		struct stat info;
 
 		if (0 != stat( outputFolder.c_str(), &info )) {
-			int success = mkdir(outputFolder.c_str());
+			int success;
+
+			#if defined(_WIN32)
+				success = _mkdir(outputFolder.c_str());
+			#else
+				success = mkdir(outputFolder.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+			#endif
 
 			if (0 != success) {
 				fprintf(stderr, "Directory %s can't be created\n", outputFolder.c_str());
 				return false;
+
 			} else {
 				return true;
 			}
@@ -111,7 +112,6 @@ private:
 			fprintf(stderr, "File %s is not a directory\n", outputFolder.c_str());
 			return false;
 		}
-		*/
 
 		return true;
 	}
