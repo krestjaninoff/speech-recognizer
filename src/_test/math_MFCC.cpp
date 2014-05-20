@@ -1,5 +1,7 @@
-#include "gtest/gtest.h"
 #include "../math/MFCC.h"
+#include "gtest/gtest.h"
+
+using namespace wtm::math;
 
 TEST(MATH_MFCC, FOURIER_TRANSFORM)
 {
@@ -10,11 +12,12 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM)
 	f->push_back((raw_t) 8);
 	f->push_back((raw_t) 0);
 
-	const double* fourierRaw = MFCC::fourierTransform(*f, 0, 3, true);
-	EXPECT_EQ(5, fourierRaw[0]);
-	EXPECT_EQ(5, fourierRaw[1]);
-	EXPECT_EQ(5, fourierRaw[2]);
-	EXPECT_EQ(5, fourierRaw[3]);
+	const double* fourierRaw = MFCC::fourierTransform(*f, 0, 3, false);
+
+	EXPECT_EQ(20, fourierRaw[0]);
+	EXPECT_EQ(4, fourierRaw[1]);
+	EXPECT_EQ(12, fourierRaw[2]);
+	EXPECT_EQ(4, fourierRaw[3]);
 
 	delete [] fourierRaw;
 }

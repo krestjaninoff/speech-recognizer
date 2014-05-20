@@ -1,5 +1,6 @@
 TODO:
 
+* Finish with DTW algorithm (write correct test)
 * Finish with AudioDataCommand (work with directories)
 
 * Fix bugs:

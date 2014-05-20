@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <sstream>
+#include <limits.h>
 
 namespace wtm {
 

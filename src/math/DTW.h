@@ -17,6 +17,9 @@ namespace math {
  * @see http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf
  */
 class DTW {
+public:
+
+	static double a() {return 5.;}
 
 	/**
 	 * Calculate distance between two sequences
@@ -24,7 +27,7 @@ class DTW {
 	static double calcDistance(double* seq1, uint32_t seq1size, double* seq2, uint32_t seq2size);
 };
 
-} /* namespace audio */
+} /* namespace math */
 } /* namespace wtm */
 
 #endif /* DTW_H_ */
