@@ -14,12 +14,10 @@ namespace math {
 /**
  * Digital Time Warping
  *
- * @see http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf
+ * @see http://sysmagazine.com/posts/135087/
  */
 class DTW {
 public:
-
-	static double a() {return 5.;}
 
 	/**
 	 * Calculate distance between two sequences
