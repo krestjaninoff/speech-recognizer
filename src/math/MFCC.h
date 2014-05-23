@@ -44,7 +44,7 @@ public:
 	static double* fourierTransform(const std::vector<raw_t>& source, length_t start, length_t finish, bool useWindow);
 
 	/**
-	 * Create mel filters, using triangular overlapping windows
+	 * Create mel filters (for range of frequencies), using triangular overlapping windows
 	 *
 	 * @see http://en.wikipedia.org/wiki/Mel_scale
 	 * @see http://en.wikipedia.org/wiki/Window_function#Triangular_window

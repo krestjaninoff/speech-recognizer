@@ -1,5 +1,5 @@
 #
-# DTW implementation
+# Octave example
 #
 
 s1=[3,4,2]
