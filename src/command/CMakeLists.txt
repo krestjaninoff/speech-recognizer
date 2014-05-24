@@ -3,6 +3,8 @@ project(command)
 
 set(SOURCE
 	CommandProcessor.cpp
+	Storage.cpp
+	ModelCommand.cpp
 )
 
 # Check for GetOpt

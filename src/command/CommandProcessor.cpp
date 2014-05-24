@@ -16,12 +16,16 @@ namespace command {
 		{ "version", no_argument, 0, 'v' },
 		{ "help", no_argument, 0, 'h' },
 		{ "input", required_argument, 0, 'i' },
+
+		{ "list", optional_argument, 0, 'l' },
+		{ "recognize", optional_argument, 0, 'r' },
+		{ "add-to-model", optional_argument, 0, 'a' },
+
 		{ "draw", optional_argument, 0, 'd' },
 		{ "split", optional_argument, 0, 's' },
-		{ "add-model", optional_argument, 0, 'a' },
 		{0, 0, 0, 0}
 	};
-	static const char* const shortOptions = "vhi:d::s::a::";
+	static const char* const shortOptions = "vhi:lr::a:d::s::";
 
 	/**
 	 * Help info
@@ -31,8 +35,13 @@ namespace command {
 		EOL
 		"Options:" EOL
 		"-v, --version \t\t Display version information" EOL
-		"-h, --help \t\t Display help information (this manual)" EOL
-		"-i, --input \t\t Read WAV data for post-processing" EOL
+		"-h, --help    \t\t Display help information (this manual)" EOL
+		"-i, --input   \t\t Read WAV data for post-processing" EOL
+		EOL
+		"-l, --list    \t\t Show list of available models" EOL
+		"-r<m1,m2>, --recognize=<m1,m2>   \t\t Recognize input data using specified (csv) list of models (by default all models are being used)" EOL
+		"-a<m1>,    --add-to-model=<m1>   \t\t Add sample into specified model (create it if doesnt't exist)" EOL
+		EOL
 		"-d<filename>, --draw=<filename> \t Create the RMS diagram based on the WAV data (requires -i) and store into the specified file (file name is optional)" EOL
 		"-s<filename>, --split=<dirname> \t Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
 		EOL
@@ -71,16 +80,32 @@ namespace command {
 						isLast = !(new AudioDataCommand())->readData(*this->context, optarg);
 						break;
 
+
+					case 'l':
+						ModelCommand::list(*this->context);
+
+						isLast = true;
+						break;
+
+					case 'r':
+						ModelCommand::recognize(*this->context, optarg);
+
+						isLast = true;
+						break;
+
+					case 'a':
+						ModelCommand::add(*this->context, optarg);
+
+						isLast = true;
+						break;
+
+
 					case 'd':
 						isLast = !(new VisualizationCommand(optarg))->createDiagram(*this->context);
 						break;
 
 					case 's':
 						isLast = !(new AudioDataCommand())->splitIntoFiles(*this->context, optarg);
-						break;
-
-					case 'a':
-						isLast = !(new ModelCommand())->addModel(*this->context);
 						break;
 
 					default:
@@ -106,5 +131,5 @@ namespace command {
 		cout << helpInfo << endl;
 	}
 
-} /* namespace cpmmand */
+} /* namespace command */
 } /* namespace wtm */

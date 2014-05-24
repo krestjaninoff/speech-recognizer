@@ -1,16 +1,20 @@
 TODO:
 
-* Finish with DTW algorithm (write correct test)
-* Finish with AudioDataCommand (work with directories)
+* Fix compilation errors
+* Check the logic!!!
+
+* Project rebrending - YAZZ (Yet Another Offline Speach Recognizer)
+** length_t -> uint32_t
+** Implement commands in static way
+** Where to put Storage
 
 * Fix bugs:
-** Invalid splitting for m2, m3
+** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
 ** Do not trim frames in samples!
 
-* Implement model storage
-
-* Add Dynamic Time Warpimg algorithm (http://www.fon.hum.uva.nl/david/ba_shs/2010/SpraakherkenningEnSynthese_week08.pdf)
-
+* Remove useless includes
+* Memory leaks
+* Code style
 
 Dinctionary:
 

@@ -1,0 +1,84 @@
+#ifndef STORAGE_H_
+#define STORAGE_H_
+
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <map>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "../math/Model.h"
+#include "../audio/Word.h"
+
+using namespace std;
+using namespace wtm::math;
+using namespace wtm::audio;
+
+namespace wtm {
+namespace command {
+
+/**
+ * Just a simple binary storage
+ * <p>
+ * Its implementation is quite ineffective. But this is better than nothing :)
+ */
+class Storage {
+
+public:
+
+	Storage();
+	~Storage();
+
+	/**
+	 * Initialization
+	 */
+	bool init();
+
+	/**
+	 * Load models from its storage
+	 */
+	const map<uint32_t, Model*>* getModels() { return this->models; }
+
+	/**
+	 * Add model
+	 */
+	uint32_t addModel(const Model* model);
+
+	/**
+	 * Add the sample into the model
+	 */
+	void addSample(uint32_t modelId, const Word& word);
+
+	/**
+	 * Flush data into FS
+	 */
+	bool persist();
+
+private:
+
+	/**
+	 * Max model's ID
+	 */
+	uint32_t maxId;
+
+	/**
+	 * Models
+	 */
+	map<uint32_t, Model*>* models;
+
+	/**
+	 * Models data base
+	 */
+	static const char* STORAGE_FILE = "models.dat";
+
+	/**
+	 * Storage-specific header
+	 */
+	static const char* STORAGE_HEADER = "YAZZ";
+};
+
+} /* namespace command */
+} /* namespace wtm */
+
+#endif /* STORAGE_H_ */

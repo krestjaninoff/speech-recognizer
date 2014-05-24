@@ -4,6 +4,8 @@ project(math)
 set(SOURCE
 	MFCC.cpp
 	DTW.cpp
+	Model.cpp
+	Recognizer.cpp
 )
 
 add_library(math STATIC ${SOURCE})

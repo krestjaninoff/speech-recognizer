@@ -22,33 +22,26 @@ namespace command {
 class ModelCommand {
 public:
 
-	bool addModel(Context& context) {
-		cout << "Splitting data into separate words..." << endl;
+	/**
+	 * Display the list of available models
+	 */
+	static void list(Context& context);
 
-		// Check pre-requirements
-		if (NULL == context.wavData) {
-			cout << "Input data is not specified :(" << endl;
-			return false;
-		}
+	/**
+	 * Recognize input data using specified models (or all available models)
+	 */
+	static void recognize(Context& context, const string& modelNames);
 
-		// Create the Processor
-		audio::Processor* processor = new Processor(context.wavData);
-		context.processor = processor;
+	/**
+	 * Add current sample into the model
+	 */
+	static void add(Context& context, const string& modelName);
 
-		// Split wav data into words
-		processor->split();
-		if (processor->getWords()->size() > 1) {
-			cout << "Training sample contains %d words (only one word is allowed)" << endl;
-			return false;
-		}
+private:
 
-		// Calc & show mfcc
-		Word* word = processor->getWords()->at(0);
-		processor->initMfcc(*word);
+	static Word* getWord(Context& context);
 
-		cout << "Complete!" << endl;
-		return true;
-	};
+	static vector<string> parseString(const string& source, char delimeter);
 };
 
 } /* namespace command */

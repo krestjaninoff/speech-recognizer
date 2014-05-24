@@ -29,16 +29,16 @@ public:
 	void setText(const std::string& text) { this->text = text; }
 	const std::string& getText() const { return text; };
 
-	void setMfcc(double* mfcc, unsigned int size) {
+	void setMfcc(double* mfcc, uint32_t size) {
 		this->mfcc = mfcc; this->mfccSize = size; }
-	double* getMfcc() { return this->mfcc; }
-	unsigned int getMfccSize() { return this->mfccSize; }
+	double* getMfcc() const { return this->mfcc; }
+	uint32_t getMfccSize() const { return this->mfccSize; }
 
 private:
 	length_t id;
 	std::string text;
 
-	unsigned int mfccSize;
+	uint32_t mfccSize;
 	double* mfcc;
 };
 
