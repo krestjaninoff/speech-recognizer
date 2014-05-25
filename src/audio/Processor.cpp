@@ -14,7 +14,7 @@
 
 using namespace std;
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 void Processor::split() {
@@ -441,4 +441,4 @@ length_t Processor::getFramesCount(const Word& word) const {
 }
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */

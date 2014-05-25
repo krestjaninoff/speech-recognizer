@@ -1,7 +1,7 @@
 #include "DTW.h"
 #include "Recognizer.h"
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 	Recognizer::Recognizer(vector<Model*>* models) {
@@ -42,4 +42,4 @@ namespace math {
 	}
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */

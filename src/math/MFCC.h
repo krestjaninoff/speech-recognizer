@@ -8,9 +8,9 @@
 #include "../audio/audio.h"
 
 using namespace std;
-using namespace wtm::audio;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 /**
@@ -72,6 +72,6 @@ public:
 };
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* MFCC_H_ */

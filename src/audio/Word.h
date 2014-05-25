@@ -3,7 +3,7 @@
 
 #include "audio.h"
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 /**
@@ -43,6 +43,6 @@ private:
 };
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* WORD_H_ */

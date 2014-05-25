@@ -12,10 +12,10 @@
 #include "../audio/Word.h"
 
 using namespace std;
-using namespace wtm::math;
-using namespace wtm::audio;
+using namespace yazz::math;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 /**
@@ -79,6 +79,6 @@ private:
 };
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* STORAGE_H_ */

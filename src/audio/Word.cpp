@@ -1,6 +1,6 @@
 #include <Word.h>
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 	Word::Word(length_t id) {
@@ -18,4 +18,4 @@ namespace audio {
 	}
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */

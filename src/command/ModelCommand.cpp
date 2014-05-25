@@ -8,7 +8,7 @@
 #include <string>
 #include <string.h>
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 	void ModelCommand::list(Context& context) {
@@ -133,7 +133,7 @@ namespace command {
 	}
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 
 

@@ -7,7 +7,7 @@
 
 #include "../common.h"
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 	/**
@@ -18,6 +18,6 @@ namespace math {
 	const double EPSILON = 1e-4;
 
 } // namespace math
-} // namespace wtm
+} // namespace yazz
 
 #endif /* MATF_H_ */

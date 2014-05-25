@@ -7,7 +7,7 @@
 #include "../audio/audio.h"
 #include "../audio/Processor.h"
 
-namespace wtm {
+namespace yazz {
 namespace visual {
 
 /**
@@ -29,6 +29,6 @@ private:
 }; // class Painter
 
 } // namespace visual
-} // namespace wtm
+} // namespace yazz
 
 #endif /* PAINTER_H_ */

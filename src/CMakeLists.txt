@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8) 
-project (WavToMe)
+project (YAZZ)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=gnu++0x")
 
@@ -49,12 +49,12 @@ option(test "Build all tests" OFF)
 	include_directories(${GTEST_INCLUDE_DIR})
 	
 	# Unit Tests
-	add_executable(UNIT_TESTS
-		_test/math_DTW.cpp
-		_test/math_MFCC.cpp
+	add_executable(unit_tests
+		_test/math/DTW.cpp
+		_test/math/MFCC.cpp
 	)
 	
 	# Link test executable against gtest & gtest_main
-	target_link_libraries(UNIT_TESTS gtest gtest_main audio math)
-	add_test(UNIT_TESTS_ALL UNIT_TESTS)
+	target_link_libraries(unit_tests gtest gtest_main audio math)
+	add_test(UNIT_TESTS_ALL unit_tests)
 #endif()

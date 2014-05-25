@@ -1,6 +1,6 @@
 #include "MFCC.h"
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t finish, uint32_t frequency) {
@@ -144,4 +144,4 @@ double* MFCC::dstTransform(double* logPower) {
 }
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */

@@ -8,9 +8,9 @@
 #include "../audio/Word.h"
 
 using namespace std;
-using namespace wtm::audio;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 /**
@@ -29,6 +29,6 @@ private:
 };
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* RECOGNIZER_H_ */

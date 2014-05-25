@@ -7,7 +7,7 @@
 #include <string>
 #include "../common.h"
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 	/**
@@ -32,7 +32,7 @@ namespace command {
 	 * Help info
 	 */
 	static const char* const helpInfo =	EOL
-		"Usage: wtm [options]" EOL
+		"Usage: yazz [options]" EOL
 		EOL
 		"Options:" EOL
 		"-v, --version \t\t Display version information" EOL
@@ -133,4 +133,4 @@ namespace command {
 	}
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */

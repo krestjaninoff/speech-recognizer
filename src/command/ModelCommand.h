@@ -11,9 +11,9 @@
 #include "../audio/Processor.h"
 
 using namespace std;
-using namespace wtm::audio;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 /**
@@ -45,6 +45,6 @@ private:
 };
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* MODELCOMMAND_H_ */

@@ -5,7 +5,7 @@
 #ifndef VISUAL_H_
 #define VISUAL_H_
 
-namespace wtm {
+namespace yazz {
 namespace visual {
 
 	/**
@@ -19,6 +19,6 @@ namespace visual {
 	const int IMAGE_HEIGHT = 768;
 
 } // namespace visual
-} // namespace wtm
+} // namespace yazz
 
 #endif /* VISUAL_H_ */

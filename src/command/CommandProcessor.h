@@ -7,7 +7,7 @@
 #include "VisualizationCommand.h"
 #include "ModelCommand.h"
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 /**
@@ -48,6 +48,6 @@ private:
 };
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* COMMANDPROCESSOR_H_ */

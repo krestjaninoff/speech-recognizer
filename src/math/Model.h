@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 /**
@@ -46,6 +46,6 @@ private:
 };
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* MODEL_H_ */

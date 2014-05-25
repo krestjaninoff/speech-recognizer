@@ -1,4 +1,6 @@
-WavToMe is my modest attempt to implement text recognition app. Let's hope it will be successful!
+YAZZ (Yet Another Speech Recognizer) is my modest attempt to implement a text recognition application.
+
+So, let's hope it will be successful! :)
 
 Note this project has external dependencies:
 * libpng (can be installed as a separate library for both Linux and Windows);

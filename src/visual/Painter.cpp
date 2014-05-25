@@ -7,9 +7,9 @@
 #include "Frame.h"
 
 using namespace std;
-using namespace wtm::audio;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace visual {
 
 enum Color { BLACK, RED, GREEN, BLUE };
@@ -208,5 +208,5 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 }
 
 } // namespace visual
-} // namespace wtm
+} // namespace yazz
 

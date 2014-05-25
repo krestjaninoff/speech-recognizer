@@ -2,7 +2,7 @@
 #include <Frame.h>
 #include "../math/MFCC.h"
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 	Frame::Frame(length_t id):
@@ -38,4 +38,4 @@ namespace audio {
 	}
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */

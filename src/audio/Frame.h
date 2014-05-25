@@ -6,9 +6,9 @@
 #include "audio.h"
 #include "../math/MFCC.h"
 
-using namespace wtm::math;
+using namespace yazz::math;
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 /**
@@ -64,6 +64,6 @@ private:
 };
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* FRAME_H_ */

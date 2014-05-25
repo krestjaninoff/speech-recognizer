@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <DTW.h>
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 	double DTW::calcDistance(double* seq1, uint32_t seq1size, double* seq2, uint32_t seq2size) {
@@ -129,4 +129,4 @@ namespace math {
 	}
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */

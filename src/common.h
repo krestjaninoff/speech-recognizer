@@ -11,7 +11,7 @@
 #include <sstream>
 #include <limits.h>
 
-namespace wtm {
+namespace yazz {
 
 	// Build information
 
@@ -31,6 +31,6 @@ namespace wtm {
 	#define toString( x ) dynamic_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 
-} // namespace wtm
+} // namespace yazz
 
 #endif /* COMMON_H_ */

@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 /**
@@ -138,4 +138,4 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 }
 
 } // namespace audio
-} // namespace wtm
+} // namespace yazz

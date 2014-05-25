@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include "../common.h"
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 	/**
@@ -68,6 +68,6 @@ namespace audio {
 	const short MFCC_FREQ_MAX = 8000;
 
 } // namespace audio
-} // namespace wtm
+} // namespace yazz
 
 #endif /* AUDIO_H_ */

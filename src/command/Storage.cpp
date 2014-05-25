@@ -1,6 +1,6 @@
 #include <Storage.h>
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 	Storage::Storage() {
@@ -111,4 +111,4 @@ namespace command {
 	}
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */

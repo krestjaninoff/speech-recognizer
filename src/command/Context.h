@@ -5,9 +5,9 @@
 #include "../audio/Processor.h"
 #include "Storage.h"
 
-using namespace wtm::audio;
+using namespace yazz::audio;
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 /**
@@ -40,6 +40,6 @@ public:
 };
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* CONTEXT_H_ */

@@ -1,12 +1,10 @@
 TODO:
 
-* Fix compilation errors
 * Check the logic!!!
 
-* Project rebrending - YAZZ (Yet Another Offline Speach Recognizer)
 ** length_t -> uint32_t
 ** Implement commands in static way
-** Where to put Storage
+** Decide where to put Storage
 
 * Fix bugs:
 ** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)

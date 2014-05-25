@@ -17,7 +17,7 @@
 #include "Frame.h"
 #include "Word.h"
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 /**
@@ -92,6 +92,6 @@ private:
 };
 
 } // namespace audio
-} // namespace wtm
+} // namespace yazz
 
 #endif /* WAV_DATA_H_ */

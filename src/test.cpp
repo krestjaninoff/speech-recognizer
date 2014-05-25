@@ -4,7 +4,7 @@
 #include "math/MFCC.h"
 
 using namespace std;
-using namespace wtm::math;
+using namespace yazz::math;
 
 /**
  * Test entry point

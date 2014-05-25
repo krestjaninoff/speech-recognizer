@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace wtm {
+namespace yazz {
 namespace math {
 
 	Model::Model(string& text):
@@ -59,4 +59,4 @@ namespace math {
 	}
 
 } /* namespace math */
-} /* namespace wtm */
+} /* namespace yazz */

@@ -7,9 +7,9 @@
 #include "../visual/Painter.h"
 
 using namespace std;
-using namespace wtm::visual;
+using namespace yazz::visual;
 
-namespace wtm {
+namespace yazz {
 namespace command {
 
 /**
@@ -56,6 +56,6 @@ private:
 };
 
 } /* namespace command */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* VIZUALIZATIONCOMMAND_H_ */

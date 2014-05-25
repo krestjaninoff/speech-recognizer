@@ -4,7 +4,7 @@
 #include "command/CommandProcessor.h"
 
 using namespace std;
-using namespace wtm::command;
+using namespace yazz::command;
 
 /**
  * Entry point

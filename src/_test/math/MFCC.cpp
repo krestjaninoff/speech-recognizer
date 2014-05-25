@@ -1,7 +1,7 @@
 #include "../math/MFCC.h"
 #include "gtest/gtest.h"
 
-using namespace wtm::math;
+using namespace yazz::math;
 
 TEST(MATH_MFCC, FOURIER_TRANSFORM)
 {

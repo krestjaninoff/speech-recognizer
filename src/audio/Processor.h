@@ -11,7 +11,7 @@
 #include "Word.h"
 #include <memory>
 
-namespace wtm {
+namespace yazz {
 namespace audio {
 
 /**
@@ -85,6 +85,6 @@ private:
 typedef Processor* ProcessorPtr;
 
 } /* namespace audio */
-} /* namespace wtm */
+} /* namespace yazz */
 
 #endif /* Processor_H_ */
