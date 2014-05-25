@@ -27,16 +27,16 @@ public:
 	Model(string& text);
 	~Model();
 
-	const uint32_t getId() { return this->id; }
+	uint32_t getId() const { return this->id; }
 	void setId(uint32_t id) { this->id = id; }
 
-	const string& getText() { return this->text; }
+	const string& getText() const { return this->text; }
 
 	void addSample(double* mfcc, uint32_t size);
-	const vector<MFCCSample>& getSamples() { return *this->samples; }
+	const vector<MFCCSample>& getSamples() const { return *this->samples; }
 
-	friend ofstream& operator<< (std::ofstream &f, const Model &obj);
-	friend ifstream& operator>> (std::ofstream &f, Model &obj);
+	friend std::ostream& operator<<(std::ostream& fs, const Model &obj);
+	friend std::istream& operator>>(std::istream& fs, Model &obj);
 
 private:
 	uint32_t id;

@@ -3,6 +3,8 @@
 #include <ostream>
 #include "Model.h"
 
+using namespace std;
+
 namespace wtm {
 namespace math {
 
@@ -21,11 +23,11 @@ namespace math {
 		this->samples->push_back(sample);
 	}
 
-	ostream& operator<< (std::ostream &fs, const Model &obj) {
-		obj.id >> fs;
-		obj.text >> fs;
+	ostream& operator<<(ostream& fs, const Model& obj) {
+		fs << obj.id;
+		fs << obj.text;
 
-		obj.samples->size() >> fs;
+		fs << obj.samples->size();
 
 		for (vector<MFCCSample>::const_iterator sample = obj.samples->begin();
 				sample != obj.samples->end(); ++sample) {
@@ -37,12 +39,12 @@ namespace math {
 		return fs;
 	}
 
-	istream& operator>> (std::istream &fs, Model &obj) {
-		obj.id << fs;
-		obj.text << fs;
+	istream& operator>>(istream& fs, Model& obj) {
+		fs >> obj.id;
+		fs >> obj.text;
 
 		size_t size;
-		size << fs;
+		fs >> size;
 
 		MFCCSample sample;
 		for (size_t i = 0; i < size; i++) {

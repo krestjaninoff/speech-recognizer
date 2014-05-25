@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "maph.h"
+#include "Model.h"
 #include "../audio/Word.h"
 
 using namespace std;
@@ -18,13 +19,13 @@ namespace math {
 class Recognizer {
 public:
 
-	Recognizer(vector<Model>* models);
+	Recognizer(vector<Model*>* models);
 	~Recognizer();
 
 	const Model* recognize(const Word& word);
 
 private:
-	const vector<Model>* models;
+	const vector<Model*>* models;
 };
 
 } /* namespace math */
