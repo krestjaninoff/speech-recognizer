@@ -1,4 +1,5 @@
 #include <Storage.h>
+#include "io.h"
 
 namespace yazz {
 namespace command {
@@ -13,7 +14,7 @@ namespace command {
 		if (NULL != this->models) {
 			for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
 					model != this->models->end(); ++model) {
-				delete *model;
+				delete (*model).second;
 			}
 
 			delete this->models;
@@ -46,11 +47,12 @@ namespace command {
 				return false;
 			}
 
-			this->maxId << fs;
+			fs >> this->maxId;
 
+			string tmpName("");
 			for (uint32_t i = 0; i < this->maxId; i++) {
-				Model* model;
-				model << fs;
+				Model* model = new Model(tmpName);
+				fs >> *model;
 
 				this->models->insert(make_pair(model->getId(), model));
 			}
@@ -72,10 +74,10 @@ namespace command {
 		return true;
 	}
 
-	uint32_t Storage::addModel(const Model* model) {
+	uint32_t Storage::addModel(Model* model) {
 
 		model->setId(++this->maxId);
-		this->models->insert(make_pair(this->maxId, *model));
+		this->models->insert(make_pair(this->maxId, model));
 
 		return this->maxId;
 	}
@@ -98,16 +100,18 @@ namespace command {
 		}
 
 		fs.write(STORAGE_HEADER, sizeof(char) * 4);
-		this->maxId >> fs;
+		fs << this->maxId;
 
 		for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
 				model != this->models->end(); ++model) {
 
-			*model >> fs;
+			fs << (*model).second;
 		}
 
 		fs.close();
 		fprintf(stdout, "done!\n");
+
+		return true;
 	}
 
 } /* namespace command */

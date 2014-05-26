@@ -43,7 +43,7 @@ public:
 	/**
 	 * Add model
 	 */
-	uint32_t addModel(const Model* model);
+	uint32_t addModel(Model* model);
 
 	/**
 	 * Add the sample into the model
@@ -70,12 +70,12 @@ private:
 	/**
 	 * Models data base
 	 */
-	static const char* STORAGE_FILE = "models.dat";
+	const char* STORAGE_FILE = "models.dat";
 
 	/**
 	 * Storage-specific header
 	 */
-	static const char* STORAGE_HEADER = "YAZZ";
+	const char* STORAGE_HEADER = "YAZZ";
 };
 
 } /* namespace command */

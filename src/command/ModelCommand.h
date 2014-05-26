@@ -1,14 +1,7 @@
 #ifndef MODELCOMMAND_H_
 #define MODELCOMMAND_H_
 
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "Context.h"
-#include "../audio/Word.h"
-#include "../audio/Processor.h"
 
 using namespace std;
 using namespace yazz::audio;

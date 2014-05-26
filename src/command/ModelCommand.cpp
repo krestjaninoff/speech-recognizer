@@ -1,5 +1,6 @@
 #include "ModelCommand.h"
 
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -7,20 +8,24 @@
 #include <getopt.h>
 #include <string>
 #include <string.h>
+#include <algorithm>
+#include "../audio/Word.h"
+#include "../audio/Processor.h"
+#include "../math/Recognizer.h"
 
 namespace yazz {
 namespace command {
 
 	void ModelCommand::list(Context& context) {
 		context.storage->init();
-		map<uint32_t, Model*>* models = context.storage->getModels();
+		const map<uint32_t, Model*>* models = context.storage->getModels();
 
 		cout << "Available models are:" << endl;
 
-		for (vector<Model*>::const_iterator model = models->begin();
+		for (map<uint32_t, Model*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
-			cout << (*model)->getText() << endl;
+			cout << (*model).second->getText() << endl;
 		}
 
 		cout << endl;
@@ -33,20 +38,24 @@ namespace command {
 		Word* word = getWord(context);
 
 		// Get available models
-		vector<Model*> modelsFiltered = new vector<Model*>();
-		map<uint32_t, Model*>* models = context.storage->getModels();
+		vector<Model*>* modelsFiltered = new vector<Model*>();
+		const map<uint32_t, Model*>* models = context.storage->getModels();
 
 		vector<string> modelNames = parseString(modelNamesStr, ',');
-		for (vector<Model*>::const_iterator model = models->begin();
-			model != models->end(); ++model) {
+		for (map<uint32_t, Model*>::const_iterator model = models->begin();
+				model != models->end(); ++model) {
 
-			// TODO Implement filtration
-			modelsFiltered.push_back(*model);
+			string modelName((*model).second->getText());
+			if (0 == modelNames.size() ||
+					find(modelNames.begin(), modelNames.end(), modelName) != modelNames.end()) {
+
+				modelsFiltered->push_back((*model).second);
+			}
 		}
 
 		// Try to recognize
 		Recognizer rec(modelsFiltered);
-		Model* model = rec.recognize(*word);
+		const Model* model = rec.recognize(*word);
 
 		cout << "done!" << endl;
 
@@ -68,19 +77,20 @@ namespace command {
 
 		// Find or create the model
 		Model* theModel = NULL;
-		map<uint32_t, Model*>* models = context.storage->getModels();
-		for (vector<Model*>::const_iterator model = models->begin();
-			model != models->end(); ++model) {
+		const map<uint32_t, Model*>* models = context.storage->getModels();
+		for (map<uint32_t, Model*>::const_iterator model = models->begin();
+				model != models->end(); ++model) {
 
-			if (strcmp(modelName.c_str(), (*model)->getText().c_str())) {
-				theModel = *model;
+			if (strcmp(modelName.c_str(), (*model).second->getText().c_str())) {
+				theModel = (*model).second;
 				break;
 			}
 		}
 
 		// Create the model if it does not exist
+		string modelNameStr(modelName);
 		if (NULL != theModel) {
-			theModel = new Model(modelName);
+			theModel = new Model(modelNameStr);
 			context.storage->addModel(theModel);
 		}
 
@@ -88,7 +98,7 @@ namespace command {
 		context.storage->addSample(theModel->getId(), *word);
 
 		cout << "done!" << endl;
-	};
+	}
 
 	Word* ModelCommand::getWord(Context& context) {
 		cout << "Calculating MFCC for input data... ";
