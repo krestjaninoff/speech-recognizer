@@ -4,12 +4,15 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "Context.h"
 #include "../audio/Word.h"
 #include "../audio/Processor.h"
+
+#ifdef __MINGW32__
+#include <io.h>
+#endif
 
 using namespace std;
 using namespace yazz::audio;

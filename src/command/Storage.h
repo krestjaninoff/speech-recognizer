@@ -70,13 +70,15 @@ private:
 	/**
 	 * Models data base
 	 */
-	const char* STORAGE_FILE = "models.dat";
+	static const char* STORAGE_FILE;
 
 	/**
 	 * Storage-specific header
 	 */
-	const char* STORAGE_HEADER = "YAZZ";
+	static const char* STORAGE_HEADER;
 };
+
+
 
 } /* namespace command */
 } /* namespace yazz */

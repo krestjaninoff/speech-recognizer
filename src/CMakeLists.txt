@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8) 
 project (YAZZ)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=gnu++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -pthread -std=gnu++0x")
 
 
 #
@@ -24,12 +24,12 @@ add_subdirectory(command)
 # Executables
 #              
 set(SOURCE main.cpp)                       
-add_executable(wtm ${SOURCE})
-target_link_libraries(wtm command visual audio math)
+add_executable(yazz ${SOURCE})
+target_link_libraries(yazz command visual audio math)
 
 #set(TEST test.cpp)
-#add_executable(wtm_test ${TEST})
-#target_link_libraries(wtm_test command visual audio math)
+#add_executable(yazz_test ${TEST})
+#target_link_libraries(yazz_test command visual audio math)
 
 
 #

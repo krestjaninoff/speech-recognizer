@@ -1,8 +1,15 @@
-#include <Storage.h>
-#include "io.h"
+#include "Storage.h"
+#include <string.h>
+
+#ifdef __MINGW32__
+#include <io.h>
+#endif
 
 namespace yazz {
 namespace command {
+
+	const char* Storage::STORAGE_FILE = "models.dat";
+	const char* Storage::STORAGE_HEADER = "YAZZ";
 
 	Storage::Storage() {
 		this->maxId = 0;
@@ -29,7 +36,7 @@ namespace command {
 		}
 		this->models = new map<uint32_t, Model*>();
 
-		if (-1 != access(STORAGE_FILE, F_OK)) {
+		if (access(STORAGE_FILE, F_OK) != -1) {
 			fprintf(stdout, "Loading models storage... ");
 
 			std::fstream fs;
