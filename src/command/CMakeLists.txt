@@ -6,6 +6,7 @@ set(SOURCE
 	Storage.cpp
 	AudioDataCommand.cpp
 	ModelCommand.cpp
+	VisualizationCommand.cpp
 )
 
 # Check for GetOpt

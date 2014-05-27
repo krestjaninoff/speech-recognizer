@@ -43,8 +43,6 @@ private:
 	static bool initOutputDirectory(const string& outputFolder);
 };
 
-const char* AudioDataCommand::OUTPUT_FOLDER_DEFAULT = "out";
-
 } /* namespace command */
 } /* namespace yazz */
 

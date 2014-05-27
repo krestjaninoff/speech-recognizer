@@ -8,6 +8,9 @@
 namespace yazz {
 namespace command {
 
+	const char* Storage::STORAGE_FILE = "models.dat";
+	const char* Storage::STORAGE_HEADER = "YAZZ";
+
 	Storage::Storage() {
 		this->maxId = 0;
 		this->models = NULL;
