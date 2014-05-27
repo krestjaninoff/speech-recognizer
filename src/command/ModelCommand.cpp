@@ -17,21 +17,32 @@ namespace yazz {
 namespace command {
 
 	void ModelCommand::list(Context& context) {
-		context.storage->init();
+		if (!context.storage->init()) {
+			return;
+		}
+
 		const map<uint32_t, Model*>* models = context.storage->getModels();
 
-		cout << "Available models are:" << endl;
+		if (models->size() > 0) {
+			cout << "Available models are:" << endl;
 
-		for (map<uint32_t, Model*>::const_iterator model = models->begin();
-				model != models->end(); ++model) {
+			for (map<uint32_t, Model*>::const_iterator model = models->begin();
+					model != models->end(); ++model) {
 
-			cout << (*model).second->getText() << endl;
+				cout << (*model).second->getText() << endl;
+			}
+
+		} else {
+			cout << "There are no any models in the storage :( Use -a option add one!" << endl;
 		}
 
 		cout << endl;
 	}
 
 	void ModelCommand::recognize(Context& context, const string& modelNamesStr) {
+		if (!context.storage->init()) {
+			return;
+		}
 		cout << "Word recognition... ";
 
 		// Get a word to recognize
@@ -70,6 +81,9 @@ namespace command {
 	}
 
 	void ModelCommand::add(Context& context, const string& modelName) {
+		if (!context.storage->init()) {
+			return;
+		}
 		cout << "Adding the new sample... ";
 
 		// Get a word to recognize

@@ -1,4 +1,5 @@
 #include "Storage.h"
+#include <stdio.h>
 #include <string.h>
 
 #ifdef __MINGW32__
@@ -37,20 +38,20 @@ namespace command {
 		this->models = new map<uint32_t, Model*>();
 
 		if (access(STORAGE_FILE, F_OK) != -1) {
-			fprintf(stdout, "Loading models storage... ");
+			cout << "Loading models from the storage... ";
 
 			std::fstream fs;
 			fs.open(STORAGE_FILE, std::ios::in | std::ios::binary);
 
 			if (!fs.good()) {
-				fprintf(stderr, "Can't access models storage\n");
+				cerr << "Can't access the model's storage :(" << endl;
 				return false;
 			}
 
 			char header[4];
 			fs.read(header, sizeof(char) * 4);
 			if (strncmp(header, STORAGE_HEADER, 4)) {
-				fprintf(stderr, "Invalid storage\n");
+				cerr << "Invalid storage :(" << endl;
 				return false;
 			}
 
@@ -65,7 +66,6 @@ namespace command {
 			}
 
 			fs.close();
-			fprintf(stdout, "done!\n");
 
 		// Storage not found, creating an empty one
 		} else {
@@ -73,11 +73,14 @@ namespace command {
 
 			std::fstream fs;
 			fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
-			fs.close();
 
-			fprintf(stdout, "done!\n");
+			fs.write(STORAGE_HEADER, sizeof(char) * 4);
+			fs << (uint32_t) 0;
+
+			fs.close();
 		}
 
+		cout << "done!" << endl;
 		return true;
 	}
 
@@ -96,13 +99,13 @@ namespace command {
 	}
 
 	bool Storage::persist() {
-		fprintf(stdout, "Storage not found, creating an empty one... ");
+		cout << "Storage not found, creating an empty one... ";
 
 		std::fstream fs;
 		fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
 
 		if (!fs.good()) {
-			fprintf(stderr, "Can't access models storage\n");
+			cerr << "Can't access model's storage :(" << endl;
 			return false;
 		}
 
@@ -116,7 +119,7 @@ namespace command {
 		}
 
 		fs.close();
-		fprintf(stdout, "done!\n");
+		cout << "done!" << endl;
 
 		return true;
 	}
