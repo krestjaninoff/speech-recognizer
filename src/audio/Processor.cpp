@@ -20,11 +20,11 @@ namespace audio {
 void Processor::split() {
 
 	// Init "samples per frame" measure
-	length_t bytesPerFrame = static_cast<length_t>(
+	uint32_t bytesPerFrame = static_cast<uint32_t>(
 			getWavData()->getHeader().bytesPerSec * FRAME_LENGTH / 1000.0);
-	length_t bytesPerSample = static_cast<uint32_t>(
+	uint32_t bytesPerSample = static_cast<uint32_t>(
 			getWavData()->getHeader().bitsPerSample / 8);
-	this->samplesPerFrame = static_cast<length_t>(bytesPerFrame / bytesPerSample);
+	this->samplesPerFrame = static_cast<uint32_t>(bytesPerFrame / bytesPerSample);
 	assert(this->samplesPerFrame > 0);
 
 	// The main part of splitting
@@ -42,8 +42,8 @@ void Processor::divideIntoFrames() {
 
 	this->frames->reserve(framesCount);
 
-	length_t indexBegin = 0, indexEnd = 0;
-	for (length_t frameId = 0, size = getWavData()->getRawData()->size(); frameId < framesCount;
+	uint32_t indexBegin = 0, indexEnd = 0;
+	for (uint32_t frameId = 0, size = getWavData()->getRawData()->size(); frameId < framesCount;
 			++frameId) {
 
 		indexBegin = frameId * samplesPerNonOverlap;
@@ -72,7 +72,7 @@ void Processor::divideIntoWords() {
 	// Let's use Moving Average value to avoid spikes
 	unsigned short maShift = MOVING_AVERAGE_SIZE / 2;
 	maAvg = maMin = this->frames->at(0)->getRms();
-	length_t iFrame;
+	uint32_t iFrame;
 	for (iFrame = maShift; iFrame < this->frames->size() - maShift; ++iFrame) {
 
 		ma = 0;
@@ -95,7 +95,7 @@ void Processor::divideIntoWords() {
 	this->maRmsMax = maMax;
 
 	// A little hack to calculate bound values
-	for (length_t iFrame = 0; iFrame < maShift; ++iFrame) {
+	for (uint32_t iFrame = 0; iFrame < maShift; ++iFrame) {
 		this->frames->at(iFrame)->setMaRms(this->frames->at(iFrame)->getRms());
 		this->frames->at(this->frames->size() - 1 - iFrame)->setMaRms(
 				this->frames->at(this->frames->size() - 1 - iFrame)->getRms());
@@ -108,7 +108,7 @@ void Processor::divideIntoWords() {
 	// If max value greater than min value more then 50% then we have the "silence" threshold.
 	// Otherwise, let's think that we have only one word.
 	double threshold = 0;
-	length_t wordId = -1;
+	uint32_t wordId = -1;
 
 	if (maMax * 0.5 > maMin) {
 		threshold = thresholdCandidate;
@@ -134,10 +134,10 @@ void Processor::divideIntoWords() {
 				if (firstFrameInCurrentWordNumber >= 0) {
 
 					// Let's find distance between start of the current word and end of the previous word
-					length_t distance = 0;
+					uint32_t distance = 0;
 					if (0 != lastWord) {
 
-						length_t lastFrameInPreviousWordNumber = this->wordToFrames->at(lastWord->getId()).second;
+						uint32_t lastFrameInPreviousWordNumber = this->wordToFrames->at(lastWord->getId()).second;
 						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
 					}
 
@@ -155,7 +155,7 @@ void Processor::divideIntoWords() {
 
 					// We need to add the current word to the previous one
 					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-						length_t firstFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).first;
+						uint32_t firstFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).first;
 
 						this->wordToFrames->erase(lastWord->getId());
 						this->wordToFrames->insert(make_pair(lastWord->getId(),
@@ -338,15 +338,15 @@ double Processor::getThresholdCandidate(double maMin, double maAvg, double maMax
 
 void Processor::initMfcc(Word& word) {
 
-	length_t firstId = this->wordToFrames->at(word.getId()).first;
-	length_t lastId = this->wordToFrames->at(word.getId()).second;
+	uint32_t firstId = this->wordToFrames->at(word.getId()).first;
+	uint32_t lastId = this->wordToFrames->at(word.getId()).second;
 
-	length_t framesCnt = lastId - firstId + 1;
+	uint32_t framesCnt = lastId - firstId + 1;
 	double* mfcc = new double[MFCC_SIZE * framesCnt];
 
 	for (uint32_t i = 0; i < framesCnt; i++) {
-		length_t rawBegin = this->frameToRaw->at(firstId + i).first;
-		length_t rawFinsh = this->frameToRaw->at(firstId + i).second;
+		uint32_t rawBegin = this->frameToRaw->at(firstId + i).first;
+		uint32_t rawFinsh = this->frameToRaw->at(firstId + i).second;
 
 		double* frameMfcc = this->frames->at(firstId + i)->initMFCC(
 				*getWavData()->getRawData(), rawBegin, rawFinsh,
@@ -399,12 +399,12 @@ void Processor::saveWordAsAudio(const std::string& file, const Word& word) const
 	raw_t* data = new raw_t[waveSize / sizeof(raw_t)];
 
 	int frameNumber = 0;
-	length_t frameStart = -1;
-	for (length_t currentFrame = this->wordToFrames->at(word.getId()).first;
+	uint32_t frameStart = -1;
+	for (uint32_t currentFrame = this->wordToFrames->at(word.getId()).first;
 			currentFrame < this->wordToFrames->at(word.getId()).second; currentFrame++) {
 		frameStart = this->frameToRaw->at(currentFrame).first;
 
-		for (length_t i = 0; i < samplesPerNonOverlap; i++) {
+		for (uint32_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
 					this->wavData->getRawData()->at(frameStart + i);
 
@@ -423,7 +423,7 @@ void Processor::saveWordAsAudio(const std::string& file, const Word& word) const
 bool Processor::isPartOfAWord(const Frame& frame) const {
 	bool isPartOfWord = false;
 
-	for (std::map<length_t, std::pair<length_t, length_t> >::const_iterator word = this->wordToFrames->begin();
+	for (std::map<uint32_t, std::pair<uint32_t, uint32_t> >::const_iterator word = this->wordToFrames->begin();
 			word != this->wordToFrames->end(); ++word) {
 
 		if (word->second.first <= frame.getId() && frame.getId() <= word->second.second) {
@@ -435,8 +435,8 @@ bool Processor::isPartOfAWord(const Frame& frame) const {
 	return isPartOfWord;
 }
 
-length_t Processor::getFramesCount(const Word& word) const {
-	 length_t cnt = this->wordToFrames->at(word.getId()).second - this->wordToFrames->at(word.getId()).first;
+uint32_t Processor::getFramesCount(const Word& word) const {
+	 uint32_t cnt = this->wordToFrames->at(word.getId()).second - this->wordToFrames->at(word.getId()).first;
 	 return cnt;
 }
 

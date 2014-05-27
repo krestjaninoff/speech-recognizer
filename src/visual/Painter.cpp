@@ -105,7 +105,7 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 	// Draw word threshold
 	uint32_t thresholdY = (processor->getWordsThreshold()) * (imgHeight - 1) / yMax;
 	thresholdY = imgHeight - thresholdY - 1;
-	for (length_t x = 0; x < imgWidth; x++) {
+	for (uint32_t x = 0; x < imgWidth; x++) {
 		image[x + thresholdY * imgWidth] = BLUE;
 	}
 

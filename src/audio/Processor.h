@@ -25,11 +25,11 @@ public:
 		this->wavData = wavData;
 
 		this->frames = new std::vector<Frame*>();
-		this->frameToRaw = new std::map<length_t, std::pair<length_t, length_t> >();
+		this->frameToRaw = new std::map<uint32_t, std::pair<uint32_t, uint32_t> >();
 		this->samplesPerFrame = 0;
 
 		this->words = new std::vector<Word*>();
-		this->wordToFrames = new std::map<length_t, std::pair<length_t, length_t> >();
+		this->wordToFrames = new std::map<uint32_t, std::pair<uint32_t, uint32_t> >();
 		this->maRmsMax = 0;
 		this->wordsThreshold = 0;
 	}
@@ -59,7 +59,7 @@ public:
 	double getMaRMSMax() const { return this->maRmsMax; }
 
 	bool isPartOfAWord(const Frame& frame) const;
-	length_t getFramesCount(const Word& word) const;
+	uint32_t getFramesCount(const Word& word) const;
 
 	void saveWordAsAudio(const std::string& file, const Word& word) const;
 
@@ -67,11 +67,11 @@ private:
 	WavData* wavData;
 
 	std::vector<Frame*>* frames;
-	std::map<length_t, std::pair<length_t, length_t> >* frameToRaw;
-	length_t samplesPerFrame;
+	std::map<uint32_t, std::pair<uint32_t, uint32_t> >* frameToRaw;
+	uint32_t samplesPerFrame;
 
 	std::vector<Word*>* words;
-	std::map<length_t, std::pair<length_t, length_t> >* wordToFrames;
+	std::map<uint32_t, std::pair<uint32_t, uint32_t> >* wordToFrames;
 	raw_t maRmsMax;
 	double wordsThreshold;
 

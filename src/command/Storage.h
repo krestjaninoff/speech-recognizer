@@ -78,7 +78,9 @@ private:
 	static const char* STORAGE_HEADER;
 };
 
+const char* Storage::STORAGE_FILE = "models.dat";
 
+const char* Storage::STORAGE_HEADER = "YAZZ";
 
 } /* namespace command */
 } /* namespace yazz */

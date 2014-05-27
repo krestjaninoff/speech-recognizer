@@ -15,13 +15,13 @@ public:
 	/**
 	 * Create a word based on set of frames
 	 */
-	Word(length_t id);
+	Word(uint32_t id);
 	~Word();
 
 	/**
 	 * Get frame's serial number
 	 */
-	length_t getId() const { return this->id; }
+	uint32_t getId() const { return this->id; }
 
 	/**
 	 * Text meaning of the word
@@ -35,7 +35,7 @@ public:
 	uint32_t getMfccSize() const { return this->mfccSize; }
 
 private:
-	length_t id;
+	uint32_t id;
 	std::string text;
 
 	uint32_t mfccSize;

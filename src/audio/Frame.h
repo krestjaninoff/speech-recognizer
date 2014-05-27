@@ -20,18 +20,18 @@ public:
 	/**
 	 * Create a frame
 	 */
-	Frame(length_t id);
+	Frame(uint32_t id);
 	~Frame();
 
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const std::vector<raw_t>& source, length_t start, length_t finish);
+	void init(const std::vector<raw_t>& source, uint32_t start, uint32_t finish);
 
 	/**
 	 * Get frame's serial number
 	 */
-	length_t getId() const { return this->id; }
+	uint32_t getId() const { return this->id; }
 
 	/**
 	 * Get Root Mean Square
@@ -48,19 +48,19 @@ public:
 	 * Get Mel-frequency cepstral coefficients
 	 */
 	double* getMFCC() const { return mfcc; }
-	double* initMFCC(const std::vector<raw_t>& source, length_t start,
-			length_t finish, uint32_t fourierLength);
+	double* initMFCC(const std::vector<raw_t>& source, uint32_t start,
+			uint32_t finish, uint32_t fourierLength);
 
 
 private:
-	const length_t id;
+	const uint32_t id;
 
 	double rms;
 	double maRms;
 
 	double* mfcc;
 
-	void calcRms(const std::vector<raw_t>& source, length_t start, length_t finish);
+	void calcRms(const std::vector<raw_t>& source, uint32_t start, uint32_t finish);
 };
 
 } /* namespace audio */

@@ -78,7 +78,7 @@ namespace command {
 						break;
 
 					case 'i':
-						isLast = !(new AudioDataCommand())->readData(*this->context, optarg);
+						isLast = !AudioDataCommand::readData(*this->context, optarg);
 						break;
 
 
@@ -102,11 +102,11 @@ namespace command {
 
 
 					case 'd':
-						isLast = !(new VisualizationCommand(optarg))->createDiagram(*this->context);
+						isLast = !VisualizationCommand::createDiagram(*this->context, optarg);
 						break;
 
 					case 's':
-						isLast = !(new AudioDataCommand())->splitIntoFiles(*this->context, optarg);
+						isLast = !AudioDataCommand::splitIntoFiles(*this->context, optarg);
 						break;
 
 					default:

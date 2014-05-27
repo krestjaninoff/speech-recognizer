@@ -58,8 +58,8 @@ public:
 
 	static WavData* readFromFile(const std::string& file);
 
-	length_t getNumberOfSamples() const { return numberOfSamples; }
-	void setNumberOfSamples(length_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
+	uint32_t getNumberOfSamples() const { return numberOfSamples; }
+	void setNumberOfSamples(uint32_t numberOfSamples) { this->numberOfSamples = numberOfSamples; }
 
 	raw_t getMaxVal() const { return maxVal; }
 	void setMaxVal(raw_t maxVal) { this->maxVal = maxVal; }
@@ -76,7 +76,7 @@ private:
 
 	raw_t                   maxVal;
 	raw_t                   minVal;
-	length_t                numberOfSamples;
+	uint32_t                numberOfSamples;
 
 	WavData(WavHeader header) {
 		this->header = header;

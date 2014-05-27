@@ -3,7 +3,7 @@
 namespace yazz {
 namespace audio {
 
-	Word::Word(length_t id) {
+	Word::Word(uint32_t id) {
 		this->id = id;
 		this->text = "";
 

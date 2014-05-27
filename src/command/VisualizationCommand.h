@@ -17,9 +17,8 @@ namespace command {
  */
 class VisualizationCommand {
 public:
-	VisualizationCommand(const char* outputFile) : outputFile(outputFile) {};
 
-	bool createDiagram(Context& context) {
+	static bool createDiagram(Context& context, const char* outputFile) {
 		cout << "Creating a diagram..." << endl;
 
 		// Check pre-requirements
@@ -29,8 +28,7 @@ public:
 		}
 
 		// Determine results file name
-		const char* outputDefault = "diagram.png";
-		string file = outputDefault;
+		string file = OUTPUT_FILE_DEFAULT;
 		if (NULL != outputFile) {
 			string outputFileStr(outputFile);
 			file = outputFileStr;
@@ -52,8 +50,11 @@ public:
 	};
 
 private:
-	const char* outputFile;
+	static const char* outputFile;
+	static const char* OUTPUT_FILE_DEFAULT;
 };
+
+const char* VisualizationCommand::OUTPUT_FILE_DEFAULT = "diagram.png";
 
 } /* namespace command */
 } /* namespace yazz */

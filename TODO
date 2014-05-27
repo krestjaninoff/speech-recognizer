@@ -2,11 +2,9 @@ TODO:
 
 * Check the logic!!!
 
-** length_t -> uint32_t
-** Implement commands in static way
 ** Decide where to put Storage
 
-* Fix bugs:
+* Wods splitting:
 ** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
 ** Do not trim frames in samples!
 

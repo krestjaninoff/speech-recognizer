@@ -3,10 +3,10 @@
 namespace yazz {
 namespace math {
 
-double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t finish, uint32_t frequency) {
+double* MFCC::transform(const vector<raw_t>& source, uint32_t start, uint32_t finish, uint32_t frequency) {
 
 	// Calc
-	length_t size = finish - start + 1;
+	uint32_t size = finish - start + 1;
 	double* fourierRaw = fourierTransform(source, start, finish, true);
 	double** melFilters = getMelFilters(size, frequency);
 	double* logPower = calcPower(fourierRaw, melFilters, size);
@@ -27,15 +27,15 @@ double* MFCC::transform(const vector<raw_t>& source, length_t start, length_t fi
 /**
  * Perform short-time fourier transform with Hamming windows
  */
-double* MFCC::fourierTransform(const vector<raw_t>& source, length_t start, length_t finish, bool useWindow) {
+double* MFCC::fourierTransform(const vector<raw_t>& source, uint32_t start, uint32_t finish, bool useWindow) {
 
 	uint32_t size = finish - start + 1;
 	double* fourierRaw = new double[size];
 
-	for (length_t k = 0; k < size; k++) {
+	for (uint32_t k = 0; k < size; k++) {
 		fourierRaw[k] = 0;
 
-		for (length_t n = 0; n < size; n++) {
+		for (uint32_t n = 0; n < size; n++) {
 			raw_t sample = static_cast<double>(source[start + n]);
 
 			// e^(ix) = cos(x) + i*sin(x)
@@ -116,7 +116,7 @@ double* MFCC::calcPower(double* fourierRaw, double** melFilters, uint32_t fourie
 	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
 		logPower[m] = 0.;
 
-		for (length_t k = 0; k < fourierLength; k++) {
+		for (uint32_t k = 0; k < fourierLength; k++) {
 			logPower[m] += fourierRaw[k] * fourierRaw[k] * melFilters[m][k];
 		}
 		logPower[m] = log(logPower[m]);

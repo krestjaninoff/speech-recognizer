@@ -25,7 +25,7 @@ public:
 	/**
 	 * Perform MFCC transformation
 	 */
-	static double* transform(const std::vector<raw_t>& source, length_t start, length_t finish, uint32_t frequency);
+	static double* transform(const std::vector<raw_t>& source, uint32_t start, uint32_t finish, uint32_t frequency);
 
 // The methods below should be private, but for testing purposes they are public now
 // private:
@@ -41,7 +41,7 @@ public:
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
 	 */
-	static double* fourierTransform(const std::vector<raw_t>& source, length_t start, length_t finish, bool useWindow);
+	static double* fourierTransform(const std::vector<raw_t>& source, uint32_t start, uint32_t finish, bool useWindow);
 
 	/**
 	 * Create mel filters (for range of frequencies), using triangular overlapping windows

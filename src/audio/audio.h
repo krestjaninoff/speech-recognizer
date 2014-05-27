@@ -21,15 +21,9 @@ namespace audio {
 	typedef int16_t raw_t;
 
 	/**
-	 * Raw audio data type
-	 */
-	typedef uint32_t length_t;
-
-
-	/**
 	 * Length of frame (ms)
 	 */
-	const length_t FRAME_LENGTH = 10;
+	const uint32_t FRAME_LENGTH = 10;
 
 	/**
 	 * Percentage of overlap for frames (0 <= x < 1)

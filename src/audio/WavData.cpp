@@ -88,7 +88,7 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 	uint8_t value8, valueLeft8, valueRight8;
 	int16_t value16, valueLeft16, valueRight16;
 
-	length_t bytesPerSample = static_cast<uint32_t>(wavHeader.bitsPerSample / 8);
+	uint32_t bytesPerSample = static_cast<uint32_t>(wavHeader.bitsPerSample / 8);
 	unsigned long numberOfSamplesXChannels = wavHeader.subchunk2Size /
 			(wavHeader.numOfChan * bytesPerSample);
 
