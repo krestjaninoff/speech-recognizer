@@ -31,12 +31,6 @@ namespace audio {
 	const double FRAME_OVERLAP = 0.5;
 
 	/**
-	 * Amount (odd) of elements for moving average smoothing during words splitting
-	 * Length of analysing fragment is FRAME_LENGTH * (1 - FRAME_OVERLAP) * MA_SIZE
-	 */
-	const unsigned short MOVING_AVERAGE_SIZE = 3;
-
-	/**
 	 * Minimal size of word (in frames)
 	 * <p>
 	 * Let's put that minimal length of word is 200ms.
@@ -60,6 +54,12 @@ namespace audio {
 	 */
 	const short MFCC_FREQ_MIN = 300;
 	const short MFCC_FREQ_MAX = 8000;
+
+	/**
+	 * Entropy params
+	 */
+	const short ENTROPY_BINS = 50;
+	const short ENTROPY_THRESHOLD = 5;
 
 } // namespace audio
 } // namespace yazz

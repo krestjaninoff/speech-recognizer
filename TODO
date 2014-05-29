@@ -2,11 +2,13 @@ TODO:
 
 * Check the logic!!!
 
-** Decide where to put Storage
 
-* Wods splitting:
+* Wods splitting: -------- UNIT TESTS, To MATH
 ** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
 ** Do not trim frames in samples!
+
+
+** Decide where to put Storage (subproject "model")
 
 * Remove useless includes
 * Memory leaks

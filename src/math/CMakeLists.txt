@@ -4,6 +4,8 @@ project(math)
 set(SOURCE
 	MFCC.cpp
 	DTW.cpp
+	Statistics.cpp
+	
 	Model.cpp
 	Recognizer.cpp
 )

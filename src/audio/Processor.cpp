@@ -33,17 +33,18 @@ void Processor::split() {
 }
 
 void Processor::divideIntoFrames() {
+	const WavData* wavData = getWavData();
 
 	unsigned int samplesPerNonOverlap =
 		static_cast<unsigned int>(this->samplesPerFrame * (1 - FRAME_OVERLAP));
 	unsigned int framesCount =
-		(getWavData()->getHeader().subchunk2Size / (getWavData()->getHeader().bitsPerSample / 8))
+		(getWavData()->getHeader().subchunk2Size / (wavData->getHeader().bitsPerSample / 8))
 			/ samplesPerNonOverlap;
 
 	this->frames->reserve(framesCount);
 
 	uint32_t indexBegin = 0, indexEnd = 0;
-	for (uint32_t frameId = 0, size = getWavData()->getRawData()->size(); frameId < framesCount;
+	for (uint32_t frameId = 0, size = wavData->getRawData()->size(); frameId < framesCount;
 			++frameId) {
 
 		indexBegin = frameId * samplesPerNonOverlap;
@@ -51,7 +52,8 @@ void Processor::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd);
+			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd,
+					wavData->getMinVal(), wavData->getMaxVal());
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -64,289 +66,119 @@ void Processor::divideIntoFrames() {
 void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
-	double maMin = 0;
-	double maAvg = 0;
-	double maMax = 0;
-	double ma;
+	//double entropy, entropyMin, entropyMax;
+	double rms, rmsMin, rmsMax;
 
-	// Let's use Moving Average value to avoid spikes
-	unsigned short maShift = MOVING_AVERAGE_SIZE / 2;
-	maAvg = maMin = this->frames->at(0)->getRms();
+	// Let's find max and min rms/entropy
+	rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
+	//entropy = entropyMax = entropyMin = this->frames->at(0)->getEntropy();
+
 	uint32_t iFrame;
-	for (iFrame = maShift; iFrame < this->frames->size() - maShift; ++iFrame) {
+	for (iFrame = 1; iFrame < this->frames->size(); ++iFrame) {
 
-		ma = 0;
-		for (unsigned short iMa = iFrame - maShift; iMa <= iFrame + maShift; iMa++) {
-			ma += this->frames->at(iMa)->getRms();
-		}
-		ma /= MOVING_AVERAGE_SIZE;
-		this->frames->at(iFrame)->setMaRms(ma);
+		rms = this->frames->at(iFrame)->getRms();
+		//rmsMin = std::min(rmsMin, rms);
+		rmsMax = std::max(rmsMax, rms);
 
-		if (maMin > ma) {
-			maMin = ma;
-		}
-		if (ma > maMax) {
-			maMax = ma;
-		}
-
-		maAvg += ma;
+		//entropy = this->frames->at(iFrame)->getEntropy();
+		//entropyMin = std::min(entropyMin, entropy);
+		//entropyMax = std::max(entropyMax, entropy);
 	}
-	maAvg /= iFrame;
-	this->maRmsMax = maMax;
-
-	// A little hack to calculate bound values
-	for (uint32_t iFrame = 0; iFrame < maShift; ++iFrame) {
-		this->frames->at(iFrame)->setMaRms(this->frames->at(iFrame)->getRms());
-		this->frames->at(this->frames->size() - 1 - iFrame)->setMaRms(
-				this->frames->at(this->frames->size() - 1 - iFrame)->getRms());
-	}
+	this->maRmsMax = rmsMax;
 
 	// Tries to guess the best threshold value
-	double thresholdCandidate = getThresholdCandidate(maMin, maAvg, maMax);
-	this->wordsThreshold = thresholdCandidate;
+	// double threshold = (entropyMax - entropyMin) / 2. + 0.1 * entropyMin;
+	double threshold = ENTROPY_THRESHOLD;
+	this->wordsThreshold = threshold;
 
-	// If max value greater than min value more then 50% then we have the "silence" threshold.
-	// Otherwise, let's think that we have only one word.
-	double threshold = 0;
+	// Divide frames into words
 	uint32_t wordId = -1;
+	long firstFrameInCurrentWordNumber = -1;
+	Word* lastWord = 0;
 
-	if (maMax * 0.5 > maMin) {
-		threshold = thresholdCandidate;
-
-		// Divide frames into words
-		long firstFrameInCurrentWordNumber = -1;
-		Word* lastWord = 0;
-
-		DEBUG("_");
-		for (vector<Frame*>::const_iterator frame = this->frames->begin();
-				frame != this->frames->end(); ++frame) {
-
-			// Got a sound
-			if ((*frame)->getMaRms() > threshold) {
-
-				if (-1 == firstFrameInCurrentWordNumber) {
-					firstFrameInCurrentWordNumber = (*frame)->getId();
-					DEBUG("Word started at frame %d", (int) firstFrameInCurrentWordNumber);
-				}
-
-			// Got silence
-			} else {
-				if (firstFrameInCurrentWordNumber >= 0) {
-
-					// Let's find distance between start of the current word and end of the previous word
-					uint32_t distance = 0;
-					if (0 != lastWord) {
-
-						uint32_t lastFrameInPreviousWordNumber = this->wordToFrames->at(lastWord->getId()).second;
-						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
-					}
-
-					// We have a new word
-					if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
-						wordId++;
-						lastWord = new Word(wordId);
-
-						this->wordToFrames->insert(make_pair(lastWord->getId(),
-								make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
-						this->words->push_back(lastWord);
-
-						DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
-								(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
-
-					// We need to add the current word to the previous one
-					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-						uint32_t firstFrameInPreviousWordNumber = wordToFrames->at(lastWord->getId()).first;
-
-						this->wordToFrames->erase(lastWord->getId());
-						this->wordToFrames->insert(make_pair(lastWord->getId(),
-								make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
-
-						DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
-								(int) wordToFrames->at(lastWord->getId()).first, (int) (*frame)->getId());
-					}
-
-					firstFrameInCurrentWordNumber = -1;
-				}
-			}
-		}
-		DEBUG("_");
-
-		// Clean up short words
-		DEBUG("_");
-		for (vector<Word*>::iterator word = this->words->begin();
-				word != this->words->end(); ++word) {
-
-			if (getFramesCount(**word) < WORD_MIN_SIZE) {
-				DEBUG("Word %d is too short and will be avoided", (int) (*word)->getId());
-
-				this->wordToFrames->erase((*word)->getId());
-				this->words->erase(word);
-			}
-		}
-		DEBUG("_");
-
-
-	// Seems we have only one word
-	} else {
-
-		this->words->push_back(new Word(wordId));
-		this->wordToFrames->insert(make_pair(wordId,
-				make_pair(frames->at(0)->getId(), frames->at(frames->size() - 1)->getId())));
-	}
-}
-
-/**
- * Determination of silence threshold
- *
- * Method divides data into 3 clusters (using something like k-means algorithm).
- * The cluster center of "Min" cluster is used as a threshold candidate.
- */
-double Processor::getThresholdCandidate(double maMin, double maAvg, double maMax) {
-	UNUSED(maAvg);
-	short currIter = 0, maxIterCnt = 30;
-	bool isCenterChanged = true;
-
-	// Init clusters
-	double minClusterCenter = maMin;
-	double minClusterCenterNew = 0;
-	std::vector<Frame*>* minCluster = new std::vector<Frame*>();
-
-	// Just an empirical solution
-	double avgClusterCenter = maMax / 2;
-	double avgClusterCenterNew = 0;
-	std::vector<Frame*>* avgCluster = new std::vector<Frame*>();
-
-	double maxClusterCenter = maMax;
-	double maxClusterCenterNew = 0;
-	std::vector<Frame*>* maxCluster = new std::vector<Frame*>();
-
-	double maRms;
+	DEBUG("_");
 	for (vector<Frame*>::const_iterator frame = this->frames->begin();
-		frame != this->frames->end(); ++frame) {
+			frame != this->frames->end(); ++frame) {
 
-		maRms = (*frame)->getMaRms();
+		// Got a sound
+		if ((*frame)->getEntropy() > threshold) {
 
-		if (fabs(maRms - minClusterCenter) < fabs(maRms - avgClusterCenter)
-				&& fabs(maRms - minClusterCenter) < fabs(maRms - maxClusterCenter)) {
-			minCluster->push_back(*frame);
+			if (-1 == firstFrameInCurrentWordNumber) {
+				firstFrameInCurrentWordNumber = (*frame)->getId();
+				DEBUG("Word started at frame %d", (int) firstFrameInCurrentWordNumber);
+			}
 
-		} else if (fabs(maRms - avgClusterCenter) < fabs(maRms - minClusterCenter)
-				&& fabs(maRms - avgClusterCenter) < fabs(maRms - maxClusterCenter)) {
-			avgCluster->push_back(*frame);
-
+		// Got silence
 		} else {
-			maxCluster->push_back(*frame);
+			if (firstFrameInCurrentWordNumber >= 0) {
+
+				// Let's find distance between start of the current word and end of the previous word
+				uint32_t distance = 0;
+				if (0 != lastWord) {
+
+					uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)[lastWord->getId()].second;
+					distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
+				}
+
+				// We have a new word
+				if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
+					wordId++;
+					lastWord = new Word(wordId);
+
+					this->wordToFrames->insert(make_pair(lastWord->getId(),
+							make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
+					this->words->push_back(lastWord);
+
+					DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
+							(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
+
+				// We need to add the current word to the previous one
+				} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
+					uint32_t firstFrameInPreviousWordNumber =
+							(*this->wordToFrames)[lastWord->getId()].first;
+
+					this->wordToFrames->erase(lastWord->getId());
+					this->wordToFrames->insert(make_pair(lastWord->getId(),
+							make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
+
+					DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
+							(int) (*this->wordToFrames)[lastWord->getId()].first, (int) (*frame)->getId());
+				}
+
+				firstFrameInCurrentWordNumber = -1;
+			}
 		}
 	}
+	DEBUG("_");
 
-	// Iterate
-	while (currIter < maxIterCnt && isCenterChanged) {
+	// Clean up short words
+	DEBUG("_");
+	for (vector<Word*>::iterator word = this->words->begin();
+			word != this->words->end();) {
 
-		//DEBUG("Min center: %f, size: %d", minClusterCenter, minCluster->size());
-		//DEBUG("Avg center: %f, size: %d", avgClusterCenter, avgCluster->size());
-		//DEBUG("Max center: %f, size: %d", maxClusterCenter, maxCluster->size());
-		//DEBUG("_");
+		if (getFramesCount(**word) < WORD_MIN_SIZE) {
+			DEBUG("Word %d is too short and will be avoided", (int) (*word)->getId());
 
-		// Calculates new cluster centers
-		if (minCluster->size() > 0) {
-			minClusterCenterNew = minCluster->at(0)->getMaRms();
-
-			for (vector<Frame*>::const_iterator frame = minCluster->begin();
-						frame != minCluster->end(); ++frame) {
-				minClusterCenterNew += (*frame)->getMaRms();
-			}
-			minClusterCenterNew /= minCluster->size();
-
+			this->wordToFrames->erase((*word)->getId());
+			this->words->erase(word);
 		} else {
-			break;
+			 ++word;
 		}
-
-		if (avgCluster->size() > 0) {
-			avgClusterCenterNew = avgCluster->at(0)->getMaRms();
-
-			for (vector<Frame*>::const_iterator frame = avgCluster->begin();
-						frame != avgCluster->end(); ++frame) {
-				avgClusterCenterNew += (*frame)->getMaRms();
-			}
-			avgClusterCenterNew /= avgCluster->size();
-
-		} else {
-			break;
-		}
-
-		if (maxCluster->size() > 0) {
-			maxClusterCenterNew = maxCluster->at(0)->getMaRms();
-
-			for (vector<Frame*>::const_iterator frame = maxCluster->begin();
-						frame != maxCluster->end(); ++frame) {
-				maxClusterCenterNew += (*frame)->getMaRms();
-			}
-			maxClusterCenterNew /= maxCluster->size();
-
-		} else {
-			break;
-		}
-
-		// Check if clusters centers changed
-		if (fabs(minClusterCenterNew - minClusterCenter) < numeric_limits<double>::epsilon()
-				&& fabs(avgClusterCenterNew - avgClusterCenter) < numeric_limits<double>::epsilon()
-				&& fabs(maxClusterCenterNew - maxClusterCenter) < numeric_limits<double>::epsilon()) {
-			isCenterChanged = false;
-			break;
-		}
-
-		// Update clusters centers
-		minClusterCenter = minClusterCenterNew;
-		avgClusterCenter = avgClusterCenterNew;
-		maxClusterCenter = maxClusterCenterNew;
-
-		// Rebuild clusters
-		minCluster->clear();
-		avgCluster->clear();
-		maxCluster->clear();
-
-		for (vector<Frame*>::const_iterator frame = this->frames->begin();
-				frame != this->frames->end(); ++frame) {
-
-			if (fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - avgClusterCenter)
-					&& fabs((*frame)->getMaRms() - minClusterCenter) < fabs((*frame)->getMaRms() - maxClusterCenter)) {
-
-				minCluster->push_back(*frame);
-
-			} else if (fabs((*frame)->getMaRms() - avgClusterCenter) < fabs((*frame)->getMaRms() - minClusterCenter)
-					&& fabs((*frame)->getMaRms() - avgClusterCenter) < fabs((*frame)->getMaRms() - maxClusterCenter)) {
-
-				avgCluster->push_back(*frame);
-
-			} else {
-				maxCluster->push_back(*frame);
-			}
-		}
-
-		currIter++;
 	}
-
-	double thresholdCandidate = minClusterCenter / 2;
-	DEBUG("Threshold candidate: %f", thresholdCandidate);
-
-	delete minCluster;
-	delete avgCluster;
-	delete maxCluster;
-
-	return thresholdCandidate;
+	DEBUG("_");
 }
 
 void Processor::initMfcc(Word& word) {
 
-	uint32_t firstId = this->wordToFrames->at(word.getId()).first;
-	uint32_t lastId = this->wordToFrames->at(word.getId()).second;
+	uint32_t firstId = (*this->wordToFrames)[word.getId()].first;
+	uint32_t lastId = (*this->wordToFrames)[word.getId()].second;
 
 	uint32_t framesCnt = lastId - firstId + 1;
 	double* mfcc = new double[MFCC_SIZE * framesCnt];
 
 	for (uint32_t i = 0; i < framesCnt; i++) {
-		uint32_t rawBegin = this->frameToRaw->at(firstId + i).first;
-		uint32_t rawFinsh = this->frameToRaw->at(firstId + i).second;
+		uint32_t rawBegin = (*this->frameToRaw)[firstId + i].first;
+		uint32_t rawFinsh = (*this->frameToRaw)[firstId + i].second;
 
 		double* frameMfcc = this->frames->at(firstId + i)->initMFCC(
 				*getWavData()->getRawData(), rawBegin, rawFinsh,
@@ -400,16 +232,13 @@ void Processor::saveWordAsAudio(const std::string& file, const Word& word) const
 
 	int frameNumber = 0;
 	uint32_t frameStart = -1;
-	for (uint32_t currentFrame = this->wordToFrames->at(word.getId()).first;
-			currentFrame < this->wordToFrames->at(word.getId()).second; currentFrame++) {
-		frameStart = this->frameToRaw->at(currentFrame).first;
+	for (uint32_t currentFrame = (*this->wordToFrames)[word.getId()].first;
+			currentFrame < (*this->wordToFrames)[word.getId()].second; currentFrame++) {
+		frameStart = (*this->frameToRaw)[currentFrame].first;
 
 		for (uint32_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
 					this->wavData->getRawData()->at(frameStart + i);
-
-			//DEBUG("Frame %d (%d): %d", frameNumber,
-			//		frameStart + i, this->wavData->getRawData()->at(frameStart + i));
 		}
 
 		frameNumber++;
@@ -423,8 +252,8 @@ void Processor::saveWordAsAudio(const std::string& file, const Word& word) const
 bool Processor::isPartOfAWord(const Frame& frame) const {
 	bool isPartOfWord = false;
 
-	for (std::map<uint32_t, std::pair<uint32_t, uint32_t> >::const_iterator word = this->wordToFrames->begin();
-			word != this->wordToFrames->end(); ++word) {
+	std::map<uint32_t, std::pair<uint32_t, uint32_t> >::const_iterator word;
+	for (word = this->wordToFrames->begin(); word != this->wordToFrames->end(); ++word) {
 
 		if (word->second.first <= frame.getId() && frame.getId() <= word->second.second) {
 			isPartOfWord = true;
@@ -436,7 +265,8 @@ bool Processor::isPartOfAWord(const Frame& frame) const {
 }
 
 uint32_t Processor::getFramesCount(const Word& word) const {
-	 uint32_t cnt = this->wordToFrames->at(word.getId()).second - this->wordToFrames->at(word.getId()).first;
+
+	 uint32_t cnt = (*this->wordToFrames)[word.getId()].second - (*this->wordToFrames)[word.getId()].first;
 	 return cnt;
 }
 

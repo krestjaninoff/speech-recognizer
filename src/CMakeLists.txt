@@ -54,6 +54,8 @@ option(test "Build all tests" OFF)
 	add_executable(unit_tests
 		_test/math/DTW.cpp
 		_test/math/MFCC.cpp
+		_test/math/Statistics.cpp
+		_test/audio/Processor.cpp
 	)
 	
 	# Link test executable against gtest & gtest_main

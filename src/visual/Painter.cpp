@@ -12,7 +12,7 @@ using namespace yazz::audio;
 namespace yazz {
 namespace visual {
 
-enum Color { BLACK, RED, GREEN, BLUE };
+enum Color { BLACK, RED, GREEN, BLUE, YELLOW };
 
 /**
  * Draw visualization of raw data
@@ -86,17 +86,32 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = ((*frame)->getMaRms()) * (imgHeight - 1) / yMax;
-		assert(y <= imgHeight);
-		y = imgHeight - y - 1;
+		// RMS
+		{
+			uint32_t y = ((*frame)->getRms()) * (imgHeight - 1) / yMax;
+			assert(y <= imgHeight);
+			y = imgHeight - y - 1;
 
-		uint32_t index = x + y * imgWidth;
-		assert(index <= imgWidth * imgHeight);
+			uint32_t index = x + y * imgWidth;
+			assert(index <= imgWidth * imgHeight);
 
-		if (processor->isPartOfAWord(**frame)) {
-			image[index] = GREEN;
-		} else {
-			image[index] = RED;
+			if (processor->isPartOfAWord(**frame)) {
+				image[index] = GREEN;
+			} else {
+				image[index] = RED;
+			}
+		}
+
+		// Entropy
+		{
+			uint32_t y = (*frame)->getEntropy() * (imgHeight - 1) / ENTROPY_BINS;
+			assert(y <= imgHeight);
+			y = imgHeight - y - 1;
+
+			uint32_t index = x + y * imgWidth;
+			assert(index <= imgWidth * imgHeight);
+
+			image[index] = YELLOW;
 		}
 
 		xCurr++;
@@ -184,6 +199,10 @@ int Painter::writeImage(const char* filename, uint8_t* image, uint32_t width, ui
 				row[3*x] = 0;
 				row[3*x + 1] = 0;
 				row[3*x + 2] = 255;
+			} else if (YELLOW == image[x + y * width]) {
+				row[3*x] = 255;
+				row[3*x + 1] = 255;
+				row[3*x + 2] = 0;
 			}
 		}
 

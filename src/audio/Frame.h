@@ -26,7 +26,8 @@ public:
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const std::vector<raw_t>& source, uint32_t start, uint32_t finish);
+	void init(const std::vector<raw_t>& source, uint32_t start, uint32_t finish,
+			raw_t minRaw, raw_t maxRaw);
 
 	/**
 	 * Get frame's serial number
@@ -37,12 +38,7 @@ public:
 	 * Get Root Mean Square
 	 */
 	double getRms() const { return rms; }
-
-	/**
-	 * Get Moving Average value of RMS
-	 */
-	double getMaRms() const { return maRms; }
-	void setMaRms(double maRms) { this->maRms = maRms; }
+	double getEntropy() const { return entropy; }
 
 	/**
 	 * Get Mel-frequency cepstral coefficients
@@ -51,16 +47,13 @@ public:
 	double* initMFCC(const std::vector<raw_t>& source, uint32_t start,
 			uint32_t finish, uint32_t fourierLength);
 
-
 private:
 	const uint32_t id;
 
 	double rms;
-	double maRms;
+	double entropy;
 
 	double* mfcc;
-
-	void calcRms(const std::vector<raw_t>& source, uint32_t start, uint32_t finish);
 };
 
 } /* namespace audio */

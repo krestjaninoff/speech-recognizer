@@ -44,8 +44,6 @@ public:
 			delete this->frames;
 			delete this->frameToRaw;
 		}
-
-		delete this->wavData;
 	}
 
 	void split();

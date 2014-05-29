@@ -27,7 +27,7 @@ TEST(MATH_DTW, CALC_DISTANCE)
 	seq2[5] = -2;
 
 	double distance = DTW::calcDistance(seq1, seq1size, seq2, seq2size);
-    EXPECT_TRUE(fabs(distance - 34.2222) < EPSILON);
+    EXPECT_TRUE(fabs(distance - 34.2222) < numeric_limits<double>::epsilon());
 }
 
 
