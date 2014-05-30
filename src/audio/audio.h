@@ -59,7 +59,7 @@ namespace audio {
 	 * Entropy params
 	 */
 	const short ENTROPY_BINS = 50;
-	const short ENTROPY_THRESHOLD = 5;
+	const short ENTROPY_THRESHOLD = 1;
 
 } // namespace audio
 } // namespace yazz

@@ -81,13 +81,24 @@ namespace command {
 	}
 
 	void ModelCommand::add(Context& context, const string& modelName) {
-		if (!context.storage->init()) {
+		cout << "Adding the new sample... " << endl;
+
+		// Check if name is valid
+		if (modelName.empty()) {
+			cerr << "Model name is not specified!" << endl;
 			return;
 		}
-		cout << "Adding the new sample... ";
 
 		// Get a word to recognize
 		Word* word = getWord(context);
+		if (NULL == word) {
+			return;
+		}
+
+		// Inin storage
+		if (!context.storage->init()) {
+			return;
+		}
 
 		// Find or create the model
 		Model* theModel = NULL;
@@ -103,25 +114,27 @@ namespace command {
 
 		// Create the model if it does not exist
 		string modelNameStr(modelName);
-		if (NULL != theModel) {
+		if (NULL == theModel) {
 			theModel = new Model(modelNameStr);
 			context.storage->addModel(theModel);
 		}
 
 		// Add the sample to the model
 		context.storage->addSample(theModel->getId(), *word);
+		context.storage->persist();
 
-		cout << "done!" << endl;
+		cout << "The new sample has been successfully added!" << endl;
 	}
 
 	Word* ModelCommand::getWord(Context& context) {
-		cout << "Calculating MFCC for input data... ";
 
 		// Check pre-requirements
 		if (NULL == context.wavData) {
-			cerr << endl << "Input data is not specified :(" << endl;
+			cerr << "Input data is not specified :(" << endl;
 			return NULL;
 		}
+
+		cout << "Checking input data... " << endl;
 
 		// Create the Processor
 		audio::Processor* processor = new Processor(context.wavData);
@@ -129,16 +142,17 @@ namespace command {
 
 		// Split wav data into words
 		processor->split();
-		if (processor->getWords()->size() > 1) {
-			cerr << endl << "Sample file contains %d words (only one word is allowed)" << endl;
+		if (processor->getWords()->size() != 1) {
+			cerr << "Sample file contains " << processor->getWords()->size() << " words, but we need exactly ONE word" << endl;
 			return NULL;
 		}
+
+		cout << "Calculating MFCC for input data... " << endl;
 
 		// Calc & show mfcc
 		Word* word = processor->getWords()->at(0);
 		processor->initMfcc(*word);
 
-		cout << "done!" << endl;
 		return word;
 	}
 

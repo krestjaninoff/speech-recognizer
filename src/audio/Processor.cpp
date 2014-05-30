@@ -191,14 +191,15 @@ void Processor::initMfcc(Word& word) {
 
 	word.setMfcc(mfcc, MFCC_SIZE * framesCnt);
 
+	/*
 	if (DEBUG_ENABLED) {
 		DEBUG("MFCC for %d are: ", (int) word.getId());
 		for (uint32_t i = 0; i < word.getMfccSize(); i++) {
-			//DEBUG("%f ", word.getMfcc()[i]);
-			cout << word.getMfcc()[i] << endl;
+			DEBUG("%f ", word.getMfcc()[i]);
 		}
 		DEBUG("_");
 	}
+	*/
 }
 
 void Processor::saveWordAsAudio(const std::string& file, const Word& word) const {
