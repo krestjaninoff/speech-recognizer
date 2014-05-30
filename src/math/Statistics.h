@@ -30,7 +30,7 @@ public:
 	 * @see http://en.wikipedia.org/wiki/Entropy_(information_theory)
 	 */
 	static double entropy(const std::vector<raw_t>& source, uint32_t start, uint32_t finish,
-			ushort binsCount, raw_t minRaw, raw_t maxRaw);
+			uint8_t binsCount, raw_t minRaw, raw_t maxRaw);
 };
 
 } /* namespace math */

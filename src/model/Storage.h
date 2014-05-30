@@ -8,7 +8,7 @@
 #include <map>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "../math/Model.h"
+#include "Model.h"
 #include "../audio/Word.h"
 
 using namespace std;

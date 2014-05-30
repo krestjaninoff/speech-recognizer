@@ -15,6 +15,9 @@ add_subdirectory(audio)
 include_directories(math)
 add_subdirectory(math)
 
+include_directories(model)
+add_subdirectory(model)
+
 include_directories(visual)
 add_subdirectory(visual)
 
@@ -27,11 +30,11 @@ add_subdirectory(command)
 #              
 set(SOURCE main.cpp)                       
 add_executable(yazz ${SOURCE})
-target_link_libraries(yazz command visual audio math)
+target_link_libraries(yazz command visual model audio math)
 
 #set(TEST test.cpp)
 #add_executable(yazz_test ${TEST})
-#target_link_libraries(yazz_test command visual audio math)
+#target_link_libraries(yazz_test command visual model audio math)
 
 
 #

@@ -3,7 +3,6 @@ project(command)
 
 set(SOURCE
 	CommandProcessor.cpp
-	Storage.cpp
 	AudioDataCommand.cpp
 	ModelCommand.cpp
 	VisualizationCommand.cpp
