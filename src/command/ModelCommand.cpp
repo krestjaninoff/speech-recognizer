@@ -11,7 +11,7 @@
 #include <algorithm>
 #include "../audio/Word.h"
 #include "../audio/Processor.h"
-#include "../math/Recognizer.h"
+#include "../model/Recognizer.h"
 
 namespace yazz {
 namespace command {
