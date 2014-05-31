@@ -15,7 +15,7 @@ namespace yazz {
 
 	// Build information
 
-	#define PROJECT_NAME "WavToMe"
+	#define PROJECT_NAME "YAZZ"
 	#define PROJECT_VERSION "0.0.1"
 
 
@@ -23,7 +23,7 @@ namespace yazz {
 
 	#define DEBUG_ENABLED true
 	#define DEBUG(...)  \
-		do { if (DEBUG_ENABLED) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } } while (0)
+		do { if (DEBUG_ENABLED) { fprintf(stderr, __VA_ARGS__); fprintf(stdout, "\n"); } } while (0)
 
 	#define UNUSED(expr) do { (void)(expr); } while (0)
 
