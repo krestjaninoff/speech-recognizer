@@ -28,7 +28,7 @@ namespace math {
 			}
 			distance /= (*model)->getSamples().size();
 
-			DEBUG("Distance for model is %s is %f", (*model)->getText().c_str(), distance);
+			cout << "Distance for model \"" << (*model)->getText().c_str() << "\" is " << distance << endl;
 
 			if (NULL == bestModel || distance < minDistance) {
 				minDistance = distance;
@@ -36,7 +36,7 @@ namespace math {
 			}
 		}
 
-		DEBUG("Best model %s with %f distance", bestModel->getText().c_str(), minDistance);
+		cout << "The best model is \"" << bestModel->getText().c_str() << "\" with " << minDistance << " distance" << endl;;
 
 		return bestModel;
 	}

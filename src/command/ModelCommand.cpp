@@ -39,11 +39,18 @@ namespace command {
 		cout << endl;
 	}
 
-	void ModelCommand::recognize(Context& context, const string& modelNamesStr) {
+	void ModelCommand::recognize(Context& context, const char* modelNamesChar) {
+
+		// Check the storage
 		if (!context.storage->init()) {
 			return;
 		}
-		cout << "Word recognition... ";
+		if (0 == context.storage->getModels()->size()) {
+			cout << "Models storage is empty! Add some model before starting recognition." << endl;
+			return;
+		}
+
+		cout << "Word recognition... " << endl;
 
 		// Get a word to recognize
 		Word* word = getWord(context);
@@ -52,7 +59,11 @@ namespace command {
 		vector<Model*>* modelsFiltered = new vector<Model*>();
 		const map<uint32_t, Model*>* models = context.storage->getModels();
 
-		vector<string> modelNames = parseString(modelNamesStr, ',');
+		vector<string> modelNames;
+		if (NULL != modelNamesChar) {
+			modelNames = parseString(modelNamesChar, ',');
+		}
+
 		for (map<uint32_t, Model*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
@@ -68,26 +79,27 @@ namespace command {
 		Recognizer rec(modelsFiltered);
 		const Model* model = rec.recognize(*word);
 
-		cout << "done!" << endl;
-
 		// Print results
 		if (NULL != model) {
 			cout << endl << "!!!" << endl;
-			cout << "Answer is: " << model->getText();
+			cout << "The answer is: " << model->getText();
 			cout << endl << "!!!" << endl;
 		} else {
-			cout << "No suitable model found :(" << endl;
+			cout << "No suitable model was found :(" << endl;
 		}
 	}
 
-	void ModelCommand::add(Context& context, const string& modelName) {
-		cout << "Adding the new sample... " << endl;
 
-		// Check if name is valid
-		if (modelName.empty()) {
-			cerr << "Model name is not specified!" << endl;
+	void ModelCommand::add(Context& context, const char* modelNameChar) {
+
+		// Check the model's name
+		if (NULL == modelNameChar) {
+			cout << "Model name is not specified" << endl;
 			return;
 		}
+		string modelName(modelNameChar);
+
+		cout << "Adding the new sample... " << endl;
 
 		// Get a word to recognize
 		Word* word = getWord(context);
@@ -106,7 +118,7 @@ namespace command {
 		for (map<uint32_t, Model*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
-			if (strcmp(modelName.c_str(), (*model).second->getText().c_str())) {
+			if (0 == strcmp(modelName.c_str(), (*model).second->getText().c_str())) {
 				theModel = (*model).second;
 				break;
 			}

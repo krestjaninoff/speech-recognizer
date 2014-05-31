@@ -22,8 +22,13 @@ namespace command {
 	const char* AudioDataCommand::OUTPUT_FOLDER_DEFAULT = "out";
 
 	bool AudioDataCommand::readData(Context& context, const char* inputFile) {
-		cout << "Reading WAV data..." << endl;
 
+		if (NULL == inputFile) {
+			cout << "Input file is not specified" << endl;
+			return false;
+		}
+
+		cout << "Reading WAV data..." << endl;
 		audio::WavData* wavData = audio::WavData::readFromFile(inputFile);
 
 		if (NULL != wavData) {

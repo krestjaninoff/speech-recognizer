@@ -96,7 +96,6 @@ void Processor::divideIntoWords() {
 	long firstFrameInCurrentWordNumber = -1;
 	Word* lastWord = 0;
 
-	DEBUG("_");
 	for (vector<Frame*>::const_iterator frame = this->frames->begin();
 			frame != this->frames->end(); ++frame) {
 
@@ -149,10 +148,8 @@ void Processor::divideIntoWords() {
 			}
 		}
 	}
-	DEBUG("_");
 
 	// Clean up short words
-	DEBUG("_");
 	for (vector<Word*>::iterator word = this->words->begin();
 			word != this->words->end();) {
 
@@ -165,7 +162,6 @@ void Processor::divideIntoWords() {
 			 ++word;
 		}
 	}
-	DEBUG("_");
 }
 
 void Processor::initMfcc(Word& word) {

@@ -38,7 +38,7 @@ namespace command {
 		this->models = new map<uint32_t, Model*>();
 
 		if (access(STORAGE_FILE, F_OK) != -1) {
-			cout << "Loading models from the storage... ";
+			cout << "Loading models from the storage... " << endl;
 
 			std::fstream fs;
 			fs.open(STORAGE_FILE, std::ios::in | std::ios::binary);
@@ -69,7 +69,7 @@ namespace command {
 
 		// Storage not found, creating an empty one
 		} else {
-			fprintf(stdout, "Storage not found, creating an empty one... ");
+			cout << "Storage not found, creating an empty one... " << endl;
 
 			std::fstream fs;
 			fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
@@ -80,7 +80,6 @@ namespace command {
 			fs.close();
 		}
 
-		cout << "done!" << endl;
 		return true;
 	}
 
