@@ -14,10 +14,11 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM)
 
 	const double* fourierRaw = MFCC::fourierTransform(*f, 0, 3, false);
 
-	EXPECT_EQ(20, fourierRaw[0]);
-	EXPECT_EQ(4, fourierRaw[1]);
-	EXPECT_EQ(12, fourierRaw[2]);
-	EXPECT_EQ(4, fourierRaw[3]);
+	const double eps = 0.001;
+	EXPECT_NEAR(20, fourierRaw[0], eps);
+	EXPECT_NEAR(4, fourierRaw[1], eps);
+	EXPECT_NEAR(12, fourierRaw[2], eps);
+	EXPECT_NEAR(4, fourierRaw[3], eps);
 
 	delete [] fourierRaw;
 }

@@ -17,7 +17,7 @@ static int splitSample(const char* file) {
 	return wordsCount;
 }
 
-TEST(AUDIO_PROCESSOR, SPLITTING)
+TEST(AUDIO_PROCESSOR, DISABLED_SPLITTING)
 {
 	int wordsCount;
 

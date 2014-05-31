@@ -6,10 +6,10 @@ namespace math {
 	double Statistics::rms(const std::vector<raw_t>& source, uint32_t start, uint32_t finish) {
 		double value = 0;
 
-		for (uint32_t i = start; i < finish; i++) {
+		for (uint32_t i = start; i <= finish; i++) {
 			value += source.at(i) * source.at(i);
 		}
-		value /= (finish - start);
+		value /= (finish - start + 1);
 
 		return sqrt(value);
 	}
