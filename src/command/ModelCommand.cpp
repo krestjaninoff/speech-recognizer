@@ -29,7 +29,7 @@ namespace command {
 			for (map<uint32_t, Model*>::const_iterator model = models->begin();
 					model != models->end(); ++model) {
 
-				cout << (*model).second->getText() << endl;
+				cout << " - \"" <<  (*model).second->getText() << "\" (" << (*model).second->getSamples().size() << ")" << endl;
 			}
 
 		} else {

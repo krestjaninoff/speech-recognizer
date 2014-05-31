@@ -55,7 +55,7 @@ namespace command {
 				return false;
 			}
 
-			fs >> this->maxId;
+			fs.read((char*) &this->maxId, sizeof(uint32_t));
 
 			string tmpName("");
 			for (uint32_t i = 0; i < this->maxId; i++) {
@@ -75,7 +75,7 @@ namespace command {
 			fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
 
 			fs.write(STORAGE_HEADER, sizeof(char) * 4);
-			fs << (uint32_t) 0;
+			fs.write((char*) &this->maxId, sizeof(uint32_t));
 
 			fs.close();
 		}
@@ -115,7 +115,7 @@ namespace command {
 		}
 
 		fs.write(STORAGE_HEADER, sizeof(char) * 4);
-		fs << this->maxId;
+		fs.write((char*) &this->maxId, sizeof(uint32_t));
 
 		for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
 				model != this->models->end(); ++model) {

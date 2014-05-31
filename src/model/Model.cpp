@@ -8,7 +8,7 @@ using namespace std;
 namespace yazz {
 namespace math {
 
-	Model::Model(string& text):
+	Model::Model(string text):
 			text(text) {
 		this->id = -1;
 		this->samples = new vector<MFCCSample>();
@@ -24,36 +24,53 @@ namespace math {
 	}
 
 	ostream& operator<<(ostream& fs, const Model& obj) {
-		fs << obj.id;
-		fs << obj.text;
 
-		fs << obj.samples->size();
+		fs.write((char*) &obj.id, sizeof(uint32_t));
+
+		size_t textSize = obj.text.size();
+		fs.write((char*) &textSize, sizeof(size_t));
+		fs.write(&obj.text[0], sizeof(char) * textSize);
+
+		size_t samplesCnt = obj.samples->size();
+		fs.write((char*) &samplesCnt, sizeof(size_t));
 
 		for (vector<MFCCSample>::const_iterator sample = obj.samples->begin();
 				sample != obj.samples->end(); ++sample) {
 			MFCCSample theSample = *sample;
 
 			fs.write((char*)(&theSample.size), sizeof(uint32_t));
-			fs.write(reinterpret_cast<const char*>(theSample.data),
-					std::streamsize(theSample.size * sizeof(double)));
+			fs.write(reinterpret_cast<char*>(theSample.data),
+					streamsize(theSample.size * sizeof(double)));
 		}
 
 		return fs;
 	}
 
 	istream& operator>>(istream& fs, Model& obj) {
-		fs >> obj.id;
-		fs >> obj.text;
 
-		size_t size;
-		fs >> size;
+		fs.read((char*)(&obj.id), sizeof(uint32_t));
+
+		size_t textSize;
+		fs.read((char*) &textSize, sizeof(size_t));
+
+		// Yes, it's really ugly. One day I'll refactor this mess.
+		char* text = new char[textSize + 1];
+		fs.read(text, sizeof(char) * textSize);
+		text[textSize] = '\0';
+		string textString(text);
+		obj.text = textString;
+
+		size_t samplesCnt;
+		fs.read((char*) &samplesCnt, sizeof(uint32_t));
 
 		MFCCSample sample;
-		for (size_t i = 0; i < size; i++) {
+		for (size_t i = 0; i < samplesCnt; i++) {
 
 			fs.read((char*)(&sample.size), sizeof(uint32_t));
+
+			sample.data = new double[sample.size];
 			fs.read(reinterpret_cast<char*>(sample.data),
-					std::streamsize(sample.size * sizeof(double)));
+					streamsize(sample.size * sizeof(double)));
 
 			obj.addSample(sample.data, sample.size);
 		}

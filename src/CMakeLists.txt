@@ -32,8 +32,8 @@ set(SOURCE main.cpp)
 add_executable(yazz ${SOURCE})
 target_link_libraries(yazz command visual model audio math)
 
-#set(TEST test.cpp)
-#add_executable(yazz_test ${TEST})
+set(TEST test.cpp)
+add_executable(yazz_test ${TEST})
 #target_link_libraries(yazz_test command visual model audio math)
 
 

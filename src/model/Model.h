@@ -24,7 +24,7 @@ struct MFCCSample {
 class Model {
 public:
 
-	Model(string& text);
+	Model(string text);
 	~Model();
 
 	uint32_t getId() const { return this->id; }
@@ -42,7 +42,7 @@ public:
 private:
 	uint32_t id;
 
-	string& text;
+	string text;
 	vector<MFCCSample>* samples;
 };
 
