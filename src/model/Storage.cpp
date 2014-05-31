@@ -94,10 +94,15 @@ namespace command {
 
 	void Storage::addSample(uint32_t modelId, const Word& word) {
 
-		Model* model = this->models->at(modelId);
+		Model* model = (*this->models)[modelId];
 		model->addSample(word.getMfcc(), word.getMfccSize());
 	}
 
+	/**
+	 * Save models into the file
+	 * <p>
+	 * We shouldn't rewrite the whole file. This is a point to fix.
+	 */
 	bool Storage::persist() {
 		cout << "Storage not found, creating an empty one... ";
 
@@ -115,7 +120,8 @@ namespace command {
 		for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
 				model != this->models->end(); ++model) {
 
-			fs << (*model).second;
+			const Model& tmpModel = *((*model).second);
+			fs << tmpModel;
 		}
 
 		fs.close();

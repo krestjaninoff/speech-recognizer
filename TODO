@@ -12,6 +12,20 @@ TODO:
 * Memory leaks
 * Code style
 
+
+
+Shelved tasks
+
+* Imporove cmd interface
+** Sequence of arguments shouldn't be matter
+** Appropriate error messages
+
+
 Dinctionary:
 
 Один, Два, Три, Четыре, Пять, Шесть, Семь, Восемь, Девять, Десять
+
+
+Cmd samples 
+
+* Adding a sample into a model: -i samples/female1/sampleFile.1.wav -a odin

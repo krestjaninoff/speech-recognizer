@@ -14,8 +14,8 @@ namespace math {
  * MFCC sample
  */
 struct MFCCSample {
-	uint32_t            size;
-    double*	            data;
+	uint32_t   size;
+    double*	   data;
 };
 
 /**
@@ -35,8 +35,9 @@ public:
 	void addSample(double* mfcc, uint32_t size);
 	const vector<MFCCSample>& getSamples() const { return *this->samples; }
 
-	friend std::ostream& operator<<(std::ostream& fs, const Model &obj);
-	friend std::istream& operator>>(std::istream& fs, Model &obj);
+
+	friend std::ostream& operator<<(std::ostream& fs, const Model& obj);
+	friend std::istream& operator>>(std::istream& fs, Model& obj);
 
 private:
 	uint32_t id;

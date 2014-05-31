@@ -31,9 +31,11 @@ namespace math {
 
 		for (vector<MFCCSample>::const_iterator sample = obj.samples->begin();
 				sample != obj.samples->end(); ++sample) {
+			MFCCSample theSample = *sample;
 
-			fs.write((char*) sample->size, sizeof(uint32_t));
-			fs.write((char*) sample->data, sizeof(double) * sample->size);
+			fs.write((char*)(&theSample.size), sizeof(uint32_t));
+			fs.write(reinterpret_cast<const char*>(theSample.data),
+					std::streamsize(theSample.size * sizeof(double)));
 		}
 
 		return fs;
@@ -50,7 +52,8 @@ namespace math {
 		for (size_t i = 0; i < size; i++) {
 
 			fs.read((char*)(&sample.size), sizeof(uint32_t));
-			fs.read((char*)(sample.data), sizeof(double) * sample.size);
+			fs.read(reinterpret_cast<char*>(sample.data),
+					std::streamsize(sample.size * sizeof(double)));
 
 			obj.addSample(sample.data, sample.size);
 		}
