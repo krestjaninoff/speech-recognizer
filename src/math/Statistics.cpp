@@ -18,32 +18,35 @@ namespace math {
 			uint8_t binsCount, raw_t minRaw, raw_t maxRaw) {
 		double entropy = 0;
 
-		int binSize = abs(minRaw - maxRaw) / binsCount + 1;
-		if (1 == binSize) {
+		double binSize = abs(maxRaw - minRaw) / (double) binsCount;
+		if (binSize <= 1) {
 			return 0;
 		}
 
 		double* p = new double[binsCount];
 		for (uint8_t i = 0; i < binsCount; i++) {
-			p[i] = 0;
+			p[i] = 0.;
 		}
 
 		// Calculate probabilities
 		int index;
-		for (uint32_t i = start; i < finish; i++) {
+		for (uint32_t i = start; i <= finish; i++) {
 			raw_t value = source.at(i);
-			index = round((value - minRaw) / binSize);
+			index = floor((value - minRaw) / binSize);
+
+			if (index >= binsCount) {
+				index = binsCount - 1;
+			}
+
 			p[index] += 1.;
 		}
 
 		// Normalize probabilities
+		uint8_t size = finish - start + 1;
 		double maxProbability = p[0];
-		for (uint8_t i = 1; i < binsCount; i++) {
-			maxProbability = std::max(maxProbability, p[i]);
-		}
 		if (maxProbability > 0) {
 			for (uint8_t i = 0; i < binsCount; i++) {
-				p[i] /= maxProbability;
+				p[i] /= size;
 			}
 		}
 
