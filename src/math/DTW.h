@@ -2,9 +2,6 @@
 #define DTW_H_
 
 #include <stdint.h>
-#include <vector>
-#include <math.h>
-#include "maph.h"
 
 using namespace std;
 

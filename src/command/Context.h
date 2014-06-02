@@ -1,9 +1,10 @@
 #ifndef CONTEXT_H_
 #define CONTEXT_H_
 
-#include "../audio/WavData.h"
-#include "../audio/Processor.h"
-#include "../model/Storage.h"
+#include <Processor.h>
+#include <stddef.h>
+#include <Storage.h>
+#include <WavData.h>
 
 using namespace yazz::audio;
 

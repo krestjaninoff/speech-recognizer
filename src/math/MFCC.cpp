@@ -1,4 +1,7 @@
-#include "MFCC.h"
+#include <MFCC.h>
+#include <stddef.h>
+
+#include "../common.h"
 
 namespace yazz {
 namespace math {

@@ -11,11 +11,10 @@
 #ifndef WAV_DATA_H_
 #define WAV_DATA_H_
 
+#include <audio.h>
+#include <cstdint>
+#include <iostream>
 #include <string>
-#include <vector>
-#include "audio.h"
-#include "Frame.h"
-#include "Word.h"
 
 namespace yazz {
 namespace audio {

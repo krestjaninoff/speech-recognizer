@@ -1,10 +1,19 @@
+#include <assert.h>
+#include <audio.h>
+#include <Frame.h>
+#include <png.h>
+#include <pngconf.h>
+#include <Painter.h>
 #include <stdio.h>
+#include <visual.h>
+#include <WavData.h>
+#include <csetjmp>
 #include <cstdlib>
-#include "assert.h"
+#include <cstring>
+#include <cwchar>
 #include <iostream>
-#include "png.h"
-#include "Painter.h"
-#include "Frame.h"
+#include <iterator>
+#include <vector>
 
 using namespace std;
 using namespace yazz::audio;

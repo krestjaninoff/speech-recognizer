@@ -1,13 +1,16 @@
-#include "AudioDataCommand.h"
-
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <sys/types.h>
+#include <AudioDataCommand.h>
+#include <Processor.h>
+#include <WavData.h>
+#include <Word.h>
 #include <sys/stat.h>
-#include "Context.h"
-#include "../audio/Word.h"
-#include "../audio/Processor.h"
+#include <cstdio>
+#include <cwchar>
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <vector>
+
+#include "../common.h"
 
 #ifdef __MINGW32__
 #include <io.h>
@@ -87,7 +90,7 @@ namespace command {
 	bool AudioDataCommand::initOutputDirectory(const string& outputFolder) {
 		struct stat info;
 
-		if (0 != stat( outputFolder.c_str(), &info )) {
+		if (0 != stat(outputFolder.c_str(), &info)) {
 			int success;
 
 			#if defined(_WIN32)

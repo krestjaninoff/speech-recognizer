@@ -1,4 +1,6 @@
 #include <Statistics.h>
+#include <cmath>
+#include <cstdlib>
 
 namespace yazz {
 namespace math {

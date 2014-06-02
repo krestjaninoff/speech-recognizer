@@ -1,17 +1,19 @@
-#include "ModelCommand.h"
-
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <getopt.h>
-#include <string>
+#include <Model.h>
+#include <ModelCommand.h>
+#include <Processor.h>
+#include <Recognizer.h>
 #include <string.h>
+#include <Storage.h>
+#include <WavData.h>
+#include <Word.h>
 #include <algorithm>
-#include "../audio/Word.h"
-#include "../audio/Processor.h"
-#include "../model/Recognizer.h"
+#include <cstdint>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace yazz {
 namespace command {

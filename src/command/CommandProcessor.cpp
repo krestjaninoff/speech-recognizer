@@ -1,10 +1,10 @@
-#include "CommandProcessor.h"
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <AudioDataCommand.h>
+#include <CommandProcessor.h>
 #include <getopt.h>
-#include <string>
+#include <ModelCommand.h>
+#include <VisualizationCommand.h>
+#include <iostream>
+
 #include "../common.h"
 
 namespace yazz {

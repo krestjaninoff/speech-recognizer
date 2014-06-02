@@ -1,17 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <memory>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
-#include <limits>
-#include <limits.h>
+#include <WavData.h>
 #include <cassert>
-#include <vector>
-#include <math.h>
-#include "audio.h"
-#include "WavData.h"
-#include "Frame.h"
-#include "Word.h"
+#include <cmath>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 

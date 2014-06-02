@@ -1,11 +1,9 @@
 #ifndef RECOGNIZER_H_
 #define RECOGNIZER_H_
 
-#include <string>
+#include <Model.h>
+#include <Word.h>
 #include <vector>
-#include "maph.h"
-#include "Model.h"
-#include "../audio/Word.h"
 
 using namespace std;
 using namespace yazz::audio;

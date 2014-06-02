@@ -1,11 +1,8 @@
 #ifndef STATISTICS_H_
 #define STATISTICS_H_
 
+#include <audio.h>
 #include <stdint.h>
-#include <vector>
-#include <math.h>
-#include "maph.h"
-#include "../audio/audio.h"
 
 using namespace std;
 using namespace yazz::audio;

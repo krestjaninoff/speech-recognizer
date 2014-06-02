@@ -1,11 +1,9 @@
 #ifndef PAINTER_H_
 #define PAINTER_H_
 
-#include <string>
-#include "../common.h"
-#include "visual.h"
-#include "../audio/audio.h"
 #include "../audio/Processor.h"
+#include <cstdint>
+#include <string>
 
 namespace yazz {
 namespace visual {

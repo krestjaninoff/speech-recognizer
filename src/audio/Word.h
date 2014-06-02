@@ -1,7 +1,8 @@
 #ifndef WORD_H_
 #define WORD_H_
 
-#include "audio.h"
+#include <cstdint>
+#include <string>
 
 namespace yazz {
 namespace audio {

@@ -1,5 +1,7 @@
-#include "DTW.h"
-#include "Recognizer.h"
+#include <DTW.h>
+#include <Recognizer.h>
+#include <iostream>
+#include <iterator>
 
 namespace yazz {
 namespace math {

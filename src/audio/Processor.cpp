@@ -1,16 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <memory>
+#include <Processor.h>
 #include <stdio.h>
 #include <string.h>
-#include <limits>
-#include <limits.h>
+#include <algorithm>
 #include <cassert>
-#include <vector>
-#include <math.h>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <string>
-#include <cassert>
-#include <Processor.h>
 
 using namespace std;
 

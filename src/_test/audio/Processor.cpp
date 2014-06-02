@@ -1,6 +1,8 @@
+#include <gtest/gtest.h>
+#include <gtest/gtest-message.h>
+#include <gtest/internal/gtest-internal.h>
+#include <Processor.h>
 #include "../audio/WavData.h"
-#include "../audio/Processor.h"
-#include "gtest/gtest.h"
 
 using namespace yazz::audio;
 

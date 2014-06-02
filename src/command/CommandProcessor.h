@@ -1,11 +1,7 @@
 #ifndef COMMANDPROCESSOR_H_
 #define COMMANDPROCESSOR_H_
 
-#include <getopt.h>
-#include "Context.h"
-#include "AudioDataCommand.h"
-#include "VisualizationCommand.h"
-#include "ModelCommand.h"
+#include <Context.h>
 
 namespace yazz {
 namespace command {
