@@ -62,29 +62,30 @@ void Processor::divideIntoFrames() {
 void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
-	double entropy, entropyMin, entropyMax;
-	double rms, rmsMin, rmsMax;
+	//double entropy, entropyMin, entropyMax;
+	//double rms, rmsMin, rmsMax;
 
 	// Let's find max and min rms/entropy
-	rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
+	//rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
 	//entropy = entropyMax = entropyMin = this->frames->at(0)->getEntropy();
 
+	/*
 	uint32_t iFrame;
 	for (iFrame = 1; iFrame < this->frames->size(); ++iFrame) {
 
-		rms = this->frames->at(iFrame)->getRms();
+		//rms = this->frames->at(iFrame)->getRms();
 		//rmsMin = std::min(rmsMin, rms);
-		rmsMax = std::max(rmsMax, rms);
+		//rmsMax = std::max(rmsMax, rms);
 
-		entropy = this->frames->at(iFrame)->getEntropy();
-		entropyMin = std::min(entropyMin, entropy);
-		entropyMax = std::max(entropyMax, entropy);
+		//entropy = this->frames->at(iFrame)->getEntropy();
+		//entropyMin = std::min(entropyMin, entropy);
+		//entropyMax = std::max(entropyMax, entropy);
 	}
-	this->maRmsMax = rmsMax;
+	*/
 
 	// Tries to guess the best threshold value
-	double threshold = (entropyMax - entropyMin) / 2. + 0.1 * entropyMin;
-	threshold = ENTROPY_THRESHOLD;
+	// double threshold = (entropyMax - entropyMin) / 2. - 0.3 * entropyMin;
+	double threshold = ENTROPY_THRESHOLD;
 	this->wordsThreshold = threshold;
 
 	// Divide frames into words

@@ -1,6 +1,9 @@
 #include <Statistics.h>
 #include <cmath>
 #include <cstdlib>
+#include <limits>
+
+using namespace std;
 
 namespace yazz {
 namespace math {
@@ -21,7 +24,7 @@ namespace math {
 		double entropy = 0;
 
 		double binSize = abs(maxRaw - minRaw) / (double) binsCount;
-		if (binSize <= 1) {
+		if (fabs(binSize) < numeric_limits<double>::epsilon()) {
 			return 0;
 		}
 
@@ -33,7 +36,7 @@ namespace math {
 		// Calculate probabilities
 		int index;
 		for (uint32_t i = start; i <= finish; i++) {
-			raw_t value = source[i];
+			double value = source[i];
 			index = floor((value - minRaw) / binSize);
 
 			if (index >= binsCount) {
@@ -45,11 +48,8 @@ namespace math {
 
 		// Normalize probabilities
 		uint8_t size = finish - start + 1;
-		double maxProbability = p[0];
-		if (maxProbability > 0) {
-			for (uint8_t i = 0; i < binsCount; i++) {
-				p[i] /= size;
-			}
+		for (uint8_t i = 0; i < binsCount; i++) {
+			p[i] /= size;
 		}
 
 		// Calculate entropy

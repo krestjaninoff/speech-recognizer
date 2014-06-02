@@ -132,7 +132,7 @@ void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wa
 
 	// Normalization
 	for (uint32_t i; i < sampleNumber; i++) {
-		wavFile.normalizaedData[i] = wavFile.rawData[i] / maxValue;
+		wavFile.normalizaedData[i] = wavFile.rawData[i] / static_cast<double>(maxValue);
 	}
 
 	// Update values
