@@ -26,7 +26,7 @@ public:
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const double* source, uint32_t start, uint32_t finish);
+	void init(const raw_t* source, const double* sourceNormalized, uint32_t start, uint32_t finish);
 
 	/**
 	 * Get frame's serial number

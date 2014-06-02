@@ -5,7 +5,7 @@ using namespace yazz::math;
 
 TEST(MATH_STATISTICS, RMS)
 {
-	double f[] = {2, 4, 3, 1};
+	raw_t f[] = {2, 4, 3, 1};
 	double rms = Statistics::rms(f, 0, 3);
 
 	ASSERT_DOUBLE_EQ(2.7386127875258306, rms);

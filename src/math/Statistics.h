@@ -20,7 +20,7 @@ public:
 	 * Calculate Root Mean Square
 	 * @see http://en.wikipedia.org/wiki/Root_mean_square
 	 */
-	static double rms(const double* source, uint32_t start, uint32_t finish);
+	static double rms(const raw_t* source, uint32_t start, uint32_t finish);
 
 	/**
 	 * Calculate entropy for data sequence

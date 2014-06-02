@@ -76,7 +76,7 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
 	uint32_t xMax = processor->getFrames()->size();
-	uint32_t yMax = processor->getMaRMSMax();
+	uint32_t yMax = processor->getRmsMax();
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -113,7 +113,7 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 
 		// Entropy
 		{
-			uint32_t y = (*frame)->getEntropy() * (imgHeight - 1) / ENTROPY_BINS;
+			uint32_t y = (*frame)->getEntropy() * (imgHeight - 1) / yMax;
 			assert(y <= imgHeight);
 			y = imgHeight - y - 1;
 

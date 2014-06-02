@@ -49,7 +49,7 @@ void Processor::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(getWavData()->getNormalizedData(), indexBegin, indexEnd);
+			frame->init(getWavData()->getRawData(), getWavData()->getNormalizedData(), indexBegin, indexEnd);
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -63,25 +63,24 @@ void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
 	//double entropy, entropyMin, entropyMax;
-	//double rms, rmsMin, rmsMax;
+	double rms, rmsMin, rmsMax;
 
 	// Let's find max and min rms/entropy
-	//rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
+	rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
 	//entropy = entropyMax = entropyMin = this->frames->at(0)->getEntropy();
 
-	/*
 	uint32_t iFrame;
 	for (iFrame = 1; iFrame < this->frames->size(); ++iFrame) {
 
-		//rms = this->frames->at(iFrame)->getRms();
+		rms = this->frames->at(iFrame)->getRms();
 		//rmsMin = std::min(rmsMin, rms);
-		//rmsMax = std::max(rmsMax, rms);
+		rmsMax = std::max(rmsMax, rms);
 
 		//entropy = this->frames->at(iFrame)->getEntropy();
 		//entropyMin = std::min(entropyMin, entropy);
 		//entropyMax = std::max(entropyMax, entropy);
 	}
-	*/
+	this->rmsMax = rmsMax;
 
 	// Tries to guess the best threshold value
 	// double threshold = (entropyMax - entropyMin) / 2. - 0.3 * entropyMin;

@@ -70,7 +70,7 @@ public:
 	void setMinVal(raw_t minVal) { this->minVal = minVal; }
 
 	const WavHeader& getHeader() const { return header; }
-	raw_t* getRawData() const { return rawData; }
+	const raw_t* getRawData() const { return rawData; }
 	const double* getNormalizedData() const { return normalizaedData; }
 
 private:

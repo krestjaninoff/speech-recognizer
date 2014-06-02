@@ -1,12 +1,10 @@
 TODO:
 
-* Wods splitting +++ UNIT TESTS (small entropy)
+
+* Wods splitting (set up entropy threshold) +++ UNIT TESTS
 
 ** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
 ** Do not trim frames in samples!
-
-
-* Check the logic!!!
 
 
 * Memory leaks

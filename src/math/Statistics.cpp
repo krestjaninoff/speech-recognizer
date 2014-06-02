@@ -8,7 +8,7 @@ using namespace std;
 namespace yazz {
 namespace math {
 
-	double Statistics::rms(const double* source, uint32_t start, uint32_t finish) {
+	double Statistics::rms(const raw_t* source, uint32_t start, uint32_t finish) {
 		double value = 0;
 
 		for (uint32_t i = start; i <= finish; i++) {

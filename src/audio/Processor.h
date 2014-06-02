@@ -30,6 +30,8 @@ public:
 
 		this->words = new std::vector<Word*>();
 		this->wordToFrames = new std::map<uint32_t, std::pair<uint32_t, uint32_t> >();
+
+		this->rmsMax = 0;
 		this->wordsThreshold = 0;
 	}
 
@@ -53,6 +55,7 @@ public:
 	const std::vector<Word*>* getWords() const { return this->words; }
 
 	double getWordsThreshold() const { return this->wordsThreshold; }
+	double getRmsMax() const { return this->rmsMax; }
 
 	bool isPartOfAWord(const Frame& frame) const;
 	uint32_t getFramesCount(const Word& word) const;
@@ -68,6 +71,8 @@ private:
 
 	std::vector<Word*>* words;
 	std::map<uint32_t, std::pair<uint32_t, uint32_t> >* wordToFrames;
+
+	double rmsMax;
 	double wordsThreshold;
 
 	void divideIntoFrames();
