@@ -49,7 +49,7 @@ namespace command {
 		}
 
 		// Determine results directory name
-		string folder = OUTPUT_FOLDER_DEFAULT;
+		string folder(OUTPUT_FOLDER_DEFAULT);
 		if (NULL != outputFolder) {
 			string outputFolderStr(outputFolder);
 			folder = outputFolderStr;
@@ -57,7 +57,7 @@ namespace command {
 		cout << "Output directory is " << folder << "..." << endl;
 
 		// Check if output directory exists or can be created
-		if (!initOutputDirectory(outputFolder)) {
+		if (!initOutputDirectory(folder)) {
 			return false;
 		}
 
@@ -73,7 +73,7 @@ namespace command {
 		for (vector<Word*>::const_iterator word = processor->getWords()->begin();
 				word != processor->getWords()->end(); ++word) {
 
-			string fileName = folder + "/sampleFile." + toString(counter) + ".wav";
+			string fileName = folder + "/" + toString(counter) + ".wav";
 			cout << fileName << endl;
 
 			processor->saveWordAsAudio(fileName, *(*word));

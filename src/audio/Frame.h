@@ -26,8 +26,7 @@ public:
 	/**
 	 * Init the frame using a part of wave data
 	 */
-	void init(const std::vector<raw_t>& source, uint32_t start, uint32_t finish,
-			raw_t minRaw, raw_t maxRaw);
+	void init(const double* source, uint32_t start, uint32_t finish);
 
 	/**
 	 * Get frame's serial number
@@ -44,8 +43,7 @@ public:
 	 * Get Mel-frequency cepstral coefficients
 	 */
 	double* getMFCC() const { return mfcc; }
-	double* initMFCC(const std::vector<raw_t>& source, uint32_t start,
-			uint32_t finish, uint32_t fourierLength);
+	double* initMFCC(const double* source, uint32_t start, uint32_t finish, uint32_t fourierLength);
 
 private:
 	const uint32_t id;

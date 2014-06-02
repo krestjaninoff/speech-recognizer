@@ -1,6 +1,7 @@
 TODO:
 
-* Wods splitting: -------- UNIT TESTS, To MATH
+* Wods splitting +++ UNIT TESTS (small entropy)
+
 ** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
 ** Do not trim frames in samples!
 
@@ -28,6 +29,7 @@ odin, dva, tri, chetire, pyat', shest', sem', vosem', devyat', desyat'
 
 Cmd samples 
 
-* Listing all available models
+* Splitting a source into samples -i samples/female1.wav -s _split
+* Listing all available models: -l
 * Adding a sample into a model: -i samples/female1/sampleFile.1.wav -a odin
 * Recognition of a sample -i samples/female1/sampleFile.1.wav -r

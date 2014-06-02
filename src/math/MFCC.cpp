@@ -3,10 +3,10 @@
 namespace yazz {
 namespace math {
 
-double* MFCC::transform(const vector<raw_t>& source, uint32_t start, uint32_t finish, uint32_t frequency) {
+double* MFCC::transform(const double* source, uint32_t start, uint32_t finish, uint32_t frequency) {
+	uint32_t size = finish - start + 1;
 
 	// Calc
-	uint32_t size = finish - start + 1;
 	double* fourierRaw = fourierTransform(source, start, finish, true);
 	double** melFilters = getMelFilters(size, frequency);
 	double* logPower = calcPower(fourierRaw, melFilters, size);
@@ -25,9 +25,19 @@ double* MFCC::transform(const vector<raw_t>& source, uint32_t start, uint32_t fi
 }
 
 /**
+ * Preemphasis digital filtration
+ */
+double* MFCC::filter(const double* source, uint32_t start, uint32_t finish) {
+	UNUSED(source);
+	UNUSED(start);
+	UNUSED(finish);
+	return NULL;
+}
+
+/**
  * Perform short-time fourier transform with Hamming windows
  */
-double* MFCC::fourierTransform(const vector<raw_t>& source, uint32_t start, uint32_t finish, bool useWindow) {
+double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t finish, bool useWindow) {
 
 	uint32_t size = finish - start + 1;
 	double* fourierRaw = new double[size];
@@ -36,7 +46,7 @@ double* MFCC::fourierTransform(const vector<raw_t>& source, uint32_t start, uint
 		fourierRaw[k] = 0;
 
 		for (uint32_t n = 0; n < size; n++) {
-			raw_t sample = static_cast<double>(source[start + n]);
+			double sample = source[start + n];
 
 			// e^(ix) = cos(x) + i*sin(x)
 			double x = -2. * PI * k * n / size;
@@ -109,7 +119,7 @@ double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 /**
  * Take the logs of the powers at each of the mel frequencies
  */
-double* MFCC::calcPower(double* fourierRaw, double** melFilters, uint32_t fourierLength) {
+double* MFCC::calcPower(const double* fourierRaw, double** melFilters, uint32_t fourierLength) {
 
 	double* logPower = new double[MFCC_SIZE];
 
@@ -128,7 +138,7 @@ double* MFCC::calcPower(double* fourierRaw, double** melFilters, uint32_t fourie
 /**
  * Take the discrete cosine transform of the list of mel log powers
  */
-double* MFCC::dstTransform(double* logPower) {
+double* MFCC::dstTransform(const double* logPower) {
 
 	double* dstTransform = new double[MFCC_SIZE];
 

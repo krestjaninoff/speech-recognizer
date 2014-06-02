@@ -23,13 +23,13 @@ public:
 	 * Calculate Root Mean Square
 	 * @see http://en.wikipedia.org/wiki/Root_mean_square
 	 */
-	static double rms(const std::vector<raw_t>& source, uint32_t start, uint32_t finish);
+	static double rms(const double* source, uint32_t start, uint32_t finish);
 
 	/**
 	 * Calculate entropy for data sequence
 	 * @see http://en.wikipedia.org/wiki/Entropy_(information_theory)
 	 */
-	static double entropy(const std::vector<raw_t>& source, uint32_t start, uint32_t finish,
+	static double entropy(const double* source, uint32_t start, uint32_t finish,
 			uint8_t binsCount, raw_t minRaw, raw_t maxRaw);
 };
 

@@ -36,14 +36,14 @@ void Painter::drawRawData(const Processor* processor, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (vector<raw_t>::const_iterator yCurr = processor->getWavData()->getRawData()->begin();
-			yCurr != processor->getWavData()->getRawData()->end(); ++yCurr) {
+	for (uint32_t i = 0; i < processor->getWavData()->getNumberOfSamples(); i++) {
+		raw_t yCurr = processor->getWavData()->getRawData()[i];
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
+		uint32_t y = (yCurr + yCorrection) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 		y = imgHeight - y - 1;
 

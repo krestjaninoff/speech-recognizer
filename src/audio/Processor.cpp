@@ -44,7 +44,7 @@ void Processor::divideIntoFrames() {
 	this->frames->reserve(framesCount);
 
 	uint32_t indexBegin = 0, indexEnd = 0;
-	for (uint32_t frameId = 0, size = wavData->getRawData()->size(); frameId < framesCount;
+	for (uint32_t frameId = 0, size = wavData->getNumberOfSamples(); frameId < framesCount;
 			++frameId) {
 
 		indexBegin = frameId * samplesPerNonOverlap;
@@ -52,8 +52,7 @@ void Processor::divideIntoFrames() {
 		if (indexEnd < size) {
 
 			Frame* frame = new Frame(frameId);
-			frame->init(*getWavData()->getRawData(), indexBegin, indexEnd,
-					wavData->getMinVal(), wavData->getMaxVal());
+			frame->init(getWavData()->getNormalizedData(), indexBegin, indexEnd);
 
 			this->frames->insert(this->frames->begin() + frameId, frame);
 			this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -66,7 +65,7 @@ void Processor::divideIntoFrames() {
 void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
-	//double entropy, entropyMin, entropyMax;
+	double entropy, entropyMin, entropyMax;
 	double rms, rmsMin, rmsMax;
 
 	// Let's find max and min rms/entropy
@@ -80,15 +79,15 @@ void Processor::divideIntoWords() {
 		//rmsMin = std::min(rmsMin, rms);
 		rmsMax = std::max(rmsMax, rms);
 
-		//entropy = this->frames->at(iFrame)->getEntropy();
-		//entropyMin = std::min(entropyMin, entropy);
-		//entropyMax = std::max(entropyMax, entropy);
+		entropy = this->frames->at(iFrame)->getEntropy();
+		entropyMin = std::min(entropyMin, entropy);
+		entropyMax = std::max(entropyMax, entropy);
 	}
 	this->maRmsMax = rmsMax;
 
 	// Tries to guess the best threshold value
-	// double threshold = (entropyMax - entropyMin) / 2. + 0.1 * entropyMin;
-	double threshold = ENTROPY_THRESHOLD;
+	double threshold = (entropyMax - entropyMin) / 2. + 0.1 * entropyMin;
+	threshold = ENTROPY_THRESHOLD;
 	this->wordsThreshold = threshold;
 
 	// Divide frames into words
@@ -177,7 +176,7 @@ void Processor::initMfcc(Word& word) {
 		uint32_t rawFinsh = (*this->frameToRaw)[firstId + i].second;
 
 		double* frameMfcc = this->frames->at(firstId + i)->initMFCC(
-				*getWavData()->getRawData(), rawBegin, rawFinsh,
+				getWavData()->getNormalizedData(), rawBegin, rawFinsh,
 				getWavData()->getHeader().samplesPerSec);
 
 		for (uint32_t j = 0; j < MFCC_SIZE; j++) {
@@ -235,7 +234,7 @@ void Processor::saveWordAsAudio(const std::string& file, const Word& word) const
 
 		for (uint32_t i = 0; i < samplesPerNonOverlap; i++) {
 			data[frameNumber * samplesPerNonOverlap + i ] =
-					this->wavData->getRawData()->at(frameStart + i);
+					this->wavData->getRawData()[frameStart + i];
 		}
 
 		frameNumber++;

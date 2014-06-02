@@ -5,14 +5,8 @@ using namespace yazz::math;
 
 TEST(MATH_MFCC, FOURIER_TRANSFORM)
 {
-	std::vector<raw_t>* f = new std::vector<raw_t>();
-
-	f->push_back((raw_t) 8);
-	f->push_back((raw_t) 4);
-	f->push_back((raw_t) 8);
-	f->push_back((raw_t) 0);
-
-	const double* fourierRaw = MFCC::fourierTransform(*f, 0, 3, false);
+	double f[] = {8, 4, 8, 0};
+	double* fourierRaw = MFCC::fourierTransform((const double*) f, 0, 3, false);
 
 	const double eps = 0.001;
 	EXPECT_NEAR(20, fourierRaw[0], eps);
