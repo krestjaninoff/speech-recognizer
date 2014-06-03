@@ -1,7 +1,11 @@
 TODO:
 
-* Wods splitting: -------- UNIT TESTS, To MATH
-** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
+* Add wavdata normalization (for solving volume problems).
+** Set entropy range to [-1;1]
+
+
+* Wods splitting: -------- UNIT TESTS
+** Invalid splitting for m2, m3
 ** Do not trim frames in samples!
 
 
@@ -31,3 +35,8 @@ Cmd samples
 * Listing all available models
 * Adding a sample into a model: -i samples/female1/sampleFile.1.wav -a odin
 * Recognition of a sample -i samples/female1/sampleFile.1.wav -r
+
+
+Docs
+
+http://cs.uef.fi/pages/tkinnu/STWS2014/lecture_notes/feature_Extraction_MFCCs.pdf

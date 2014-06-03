@@ -51,7 +51,8 @@ public:
 	 * @see http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/
 	 * @see http://www.pvsm.ru/programmirovanie/4344
 	 */
-	static double** getMelFilters(uint32_t size, uint32_t frequency);
+	static double** getMelFilters(uint8_t mfccSize, uint32_t filterLength, uint32_t frequency,
+			uint32_t freqMin, uint32_t freqMax);
 
 	/**
 	 * Take the logs of the powers at each of the mel frequencies

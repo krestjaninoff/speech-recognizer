@@ -1,5 +1,8 @@
-#include "../math/MFCC.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <gtest/gtest-message.h>
+#include <gtest/internal/gtest-internal.h>
+#include <MFCC.h>
+#include <cstring>
 
 using namespace yazz::math;
 
@@ -25,19 +28,36 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM)
 
 TEST(MATH_MFCC, MEL_FILTERS)
 {
-	double** melFreq = MFCC::getMelFilters(400, 16000);
+	uint8_t mfccCnt = 5;
+	uint32_t filterLength = 8;
+	uint32_t frequency = 8000;
+	uint32_t freqMin = 300;
+	uint32_t freqMax = 3000;
+	double** melFilter = MFCC::getMelFilters(mfccCnt, filterLength, frequency, freqMin, freqMax);
+
+	double* melFilterEx = new double[mfccCnt * filterLength];
+	memset((void*) melFilterEx, 0, sizeof(double) * mfccCnt * filterLength);
+	melFilterEx[6] = 0.90835;
+	melFilterEx[7] = 0.09165;
+	melFilterEx[12] = 0.21409;
+	melFilterEx[13] = 0.78591;
+	melFilterEx[19] = 0.96214;
+	melFilterEx[20] = 0.03786;
+	melFilterEx[25] = 0.98536;
+	melFilterEx[30] = 0.19707;
 
 	// Just check if code runs without exceptions
-	/*
-	for (int m = 0; m <= MFCC_SIZE; m++) {
-		for (int i = 0; i <= 400; i++) {
+	for (uint32_t i = 0; i <= mfccCnt; i++) {
+		for (uint32_t j = 0; j <= filterLength; j++) {
+			EXPECT_NEAR(melFilterEx[i * filterLength + j], melFilter[i][j],
+					numeric_limits<double>::epsilon());
 		}
 	}
-	*/
 
+	delete [] melFilterEx;
 	for (int m = 0; m <= MFCC_SIZE; m++) {
-		delete [] melFreq[m];
+		delete [] melFilter[m];
 	}
-	delete [] melFreq;
+	delete [] melFilter;
 }
 
