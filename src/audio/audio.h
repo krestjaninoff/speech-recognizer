@@ -53,7 +53,7 @@ namespace audio {
 	 * Frequency bounds
 	 */
 	const short MFCC_FREQ_MIN = 300;
-	const short MFCC_FREQ_MAX = 8000;
+	const short MFCC_FREQ_MAX = 4000;
 
 	/**
 	 * Entropy params

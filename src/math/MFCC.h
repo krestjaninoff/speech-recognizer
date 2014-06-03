@@ -36,7 +36,7 @@ public:
 	static double* filter(const double* source, uint32_t start, uint32_t finish);
 
 	/**
-	 * Perform short-time fourier transform with Hamming windows
+	 * Compute singnal's magnitude (short-time Fourier transform with Hamming window)
 	 *
 	 * @see http://en.wikipedia.org/wiki/Fourier_transform
 	 * @see http://en.wikipedia.org/wiki/Discrete-time_Fourier_transform
@@ -46,7 +46,8 @@ public:
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
 	 */
-	static double* fourierTransform(const double* source, uint32_t start, uint32_t finish, bool useWindow);
+	static double* fourierTransform(const double* source, uint32_t start, uint32_t finish,
+			bool useWindow);
 
 	/**
 	 * Create mel filters (for range of frequencies), using triangular overlapping windows
@@ -62,14 +63,15 @@ public:
 	/**
 	 * Take the logs of the powers at each of the mel frequencies
 	 */
-	static double* calcPower(const double* fourierRaw, double** melFilters, uint32_t fourierLength);
+	static double* calcPower(const double* fourierRaw, uint32_t fourierLength,
+			double** melFilters, uint32_t mfccCount);
 
 	/**
 	 * Take the discrete cosine transform of the list of mel log powers
 	 *
 	 * @see http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
 	 */
-	static double* dstTransform(const double* melScale);
+	static double* dstTransform(const double* data, uint32_t length);
 
 
 	// Mel convertors

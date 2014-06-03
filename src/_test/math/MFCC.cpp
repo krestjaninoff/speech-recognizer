@@ -6,22 +6,54 @@
 
 using namespace yazz::math;
 
-TEST(MATH_MFCC, FOURIER_TRANSFORM)
-{
-	double f[] = {8, 4, 8, 0};
-	double* fourierRaw = MFCC::fourierTransform((const double*) f, 0, 3, false);
+/**
+ * MFCC tests
+ *
+ * Octave code:
+ *
+ * frame = [0.12165, -0.05362, -0.18302, -0.25706, -0.28193, -0.26713,-0.22056, -0.15699,-0.10022, -0.07285]
+ * frame = frame(:)
+ *
+ * frameH = frame .* hamming(length(frame))
+ * fourier = abs(fft(frame)) # and the same for frameH
+ *
+ * dst = dst(frame)
+ *
+ *
+ * [fb, freq] = trifbank( 5, 8, [300 3000], 8000, hz2mel, mel2hz )
+ * raw=[1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357, 0.15109, 0.17987]
+ */
 
-	const double eps = 0.001;
-	EXPECT_NEAR(20, fourierRaw[0], eps);
-	EXPECT_NEAR(4, fourierRaw[1], eps);
-	EXPECT_NEAR(12, fourierRaw[2], eps);
-	EXPECT_NEAR(4, fourierRaw[3], eps);
+TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 
-	delete [] fourierRaw;
+	const uint8_t frameSize = 10;
+	const double frame[] = {0.12165, -0.05362, -0.18302, -0.25706, -0.28193, -0.26713,
+		-0.22056, -0.15699,-0.10022, -0.07285};
+
+	const double fourierExpected[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357,
+		0.15109, 0.17987, 0.24049, 0.75985};
+	double* fourierResult = MFCC::fourierTransform(frame, 0, frameSize - 1, false);
+
+	for (uint32_t i = 0; i <= frameSize; i++) {
+		EXPECT_NEAR(fourierExpected[i], fourierResult[i],
+					numeric_limits<double>::epsilon());
+	}
+	delete [] fourierResult;
+
+
+	const double fourierHamExpected[] = {1.0830011, 0.7111400, 0.1586940, 0.0093373, 0.0068586,
+		0.0085555, 0.0068586, 0.0093373, 0.1586940, 0.7111400};
+	fourierResult = MFCC::fourierTransform(frame, 0, frameSize - 1, true);
+
+	for (uint32_t i = 0; i <= frameSize; i++) {
+		EXPECT_NEAR(fourierHamExpected[i], fourierResult[i],
+					numeric_limits<double>::epsilon());
+	}
+
+	delete [] fourierResult;
 }
 
-TEST(MATH_MFCC, MEL_FILTERS)
-{
+TEST(MATH_MFCC, MEL_FILTERS) {
 	uint8_t mfccCnt = 5;
 	uint32_t filterLength = 8;
 	uint32_t frequency = 8000;
@@ -53,5 +85,49 @@ TEST(MATH_MFCC, MEL_FILTERS)
 		delete [] melFilter[m];
 	}
 	delete [] melFilter;
+}
+
+TEST(MATH_MFCC, CALC_POWER) {
+
+	uint8_t mfccCnt = 5;
+	uint32_t frameSize = 8;
+	uint32_t frequency = 8000;
+	uint32_t freqMin = 300;
+	uint32_t freqMax = 3000;
+	double** melFilter = MFCC::getMelFilters(mfccCnt, frameSize, frequency, freqMin, freqMax);
+
+	const double fourierRaw[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357,
+		0.15109, 0.17987};
+	const double logPowerEx[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109};
+
+	double* logPower = MFCC::calcPower(fourierRaw, frameSize, melFilter, mfccCnt);
+
+	// Just check if code runs without exceptions
+	for (uint32_t i = 0; i <= mfccCnt; i++) {
+		EXPECT_NEAR(logPower[i], logPowerEx[i],	numeric_limits<double>::epsilon());
+	}
+
+	delete [] logPower;
+	for (int m = 0; m <= MFCC_SIZE; m++) {
+		delete [] melFilter[m];
+	}
+	delete [] melFilter;
+}
+
+TEST(MATH_MFCC, DST_TRANSFORM) {
+
+	const uint8_t frameSize = 10;
+	const double frame[] = {0.12165, -0.05362, -0.18302, -0.25706, -0.28193, -0.26713,
+		-0.22056, -0.15699,-0.10022, -0.07285};
+
+	const double dstExpected[] = {-1.304316, 0.090024, 0.334787, 0.263605, 0.157515, 0.172151,
+		0.080532, 0.089974, 0.036045, 0.028483};
+	double* dstResult = MFCC::dstTransform(frame, frameSize);
+
+	for (uint32_t i = 0; i <= frameSize; i++) {
+		EXPECT_NEAR(dstExpected[i], dstResult[i], numeric_limits<double>::epsilon());
+	}
+
+	delete [] dstResult;
 }
 

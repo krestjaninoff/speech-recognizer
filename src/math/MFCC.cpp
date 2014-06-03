@@ -1,7 +1,6 @@
+#include "../common.h"
 #include <MFCC.h>
 #include <stddef.h>
-
-#include "../common.h"
 
 namespace yazz {
 namespace math {
@@ -11,9 +10,9 @@ double* MFCC::transform(const double* source, uint32_t start, uint32_t finish, u
 
 	// Calc
 	double* fourierRaw = fourierTransform(source, start, finish, true);
-	double** melFilters = getMelFilters(size, frequency);
-	double* logPower = calcPower(fourierRaw, melFilters, size);
-	double* dstTransformData = dstTransform(logPower);
+	double** melFilters = getMelFilters(MFCC_SIZE, size, frequency, MFCC_FREQ_MIN, MFCC_FREQ_MAX);
+	double* logPower = calcPower(fourierRaw, size, melFilters, MFCC_SIZE);
+	double* dstTransformData = dstTransform(logPower, MFCC_SIZE);
 
 	// Clean up
 	delete [] logPower;
@@ -38,7 +37,7 @@ double* MFCC::filter(const double* source, uint32_t start, uint32_t finish) {
 }
 
 /**
- * Perform short-time fourier transform with Hamming windows
+ * Compute singnal's spectrum and its magnitudes (short-time Fourier transform with Hamming window)
  */
 double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t finish, bool useWindow) {
 
@@ -51,9 +50,10 @@ double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t fi
 		for (uint32_t n = 0; n < size; n++) {
 			double sample = source[start + n];
 
-			// e^(ix) = cos(x) + i*sin(x)
+			// According Euler's formula: e^(ix) = cos(x) + i*sin(x)
+			// As for magnitude, let's use Euclid's distance for its calculation
 			double x = -2. * PI * k * n / size;
-			double f = sample * (cos(x) + sin(x));
+			double f = sample * sqrt(pow(cos(x), 2) + pow(sin(x), 2));
 
 			double w = 1;
 			if (useWindow) {
@@ -70,37 +70,38 @@ double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t fi
 }
 
 /**
- * Create mel filters, using triangular overlapping windows
+ * Create triangular filters spaced on mel scale
  */
-double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
+double** MFCC::getMelFilters(uint8_t mfccSize, uint32_t filterLength, uint32_t frequency,
+		uint32_t freqMin, uint32_t freqMax) {
 
 	// Create points for filter banks
-	double* fb = new double[MFCC_SIZE + 2];
-	fb[0] = convertToMel(MFCC_FREQ_MIN);
-	fb[MFCC_SIZE + 1] = convertToMel(MFCC_FREQ_MAX);
+	double* fb = new double[mfccSize + 2];
+	fb[0] = convertToMel(freqMin);
+	fb[mfccSize + 1] = convertToMel(freqMax);
 
 	// Create mel bin
-	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {
-		fb[m] = fb[0] + m * (fb[MFCC_SIZE + 1] - fb[0]) / (MFCC_SIZE + 1);
+	for (unsigned short m = 1; m < mfccSize + 1; m++) {
+		fb[m] = fb[0] + m * (fb[mfccSize + 1] - fb[0]) / (MFCC_SIZE + 1);
 	}
 
-	for (unsigned short m = 0; m < MFCC_SIZE + 2; m++) {
+	for (unsigned short m = 0; m < mfccSize + 2; m++) {
 
 		// Convert them from mel to frequency
 		fb[m] = convertFromMel(fb[m]);
 
 		// Round those frequencies to the nearest DFT bin
-		fb[m] = floor((fourierLength + 1) * fb[m] / frequency);
+		fb[m] = floor((filterLength + 1) * fb[m] / frequency);
 	}
 
 	// Calc filter banks
-	double** filterBanks = new double*[MFCC_SIZE];
-	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
-		filterBanks[m] =  new double[fourierLength];
+	double** filterBanks = new double*[mfccSize];
+	for (unsigned short m = 0; m < mfccSize; m++) {
+		filterBanks[m] =  new double[filterLength];
 	}
 
-	for (unsigned short m = 1; m < MFCC_SIZE + 1; m++) {
-		for (uint32_t k = 0; k < fourierLength; k++) {
+	for (unsigned short m = 1; m < mfccSize + 1; m++) {
+		for (uint32_t k = 0; k < filterLength; k++) {
 
 			if (fb[m - 1] <= k && k <= fb[m]) {
 				filterBanks[m - 1][k] = (k - fb[m - 1]) / (fb[m] - fb[m - 1]);
@@ -120,13 +121,14 @@ double** MFCC::getMelFilters(uint32_t fourierLength, uint32_t frequency) {
 }
 
 /**
- * Take the logs of the powers at each of the mel frequencies
+ * Apply mel filters to spectrum's magnitudes, take the logs of the powers
  */
-double* MFCC::calcPower(const double* fourierRaw, double** melFilters, uint32_t fourierLength) {
+double* MFCC::calcPower(const double* fourierRaw, uint32_t fourierLength,
+		double** melFilters, uint32_t mfccCount) {
 
-	double* logPower = new double[MFCC_SIZE];
+	double* logPower = new double[mfccCount];
 
-	for (unsigned short m = 0; m < MFCC_SIZE; m++) {
+	for (unsigned short m = 0; m < mfccCount; m++) {
 		logPower[m] = 0.;
 
 		for (uint32_t k = 0; k < fourierLength; k++) {
@@ -141,15 +143,15 @@ double* MFCC::calcPower(const double* fourierRaw, double** melFilters, uint32_t 
 /**
  * Take the discrete cosine transform of the list of mel log powers
  */
-double* MFCC::dstTransform(const double* logPower) {
+double* MFCC::dstTransform(const double* data, uint32_t length) {
 
-	double* dstTransform = new double[MFCC_SIZE];
+	double* dstTransform = new double[length];
 
-	for (unsigned short n = 0; n < MFCC_SIZE; n++) {
+	for (unsigned short n = 0; n < length; n++) {
 		dstTransform[n] = 0;
 
-		for (unsigned short m = 0; m < MFCC_SIZE; m++) {
-			dstTransform[n] += logPower[m] * cos(PI * n * (m + 1./2.) / MFCC_SIZE);
+		for (unsigned short m = 0; m < length; m++) {
+			dstTransform[n] += data[m] * cos(PI * n * (m + 1./2.) / MFCC_SIZE);
 		}
 	}
 
