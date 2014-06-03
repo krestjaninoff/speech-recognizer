@@ -1,4 +1,6 @@
 #include <Word.h>
+#include <cstdint>
+#include <string>
 
 namespace yazz {
 namespace audio {

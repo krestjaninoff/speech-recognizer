@@ -1,13 +1,16 @@
-#include "AudioDataCommand.h"
-
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <sys/types.h>
+#include <AudioDataCommand.h>
+#include <Processor.h>
+#include <WavData.h>
+#include <Word.h>
 #include <sys/stat.h>
-#include "Context.h"
-#include "../audio/Word.h"
-#include "../audio/Processor.h"
+#include <cstdio>
+#include <cwchar>
+#include <iostream>
+#include <iterator>
+#include <sstream>
+#include <vector>
+
+#include "../common.h"
 
 #ifdef __MINGW32__
 #include <io.h>
@@ -49,7 +52,7 @@ namespace command {
 		}
 
 		// Determine results directory name
-		string folder = OUTPUT_FOLDER_DEFAULT;
+		string folder(OUTPUT_FOLDER_DEFAULT);
 		if (NULL != outputFolder) {
 			string outputFolderStr(outputFolder);
 			folder = outputFolderStr;
@@ -57,7 +60,7 @@ namespace command {
 		cout << "Output directory is " << folder << "..." << endl;
 
 		// Check if output directory exists or can be created
-		if (!initOutputDirectory(outputFolder)) {
+		if (!initOutputDirectory(folder)) {
 			return false;
 		}
 
@@ -73,7 +76,7 @@ namespace command {
 		for (vector<Word*>::const_iterator word = processor->getWords()->begin();
 				word != processor->getWords()->end(); ++word) {
 
-			string fileName = folder + "/sampleFile." + toString(counter) + ".wav";
+			string fileName = folder + "/" + toString(counter) + ".wav";
 			cout << fileName << endl;
 
 			processor->saveWordAsAudio(fileName, *(*word));
@@ -87,7 +90,7 @@ namespace command {
 	bool AudioDataCommand::initOutputDirectory(const string& outputFolder) {
 		struct stat info;
 
-		if (0 != stat( outputFolder.c_str(), &info )) {
+		if (0 != stat(outputFolder.c_str(), &info)) {
 			int success;
 
 			#if defined(_WIN32)

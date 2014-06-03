@@ -25,10 +25,15 @@ public:
 	/**
 	 * Perform MFCC transformation
 	 */
-	static double* transform(const std::vector<raw_t>& source, uint32_t start, uint32_t finish, uint32_t frequency);
+	static double* transform(const double* source, uint32_t start, uint32_t finish, uint32_t frequency);
 
 // The methods below should be private, but for testing purposes they are public now
 // private:
+
+	/**
+	 * Preemphasis digital filtration
+	 */
+	static double* filter(const double* source, uint32_t start, uint32_t finish);
 
 	/**
 	 * Perform short-time fourier transform with Hamming windows
@@ -41,7 +46,7 @@ public:
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
 	 */
-	static double* fourierTransform(const std::vector<raw_t>& source, uint32_t start, uint32_t finish, bool useWindow);
+	static double* fourierTransform(const double* source, uint32_t start, uint32_t finish, bool useWindow);
 
 	/**
 	 * Create mel filters (for range of frequencies), using triangular overlapping windows
@@ -57,14 +62,14 @@ public:
 	/**
 	 * Take the logs of the powers at each of the mel frequencies
 	 */
-	static double* calcPower(double* fourierRaw, double** melFilters, uint32_t fourierLength);
+	static double* calcPower(const double* fourierRaw, double** melFilters, uint32_t fourierLength);
 
 	/**
 	 * Take the discrete cosine transform of the list of mel log powers
 	 *
 	 * @see http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
 	 */
-	static double* dstTransform(double* melScale);
+	static double* dstTransform(const double* melScale);
 
 
 	// Mel convertors

@@ -1,9 +1,10 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
+#include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
-#include "maph.h"
 
 using namespace std;
 

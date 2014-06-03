@@ -1,8 +1,9 @@
-#include <stdio.h>
+#include <Painter.h>
+#include <Processor.h>
+#include <VisualizationCommand.h>
+#include <WavData.h>
+#include <iostream>
 #include <string>
-#include "VisualizationCommand.h"
-#include "Context.h"
-#include "../visual/Painter.h"
 
 using namespace std;
 using namespace yazz::visual;

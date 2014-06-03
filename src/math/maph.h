@@ -5,8 +5,6 @@
 #ifndef MATF_H_
 #define MATF_H_
 
-#include "../common.h"
-
 namespace yazz {
 namespace math {
 

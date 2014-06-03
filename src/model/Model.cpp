@@ -1,7 +1,8 @@
+#include <Model.h>
+#include <stddef.h>
+#include <cstdint>
 #include <iostream>
-#include <istream>
-#include <ostream>
-#include "Model.h"
+#include <iterator>
 
 using namespace std;
 

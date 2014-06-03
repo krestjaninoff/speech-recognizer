@@ -1,17 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <memory>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
-#include <limits>
-#include <limits.h>
+#include <WavData.h>
 #include <cassert>
-#include <vector>
-#include <math.h>
-#include "audio.h"
-#include "WavData.h"
-#include "Frame.h"
-#include "Word.h"
+#include <cmath>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -41,7 +36,7 @@ WavData* WavData::readFromFile(const std::string& file) {
 
 	// Read raw data
 	WavData* wavData = new WavData(wavHeader);
-	readRawData(fs, wavHeader, *wavData);
+	readData(fs, wavHeader, *wavData);
 	fs.close();
 
 	return wavData;
@@ -83,7 +78,7 @@ bool WavData::checkHeader(const WavHeader& wavHeader) {
 	return true;
 }
 
-void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile) {
+void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile) {
 	raw_t value, minValue = 0, maxValue = 0;
 	uint8_t value8, valueLeft8, valueRight8;
 	int16_t value16, valueLeft16, valueRight16;
@@ -92,10 +87,13 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 	unsigned long numberOfSamplesXChannels = wavHeader.subchunk2Size /
 			(wavHeader.numOfChan * bytesPerSample);
 
-	unsigned long sampleNumber = 0;
+	wavFile.rawData = new raw_t[numberOfSamplesXChannels];
+	wavFile.normalizaedData = new double[numberOfSamplesXChannels];
+
+	uint32_t sampleNumber = 0;
 	for (; sampleNumber < numberOfSamplesXChannels && !fs.eof(); sampleNumber++) {
 
-		// Should we match 8 bit values to 16 bit? Vice versa?
+		// How can we match 8 bit [0, X] values into 16 bit [-Y, Y]?
 		if (8 == wavHeader.bitsPerSample) {
 			if (1 == wavHeader.numOfChan) {
 				fs.read((char*)(&value8), sizeof(uint8_t));
@@ -127,9 +125,15 @@ void WavData::readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData&
 		}
 
 		//wavFile.rawData->push_back(value);
-		wavFile.rawData->insert(wavFile.rawData->begin() + sampleNumber, value);
+		wavFile.rawData[sampleNumber] = value;
 	}
 	assert(sampleNumber > 0);
+	sampleNumber++;
+
+	// Normalization
+	for (uint32_t i; i < sampleNumber; i++) {
+		wavFile.normalizaedData[i] = wavFile.rawData[i] / static_cast<double>(maxValue);
+	}
 
 	// Update values
 	wavFile.setMinVal(minValue);

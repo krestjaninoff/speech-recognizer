@@ -1,21 +1,14 @@
 #ifndef AUDIODATACOMMAND_H_
 #define AUDIODATACOMMAND_H_
 
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "Context.h"
-#include "../audio/Word.h"
-#include "../audio/Processor.h"
+#include <Context.h>
+#include <string>
 
 #ifdef __MINGW32__
 #include <io.h>
 #endif
 
 using namespace std;
-using namespace yazz::audio;
 
 namespace yazz {
 namespace command {

@@ -11,11 +11,10 @@
 #ifndef WAV_DATA_H_
 #define WAV_DATA_H_
 
+#include <audio.h>
+#include <cstdint>
+#include <iostream>
 #include <string>
-#include <vector>
-#include "audio.h"
-#include "Frame.h"
-#include "Word.h"
 
 namespace yazz {
 namespace audio {
@@ -51,8 +50,11 @@ class WavData {
 public:
 
 	~WavData() {
-		if (this->rawData) {
+		if (NULL != this->rawData) {
 			delete this->rawData;
+		}
+		if (NULL != this->normalizaedData) {
+			delete this->normalizaedData;
 		}
 	}
 
@@ -68,19 +70,22 @@ public:
 	void setMinVal(raw_t minVal) { this->minVal = minVal; }
 
 	const WavHeader& getHeader() const { return header; }
-	const std::vector<raw_t>* getRawData() const { return rawData; }
+	const raw_t* getRawData() const { return rawData; }
+	const double* getNormalizedData() const { return normalizaedData; }
 
 private:
-	WavHeader               header;
-	std::vector<raw_t>*     rawData;
+	WavHeader		header;
+	raw_t*			rawData;
+	double*			normalizaedData;
 
-	raw_t                   maxVal;
-	raw_t                   minVal;
-	uint32_t                numberOfSamples;
+	raw_t			maxVal;
+	raw_t			minVal;
+	uint32_t		numberOfSamples;
 
 	WavData(WavHeader header) {
 		this->header = header;
-		this->rawData = new std::vector<raw_t>;
+		this->rawData = NULL;
+		this->normalizaedData = NULL;
 
 		this->maxVal = 0;
 		this->minVal = 0;
@@ -88,7 +93,7 @@ private:
 	}
 
 	static bool checkHeader(const WavHeader& wavHeader);
-	static void readRawData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
+	static void readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile);
 };
 
 } // namespace audio

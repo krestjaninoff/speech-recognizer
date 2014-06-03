@@ -1,6 +1,9 @@
-#include "Storage.h"
-#include <stdio.h>
 #include <string.h>
+#include <Storage.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <utility>
 
 #ifdef __MINGW32__
 #include <io.h>

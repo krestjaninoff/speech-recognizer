@@ -1,10 +1,19 @@
+#include <assert.h>
+#include <audio.h>
+#include <Frame.h>
+#include <png.h>
+#include <pngconf.h>
+#include <Painter.h>
 #include <stdio.h>
+#include <visual.h>
+#include <WavData.h>
+#include <csetjmp>
 #include <cstdlib>
-#include "assert.h"
+#include <cstring>
+#include <cwchar>
 #include <iostream>
-#include "png.h"
-#include "Painter.h"
-#include "Frame.h"
+#include <iterator>
+#include <vector>
 
 using namespace std;
 using namespace yazz::audio;
@@ -36,14 +45,14 @@ void Painter::drawRawData(const Processor* processor, const string& file) {
 	memset(image, 0, bufferSize);
 
 	uint32_t xCurr = 0;
-	for (vector<raw_t>::const_iterator yCurr = processor->getWavData()->getRawData()->begin();
-			yCurr != processor->getWavData()->getRawData()->end(); ++yCurr) {
+	for (uint32_t i = 0; i < processor->getWavData()->getNumberOfSamples(); i++) {
+		raw_t yCurr = processor->getWavData()->getRawData()[i];
 
 		// Contractive mapping
 		uint32_t x = xCurr * (imgWidth - 1) / xMax;
 		assert(x <= imgWidth);
 
-		uint32_t y = (*yCurr + yCorrection) * (imgHeight - 1) / yMax;
+		uint32_t y = (yCurr + yCorrection) * (imgHeight - 1) / yMax;
 		assert(y <= imgHeight);
 		y = imgHeight - y - 1;
 
@@ -67,7 +76,7 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 	uint32_t imgHeight = IMAGE_HEIGHT;
 
 	uint32_t xMax = processor->getFrames()->size();
-	uint32_t yMax = processor->getMaRMSMax();
+	uint32_t yMax = processor->getRmsMax();
 
 	uint32_t bufferSize = imgWidth * imgHeight * sizeof(uint8_t);
 	uint8_t* image = (uint8_t*) malloc(bufferSize);
@@ -104,7 +113,7 @@ void Painter::drawFrames(const Processor* processor, const string& file) {
 
 		// Entropy
 		{
-			uint32_t y = (*frame)->getEntropy() * (imgHeight - 1) / ENTROPY_BINS;
+			uint32_t y = (*frame)->getEntropy() * (imgHeight - 1) / yMax;
 			assert(y <= imgHeight);
 			y = imgHeight - y - 1;
 

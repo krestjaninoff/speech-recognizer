@@ -1,15 +1,10 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <vector>
+#include <Model.h>
+#include <Word.h>
+#include <cstdint>
 #include <map>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "Model.h"
-#include "../audio/Word.h"
 
 using namespace std;
 using namespace yazz::math;
