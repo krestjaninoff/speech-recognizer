@@ -1,19 +1,22 @@
-#include "../math/Statistics.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <gtest/gtest-message.h>
+#include <gtest/internal/gtest-internal.h>
+#include <maph.h>
+#include <Statistics.h>
 
 using namespace yazz::math;
+
 
 TEST(MATH_STATISTICS, RMS)
 {
 	raw_t f[] = {2, 4, 3, 1};
 	double rms = Statistics::rms(f, 0, 3);
 
-	ASSERT_DOUBLE_EQ(2.7386127875258306, rms);
+	EXPECT_NEAR(2.73861, rms, EPS_TEST);
 }
 
-
 /**
- * Matlab/Octave implementation
+ * Octave implementation
  *
  * I = [2,4,3,1,6,3,8,2,3,6,1,7]
  * NBin =  4
@@ -29,7 +32,15 @@ TEST(MATH_STATISTICS, ENTROPY)
 	uint32_t max = 9;
 
 	double entropy = Statistics::entropy(f, 0, 11, binCnt, min, max);
+	EXPECT_NEAR(1.9183, entropy, EPS_TEST);
 
-	EXPECT_NEAR(1.9183, entropy, 0.001);
+
+	double f2[] = {-0.2, 0.4, 0.3, 0.1, 0.6, 0.3, 0.9, 0.2, 0.3, 0.6, 0.1, 0.7};
+	binCnt = 4;
+	min = -0.2;
+	max = 0.9;
+
+	entropy = Statistics::entropy(f2, 0, 11, binCnt, min, max);
+	EXPECT_NEAR(1.6258, entropy, EPS_TEST);
 }
 

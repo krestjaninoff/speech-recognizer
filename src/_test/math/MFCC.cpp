@@ -34,9 +34,8 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 		0.15109, 0.17987, 0.24049, 0.75985};
 	double* fourierResult = MFCC::fourierTransform(frame, 0, frameSize - 1, false);
 
-	for (uint32_t i = 0; i <= frameSize; i++) {
-		EXPECT_NEAR(fourierExpected[i], fourierResult[i],
-					numeric_limits<double>::epsilon());
+	for (uint32_t i = 0; i < frameSize; i++) {
+		EXPECT_NEAR(fourierExpected[i], fourierResult[i], EPS_TEST);
 	}
 	delete [] fourierResult;
 
@@ -45,9 +44,8 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 		0.0085555, 0.0068586, 0.0093373, 0.1586940, 0.7111400};
 	fourierResult = MFCC::fourierTransform(frame, 0, frameSize - 1, true);
 
-	for (uint32_t i = 0; i <= frameSize; i++) {
-		EXPECT_NEAR(fourierHamExpected[i], fourierResult[i],
-					numeric_limits<double>::epsilon());
+	for (uint32_t i = 0; i < frameSize; i++) {
+		EXPECT_NEAR(fourierHamExpected[i], fourierResult[i], EPS_TEST);
 	}
 
 	delete [] fourierResult;
@@ -73,10 +71,9 @@ TEST(MATH_MFCC, MEL_FILTERS) {
 	melFilterEx[30] = 0.19707;
 
 	// Just check if code runs without exceptions
-	for (uint32_t i = 0; i <= mfccCnt; i++) {
-		for (uint32_t j = 0; j <= filterLength; j++) {
-			EXPECT_NEAR(melFilterEx[i * filterLength + j], melFilter[i][j],
-					numeric_limits<double>::epsilon());
+	for (uint32_t i = 0; i < mfccCnt; i++) {
+		for (uint32_t j = 0; j < filterLength; j++) {
+			EXPECT_NEAR(melFilterEx[i * filterLength + j], melFilter[i][j], EPS_TEST);
 		}
 	}
 
@@ -103,12 +100,12 @@ TEST(MATH_MFCC, CALC_POWER) {
 	double* logPower = MFCC::calcPower(fourierRaw, frameSize, melFilter, mfccCnt);
 
 	// Just check if code runs without exceptions
-	for (uint32_t i = 0; i <= mfccCnt; i++) {
-		EXPECT_NEAR(logPower[i], logPowerEx[i],	numeric_limits<double>::epsilon());
+	for (uint32_t i = 0; i < mfccCnt; i++) {
+		EXPECT_NEAR(logPower[i], logPowerEx[i],	EPS_TEST);
 	}
 
 	delete [] logPower;
-	for (int m = 0; m <= MFCC_SIZE; m++) {
+	for (int m = 0; m < mfccCnt; m++) {
 		delete [] melFilter[m];
 	}
 	delete [] melFilter;
@@ -124,8 +121,8 @@ TEST(MATH_MFCC, DST_TRANSFORM) {
 		0.080532, 0.089974, 0.036045, 0.028483};
 	double* dstResult = MFCC::dstTransform(frame, frameSize);
 
-	for (uint32_t i = 0; i <= frameSize; i++) {
-		EXPECT_NEAR(dstExpected[i], dstResult[i], numeric_limits<double>::epsilon());
+	for (uint32_t i = 0; i < frameSize; i++) {
+		EXPECT_NEAR(dstExpected[i], dstResult[i], EPS_TEST);
 	}
 
 	delete [] dstResult;

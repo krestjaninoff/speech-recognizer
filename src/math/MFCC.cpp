@@ -1,6 +1,9 @@
 #include "../common.h"
 #include <MFCC.h>
 #include <stddef.h>
+#include <complex.h>
+
+using namespace std;
 
 namespace yazz {
 namespace math {
@@ -39,32 +42,38 @@ double* MFCC::filter(const double* source, uint32_t start, uint32_t finish) {
 /**
  * Compute singnal's spectrum and its magnitudes (short-time Fourier transform with Hamming window)
  */
-double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t finish, bool useWindow) {
+double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t finish,
+		bool useWindow) {
 
 	uint32_t size = finish - start + 1;
+	complex<double>* fourierCmplxRaw = new complex<double>[size];
 	double* fourierRaw = new double[size];
 
+
 	for (uint32_t k = 0; k < size; k++) {
-		fourierRaw[k] = 0;
+		fourierCmplxRaw[k] = complex<double>(0, 0);
 
 		for (uint32_t n = 0; n < size; n++) {
 			double sample = source[start + n];
 
 			// According Euler's formula: e^(ix) = cos(x) + i*sin(x)
-			// As for magnitude, let's use Euclid's distance for its calculation
-			double x = -2. * PI * k * n / size;
-			double f = sample * sqrt(pow(cos(x), 2) + pow(sin(x), 2));
+			double x = -2. * PI * k * n / (double) size;
+			complex<double> f = sample * complex<double>(cos(x), sin(x));
 
-			double w = 1;
+			double w = 1.;
 			if (useWindow) {
 				// Hamming window
-				w = 0.54 + 0.46 * cos(2 * PI * n / (size - 1));
+				w = 0.54 - 0.46 * cos(2 * PI * n / (size - 1));
 			}
-			fourierRaw[k] += f * w;
+
+			fourierCmplxRaw[k] += f * w;
 		}
 
-		fourierRaw[k] = fabs(fourierRaw[k]);
+		// As for magnitude, let's use Euclid's distance for its calculation
+		fourierRaw[k] = sqrt(norm(fourierCmplxRaw[k]));
 	}
+
+	delete [] fourierCmplxRaw;
 
 	return fourierRaw;
 }

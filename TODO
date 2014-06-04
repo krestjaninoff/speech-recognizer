@@ -1,15 +1,18 @@
 TODO:
 
+* UNIT TESTS
+- MATH_MFCC/MEL_FILTERS
+- MATH_MFCC/CALC_POWER
+- MATH_MFCC/DST_TRANSFORM
+- MATH_STATISTICS/ENTROPY
 
-* Wods splitting (set up entropy threshold) +++ UNIT TESTS
-
-** Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
-** Do not trim frames in samples!
+* Wods splitting (set up entropy threshold)
+- Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
+- Do not trim frames in samples!
 
 
 * Memory leaks
 * Code style
-
 
 
 Shelved tasks
