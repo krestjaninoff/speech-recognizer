@@ -51,10 +51,10 @@ public:
 
 	~WavData() {
 		if (NULL != this->rawData) {
-			delete this->rawData;
+			delete [] this->rawData;
 		}
 		if (NULL != this->normalizaedData) {
-			delete this->normalizaedData;
+			delete [] this->normalizaedData;
 		}
 	}
 

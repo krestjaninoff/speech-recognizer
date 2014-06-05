@@ -33,16 +33,16 @@ namespace audio {
 	/**
 	 * Minimal size of word (in frames)
 	 * <p>
-	 * Let's put that minimal length of word is 200ms.
+	 * Let's put that minimal length of word is 100ms.
 	 */
-	const unsigned short WORD_MIN_SIZE = (200 / FRAME_LENGTH) / (1 - FRAME_OVERLAP);
+	const unsigned short WORD_MIN_SIZE = (100 / FRAME_LENGTH) / (1 - FRAME_OVERLAP);
 
 	/**
 	 * Minimal amount of framer between two words
 	 * <p>
 	 * Let's put that minimal distance between two words is 50% of minimal size of word
 	 */
-	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.70;
+	const unsigned short WORDS_MIN_DISTANCE = WORD_MIN_SIZE * 0.50;
 
 	/**
 	 * MFCC vector size
@@ -56,10 +56,10 @@ namespace audio {
 	const short MFCC_FREQ_MAX = 4000;
 
 	/**
-	 * Entropy params
+	 * Entropy parameters
 	 */
-	const short ENTROPY_BINS = 50;
-	const short ENTROPY_THRESHOLD = 1;
+	const short ENTROPY_BINS = 75;
+	const double ENTROPY_THRESHOLD = 0.1;
 
 } // namespace audio
 } // namespace yazz

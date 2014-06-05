@@ -6,11 +6,6 @@ TODO:
 - MATH_MFCC/DST_TRANSFORM
 - MATH_STATISTICS/ENTROPY
 
-* Wods splitting (set up entropy threshold)
-- Invalid splitting for m2, m3 (Rabinel-Lamel algorithm)
-- Do not trim frames in samples!
-
-
 * Memory leaks
 * Code style
 
@@ -29,7 +24,9 @@ odin, dva, tri, chetire, pyat', shest', sem', vosem', devyat', desyat'
 
 Cmd samples 
 
-* Splitting a source into samples -i samples/female1.wav -s _split
-* Listing all available models: -l
-* Adding a sample into a model: -i samples/female1/sampleFile.1.wav -a odin
-* Recognition of a sample -i samples/female1/sampleFile.1.wav -r
+* Splitting a source into samples: yazz -i samples/female1.wav -s_split
+* Listing all available models: yazz -l
+* Adding a sample into a model: yazz -i samples/female1/sampleFile.1.wav -a odin
+* Recognition of a sample: yazz -i samples/female1/sampleFile.1.wav -r
+
+* Unit tests: yazz_test --gtest_filter=MATH_MFCC*

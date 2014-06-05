@@ -27,7 +27,7 @@ public:
 	 * @see http://en.wikipedia.org/wiki/Entropy_(information_theory)
 	 */
 	static double entropy(const double* source, uint32_t start, uint32_t finish,
-			uint8_t binsCount, raw_t minRaw, raw_t maxRaw);
+			uint8_t binsCount, double minRaw, double maxRaw);
 };
 
 } /* namespace math */

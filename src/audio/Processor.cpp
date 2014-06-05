@@ -62,30 +62,26 @@ void Processor::divideIntoFrames() {
 void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
-	//double entropy, entropyMin, entropyMax;
-	double rms, rmsMin, rmsMax;
 
 	// Let's find max and min rms/entropy
-	rms = rmsMin = rmsMax = this->frames->at(0)->getRms();
-	//entropy = entropyMax = entropyMin = this->frames->at(0)->getEntropy();
+	double rms, rmsMax, rmsSilenceMax = 0;
+	rms = rmsMax = this->frames->at(0)->getRms();
 
-	uint32_t iFrame;
-	for (iFrame = 1; iFrame < this->frames->size(); ++iFrame) {
+	// Try to guess the best threshold value
+	for (vector<Frame*>::const_iterator frame = this->frames->begin();
+				frame != this->frames->end(); ++frame) {
 
-		rms = this->frames->at(iFrame)->getRms();
-		//rmsMin = std::min(rmsMin, rms);
+		rms = (*frame)->getRms();
 		rmsMax = std::max(rmsMax, rms);
 
-		//entropy = this->frames->at(iFrame)->getEntropy();
-		//entropyMin = std::min(entropyMin, entropy);
-		//entropyMax = std::max(entropyMax, entropy);
-	}
-	this->rmsMax = rmsMax;
+		if ((*frame)->getEntropy() < ENTROPY_THRESHOLD) {
 
-	// Tries to guess the best threshold value
-	// double threshold = (entropyMax - entropyMin) / 2. - 0.3 * entropyMin;
-	double threshold = ENTROPY_THRESHOLD;
-	this->wordsThreshold = threshold;
+			rmsSilenceMax = std::max(rmsSilenceMax, (*frame)->getRms());
+		}
+	}
+
+	this->rmsMax = rmsMax;
+	this->wordsThreshold = rmsSilenceMax;
 
 	// Divide frames into words
 	uint32_t wordId = -1;
@@ -96,7 +92,7 @@ void Processor::divideIntoWords() {
 			frame != this->frames->end(); ++frame) {
 
 		// Got a sound
-		if ((*frame)->getEntropy() > threshold) {
+		if ((*frame)->getRms() > this->wordsThreshold) {
 
 			if (-1 == firstFrameInCurrentWordNumber) {
 				firstFrameInCurrentWordNumber = (*frame)->getId();
