@@ -71,7 +71,7 @@ public:
 	 *
 	 * @see http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
 	 */
-	static double* dstTransform(const double* data, uint32_t length);
+	static double* dctTransform(const double* data, uint32_t length);
 
 
 	// Mel convertors

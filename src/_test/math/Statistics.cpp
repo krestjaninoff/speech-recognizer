@@ -31,9 +31,8 @@ TEST(MATH_STATISTICS, ENTROPY)
 	double min = 1;
 	double max = 9;
 
-	double entropy;/* = Statistics::entropy(f, 0, 11, binCnt, min, max);
-	EXPECT_NEAR(1.9183, entropy, EPS_TEST);*/
-
+	double entropy = Statistics::entropy(f, 0, 11, binCnt, min, max);
+	EXPECT_NEAR(1.9183, entropy, EPS_TEST);
 
 	double f2[] = {-0.2, 0.4, 0.3, 0.1, 0.6, 0.3, 0.9, 0.2, 0.3, 0.6, 0.1, 0.7};
 	binCnt = 4;
@@ -41,6 +40,6 @@ TEST(MATH_STATISTICS, ENTROPY)
 	max = 0.9;
 
 	entropy = Statistics::entropy(f2, 0, 11, binCnt, min, max);
-	EXPECT_NEAR(1.6258, entropy, EPS_TEST);
+	EXPECT_NEAR(1.7296, entropy, EPS_TEST);
 }
 
