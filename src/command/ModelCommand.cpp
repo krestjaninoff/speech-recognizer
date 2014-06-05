@@ -41,15 +41,15 @@ namespace command {
 		cout << endl;
 	}
 
-	void ModelCommand::recognize(Context& context, const char* modelNamesChar) {
+	string ModelCommand::recognize(Context& context, const char* modelNamesChar) {
 
 		// Check the storage
 		if (!context.storage->init()) {
-			return;
+			return NULL;
 		}
 		if (0 == context.storage->getModels()->size()) {
 			cout << "Models storage is empty! Add some model before starting recognition." << endl;
-			return;
+			return NULL;
 		}
 
 		cout << "Word recognition... " << endl;
@@ -80,17 +80,21 @@ namespace command {
 		// Try to recognize
 		Recognizer rec(modelsFiltered);
 		const Model* model = rec.recognize(*word);
+		string theWord = NULL;
 
 		// Print results
 		if (NULL != model) {
+			theWord =  model->getText();
+
 			cout << endl << "!!!" << endl;
 			cout << "The answer is: " << model->getText();
 			cout << endl << "!!!" << endl;
 		} else {
 			cout << "No suitable model was found :(" << endl;
 		}
-	}
 
+		return theWord;
+	}
 
 	void ModelCommand::add(Context& context, const char* modelNameChar) {
 

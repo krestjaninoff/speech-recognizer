@@ -23,7 +23,7 @@ public:
 	/**
 	 * Recognize input data using specified models (or all available models)
 	 */
-	static void recognize(Context& context, const char* modelNames);
+	static string recognize(Context& context, const char* modelNames);
 
 	/**
 	 * Add current sample into the model

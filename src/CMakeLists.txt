@@ -55,9 +55,10 @@ option(test "Build all tests" OFF)
 		_test/math/MFCC.cpp
 		_test/math/Statistics.cpp
 		_test/audio/Processor.cpp
+		_test/model/Recognizer.cpp
 	)
 	
 	# Link test executable against gtest & gtest_main
-	target_link_libraries(unit_tests gtest gtest_main audio math)
+	target_link_libraries(unit_tests gtest gtest_main command model audio math)
 	add_test(UNIT_TESTS_ALL unit_tests)
 #endif()
