@@ -10,13 +10,12 @@ using namespace yazz::audio;
 using namespace yazz::command;
 
 static string recognizeSample(string file) {
-
 	Context* ctx = new Context();
 
 	WavData* wavData = WavData::readFromFile(file);
 	ctx->wavData = wavData;
 
-	string theWord = ModelCommand::recognize(*ctx, NULL);
+	string theWord = ModelCommand::doRecognize(*ctx, NULL);
 	delete ctx;
 
 	return theWord;
@@ -38,10 +37,13 @@ static void testSetOfSamples(string folder) {
 
 TEST(AUDIO_PROCESSOR, DISABLED_SPLITTING)
 {
+	// NOTICE The models in the storage are trained on male2, male3 and female1 samples.
+	// That's why we use male1 (who is not in the list) for tests.
 	testSetOfSamples("samples/male1");
-	testSetOfSamples("samples/male2");
-	testSetOfSamples("samples/male3");
-	testSetOfSamples("samples/female1");
+
+	// testSetOfSamples("samples/male2");
+	// testSetOfSamples("samples/male3");
+	// testSetOfSamples("samples/female1");
 }
 
 

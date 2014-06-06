@@ -21,14 +21,19 @@ public:
 	static void list(Context& context);
 
 	/**
-	 * Recognize input data using specified models (or all available models)
-	 */
-	static string recognize(Context& context, const char* modelNames);
-
-	/**
 	 * Add current sample into the model
 	 */
 	static void add(Context& context, const char* modelName);
+
+	/**
+	 * Recognize input data using specified models (or all available models)
+	 */
+	static void recognize(Context& context, const char* modelNames);
+
+	/**
+	 * Recognize input data using specified models (or all available models)
+	 */
+	static string doRecognize(Context& context, const char* modelNames);
 
 private:
 

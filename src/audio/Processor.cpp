@@ -62,12 +62,12 @@ void Processor::divideIntoFrames() {
 void Processor::divideIntoWords() {
 	assert(frames->size() > 10);
 
-
 	// Let's find max and min rms/entropy
 	double rms, rmsMax, rmsSilenceMax = 0;
 	rms = rmsMax = this->frames->at(0)->getRms();
 
 	// Try to guess the best threshold value
+	bool hasSilence = false;
 	for (vector<Frame*>::const_iterator frame = this->frames->begin();
 				frame != this->frames->end(); ++frame) {
 
@@ -76,6 +76,7 @@ void Processor::divideIntoWords() {
 
 		if ((*frame)->getEntropy() < ENTROPY_THRESHOLD) {
 
+			hasSilence = true;
 			rmsSilenceMax = std::max(rmsSilenceMax, (*frame)->getRms());
 		}
 	}
@@ -88,57 +89,68 @@ void Processor::divideIntoWords() {
 	long firstFrameInCurrentWordNumber = -1;
 	Word* lastWord = 0;
 
-	for (vector<Frame*>::const_iterator frame = this->frames->begin();
-			frame != this->frames->end(); ++frame) {
+	if (hasSilence) {
+		for (vector<Frame*>::const_iterator frame = this->frames->begin();
+				frame != this->frames->end(); ++frame) {
 
-		// Got a sound
-		if ((*frame)->getRms() > this->wordsThreshold) {
+			// Got a sound
+			if ((*frame)->getRms() > this->wordsThreshold) {
 
-			if (-1 == firstFrameInCurrentWordNumber) {
-				firstFrameInCurrentWordNumber = (*frame)->getId();
-				DEBUG("Word started at frame %d", (int) firstFrameInCurrentWordNumber);
-			}
-
-		// Got silence
-		} else {
-			if (firstFrameInCurrentWordNumber >= 0) {
-
-				// Let's find distance between start of the current word and end of the previous word
-				uint32_t distance = 0;
-				if (0 != lastWord) {
-
-					uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)[lastWord->getId()].second;
-					distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
+				if (-1 == firstFrameInCurrentWordNumber) {
+					firstFrameInCurrentWordNumber = (*frame)->getId();
+					DEBUG("Word started at frame %d", (int) firstFrameInCurrentWordNumber);
 				}
 
-				// We have a new word
-				if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
-					wordId++;
-					lastWord = new Word(wordId);
+			// Got silence
+			} else {
+				if (firstFrameInCurrentWordNumber >= 0) {
 
-					this->wordToFrames->insert(make_pair(lastWord->getId(),
-							make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
-					this->words->push_back(lastWord);
+					// Let's find distance between start of the current word and end of the previous word
+					uint32_t distance = 0;
+					if (0 != lastWord) {
 
-					DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
-							(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
+						uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)[lastWord->getId()].second;
+						distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
+					}
 
-				// We need to add the current word to the previous one
-				} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-					uint32_t firstFrameInPreviousWordNumber =
-							(*this->wordToFrames)[lastWord->getId()].first;
+					// We have a new word
+					if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
+						wordId++;
+						lastWord = new Word(wordId);
 
-					this->wordToFrames->erase(lastWord->getId());
-					this->wordToFrames->insert(make_pair(lastWord->getId(),
-							make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
+						this->wordToFrames->insert(make_pair(lastWord->getId(),
+								make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
+						this->words->push_back(lastWord);
 
-					DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
-							(int) (*this->wordToFrames)[lastWord->getId()].first, (int) (*frame)->getId());
+						DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
+								(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
+
+					// We need to add the current word to the previous one
+					} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
+						uint32_t firstFrameInPreviousWordNumber =
+								(*this->wordToFrames)[lastWord->getId()].first;
+
+						this->wordToFrames->erase(lastWord->getId());
+						this->wordToFrames->insert(make_pair(lastWord->getId(),
+								make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
+
+						DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
+								(int) (*this->wordToFrames)[lastWord->getId()].first, (int) (*frame)->getId());
+					}
+
+					firstFrameInCurrentWordNumber = -1;
 				}
-
-				firstFrameInCurrentWordNumber = -1;
 			}
 		}
+
+	// There is no any silence in the sound
+	} else {
+		wordId++;
+		lastWord = new Word(wordId);
+
+		this->wordToFrames->insert(make_pair(lastWord->getId(),
+				make_pair(this->frames->at(0)->getId(), this->frames->at(this->frames->size() - 1)->getId())));
+		this->words->push_back(lastWord);
 	}
 
 	// Clean up short words

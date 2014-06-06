@@ -41,61 +41,6 @@ namespace command {
 		cout << endl;
 	}
 
-	string ModelCommand::recognize(Context& context, const char* modelNamesChar) {
-
-		// Check the storage
-		if (!context.storage->init()) {
-			return NULL;
-		}
-		if (0 == context.storage->getModels()->size()) {
-			cout << "Models storage is empty! Add some model before starting recognition." << endl;
-			return NULL;
-		}
-
-		cout << "Word recognition... " << endl;
-
-		// Get a word to recognize
-		Word* word = getWord(context);
-
-		// Get available models
-		vector<Model*>* modelsFiltered = new vector<Model*>();
-		const map<uint32_t, Model*>* models = context.storage->getModels();
-
-		vector<string> modelNames;
-		if (NULL != modelNamesChar) {
-			modelNames = parseString(modelNamesChar, ',');
-		}
-
-		for (map<uint32_t, Model*>::const_iterator model = models->begin();
-				model != models->end(); ++model) {
-
-			string modelName((*model).second->getText());
-			if (0 == modelNames.size() ||
-					find(modelNames.begin(), modelNames.end(), modelName) != modelNames.end()) {
-
-				modelsFiltered->push_back((*model).second);
-			}
-		}
-
-		// Try to recognize
-		Recognizer rec(modelsFiltered);
-		const Model* model = rec.recognize(*word);
-		string theWord = NULL;
-
-		// Print results
-		if (NULL != model) {
-			theWord =  model->getText();
-
-			cout << endl << "!!!" << endl;
-			cout << "The answer is: " << model->getText();
-			cout << endl << "!!!" << endl;
-		} else {
-			cout << "No suitable model was found :(" << endl;
-		}
-
-		return theWord;
-	}
-
 	void ModelCommand::add(Context& context, const char* modelNameChar) {
 
 		// Check the model's name
@@ -144,6 +89,69 @@ namespace command {
 		cout << "The new sample has been successfully added!" << endl;
 	}
 
+	string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
+
+		// Check the storage
+		if (!context.storage->init()) {
+			return NULL;
+		}
+		if (0 == context.storage->getModels()->size()) {
+			cout << "Models storage is empty! Add some model before starting recognition." << endl;
+			return NULL;
+		}
+
+		cout << "Word recognition... " << endl;
+
+		// Get a word to recognize
+		Word* word = getWord(context);
+
+		// Get available models
+		vector<Model*>* modelsFiltered = new vector<Model*>();
+		const map<uint32_t, Model*>* models = context.storage->getModels();
+
+		vector<string> modelNames;
+		if (NULL != modelNamesChar) {
+			modelNames = parseString(modelNamesChar, ',');
+		}
+
+		for (map<uint32_t, Model*>::const_iterator model = models->begin();
+				model != models->end(); ++model) {
+
+			string modelName((*model).second->getText());
+			if (0 == modelNames.size() ||
+					find(modelNames.begin(), modelNames.end(), modelName) != modelNames.end()) {
+
+				modelsFiltered->push_back((*model).second);
+			}
+		}
+
+		// Try to recognize
+		Recognizer rec(modelsFiltered);
+		const Model* model = rec.recognize(*word);
+		string theWord = NULL;
+
+		// Print results
+		if (NULL != model) {
+			theWord =  model->getText();
+		}
+
+		return theWord;
+	}
+
+	void ModelCommand::recognize(Context& context, const char* modelNamesChar) {
+		string theWord = doRecognize(context, modelNamesChar);
+
+		// Print results
+		if (theWord.empty()) {
+			cout << endl << "!!!" << endl;
+			cout << "The answer is: " << theWord;
+			cout << endl << "!!!" << endl;
+
+		} else {
+			cout << "No suitable model was found :(" << endl;
+		}
+	}
+
 	Word* ModelCommand::getWord(Context& context) {
 
 		// Check pre-requirements
@@ -155,7 +163,7 @@ namespace command {
 		cout << "Checking input data... " << endl;
 
 		// Create the Processor
-		audio::Processor* processor = new Processor(context.wavData);
+		Processor* processor = new Processor(context.wavData);
 		context.processor = processor;
 
 		// Split wav data into words
