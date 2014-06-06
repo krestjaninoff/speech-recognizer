@@ -1,11 +1,5 @@
 TODO:
 
-* UNIT TESTS
-- MATH_MFCC/MEL_FILTERS
-- MATH_MFCC/CALC_POWER
-- MATH_MFCC/DST_TRANSFORM
-- MATH_STATISTICS/ENTROPY
-
 * Memory leaks
 * Code style
 
@@ -24,8 +18,8 @@ odin, dva, tri, chetire, pyat', shest', sem', vosem', devyat', desyat'
 
 Cmd samples 
 
+* Listing all the available models: yazz -l
 * Splitting a source into samples: yazz -i samples/female1.wav -s_split
-* Listing all available models: yazz -l
 * Adding a sample into a model: yazz -i samples/female1/sampleFile.1.wav -a odin
 * Recognition of a sample: yazz -i samples/female1/sampleFile.1.wav -r
 

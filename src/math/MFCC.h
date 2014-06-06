@@ -25,7 +25,8 @@ public:
 	/**
 	 * Perform MFCC transformation
 	 */
-	static double* transform(const double* source, uint32_t start, uint32_t finish, uint32_t frequency);
+	static double* transform(const double* source, uint32_t start, uint32_t finish,
+			uint8_t mfccSize, uint32_t frequency, uint32_t freqMin, uint32_t freqMax);
 
 // The methods below should be private, but for testing purposes they are public now
 // private:
@@ -46,7 +47,7 @@ public:
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
 	 */
-	static double* fourierTransform(const double* source, uint32_t start, uint32_t finish,
+	static double* fourierTransform(const double* source, uint32_t start, uint32_t length,
 			bool useWindow);
 
 	/**
@@ -64,7 +65,7 @@ public:
 	 * Take the logs of the powers at each of the mel frequencies
 	 */
 	static double* calcPower(const double* fourierRaw, uint32_t fourierLength,
-			double** melFilters, uint32_t mfccCount);
+			double** melFilters, uint8_t mfccSize);
 
 	/**
 	 * Take the discrete cosine transform of the list of mel log powers
