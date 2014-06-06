@@ -88,7 +88,6 @@ void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wa
 			(wavHeader.numOfChan * bytesPerSample);
 
 	wavFile.rawData = new raw_t[numberOfSamplesXChannels];
-	wavFile.normalizaedData = new double[numberOfSamplesXChannels];
 
 	uint32_t sampleNumber = 0;
 	for (; sampleNumber < numberOfSamplesXChannels && !fs.eof(); sampleNumber++) {
@@ -131,6 +130,7 @@ void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wa
 	sampleNumber++;
 
 	// Normalization
+	wavFile.normalizaedData = new double[sampleNumber];
 	for (uint32_t i; i < sampleNumber; i++) {
 		wavFile.normalizaedData[i] = wavFile.rawData[i] / static_cast<double>(maxValue);
 	}

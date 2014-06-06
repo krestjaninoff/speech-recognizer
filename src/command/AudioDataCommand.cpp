@@ -32,7 +32,7 @@ namespace command {
 		}
 
 		cout << "Reading WAV data..." << endl;
-		audio::WavData* wavData = audio::WavData::readFromFile(inputFile);
+		audio::WavData* wavData = WavData::readFromFile(inputFile);
 
 		if (NULL != wavData) {
 			context.wavData = wavData;

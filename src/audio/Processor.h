@@ -21,31 +21,8 @@ namespace audio {
 class Processor {
 public:
 
-	Processor(WavData* wavData) {
-		this->wavData = wavData;
-
-		this->frames = new std::vector<Frame*>();
-		this->frameToRaw = new std::map<uint32_t, std::pair<uint32_t, uint32_t> >();
-		this->samplesPerFrame = 0;
-
-		this->words = new std::vector<Word*>();
-		this->wordToFrames = new std::map<uint32_t, std::pair<uint32_t, uint32_t> >();
-
-		this->rmsMax = 0;
-		this->wordsThreshold = 0;
-	}
-
-	~Processor() {
-		if (this->words) {
-			delete this->words;
-			delete this->wordToFrames;
-		}
-
-		if (this->frames) {
-			delete this->frames;
-			delete this->frameToRaw;
-		}
-	}
+	Processor(WavData* wavData);
+	~Processor();
 
 	void split();
 	void initMfcc(Word& word);
