@@ -54,7 +54,7 @@ namespace math {
 
 		// Calculate entropy
 		for (uint8_t i = 0; i < binsCount; i++) {
-			if (p[i] > 0) {
+			if (p[i] > numeric_limits<double>::epsilon()) {
 				entropy += p[i] * log2(p[i]);
 			}
 		}

@@ -155,9 +155,11 @@ double* MFCC::calcPower(const double* fourierRaw, uint32_t fourierLength,
 			logPower[m] += melFilters[m][k] * pow(fourierRaw[k], 2);
 		}
 
-		if (logPower[m] > 0) {
-			logPower[m] = log(logPower[m]);
+		// NOTE I'm not sure that we need to take logs since we normalized the input data
+		if (logPower[m] < numeric_limits<double>::epsilon()) {
+			assert("Spectrum power is less than zero");
 		}
+		logPower[m] = log(logPower[m]);
 	}
 
 	return logPower;
