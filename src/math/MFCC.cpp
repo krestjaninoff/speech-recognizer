@@ -63,13 +63,13 @@ double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t le
 			double sample = source[start + n];
 
 			// According Euler's formula: e^(ix) = cos(x) + i*sin(x)
-			double x = -2. * PI * k * n / (double) length;
+			double x = -2. * M_PI * k * n / (double) length;
 			complex<double> f = sample * complex<double>(cos(x), sin(x));
 
 			double w = 1.;
 			if (useWindow) {
 				// Hamming window
-				w = 0.54 - 0.46 * cos(2 * PI * n / (length - 1));
+				w = 0.54 - 0.46 * cos(2 * M_PI * n / (length - 1));
 			}
 
 			fourierCmplxRaw[k] += f * w;
@@ -176,7 +176,7 @@ double* MFCC::dctTransform(const double* data, uint32_t length) {
 		dctTransform[n] = 0;
 
 		for (unsigned short m = 0; m < length; m++) {
-			dctTransform[n] += data[m] * cos(PI * n * (m + 1./2.) / length);
+			dctTransform[n] += data[m] * cos(M_PI * n * (m + 1./2.) / length);
 		}
 	}
 

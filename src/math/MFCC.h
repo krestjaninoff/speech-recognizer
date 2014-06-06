@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include <math.h>
-#include "maph.h"
+#include "math.h"
 #include "../audio/audio.h"
 
 using namespace std;

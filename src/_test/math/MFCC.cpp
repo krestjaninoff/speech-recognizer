@@ -4,6 +4,7 @@
 #include <MFCC.h>
 #include <cstring>
 
+using namespace yazz;
 using namespace yazz::math;
 
 /**

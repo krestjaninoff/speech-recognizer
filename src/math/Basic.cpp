@@ -1,4 +1,4 @@
-#include <Statistics.h>
+#include <Basic.h>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -8,7 +8,7 @@ using namespace std;
 namespace yazz {
 namespace math {
 
-	double Statistics::rms(const raw_t* source, uint32_t start, uint32_t finish) {
+	double Basic::rms(const raw_t* source, uint32_t start, uint32_t finish) {
 		double value = 0;
 
 		for (uint32_t i = start; i <= finish; i++) {
@@ -19,7 +19,7 @@ namespace math {
 		return sqrt(value);
 	}
 
-	double Statistics::entropy(const double* source, uint32_t start, uint32_t finish,
+	double Basic::entropy(const double* source, uint32_t start, uint32_t finish,
 			uint8_t binsCount, double minRaw, double maxRaw) {
 		double entropy = 0;
 

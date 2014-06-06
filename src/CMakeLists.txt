@@ -51,9 +51,9 @@ option(test "Build all tests" OFF)
 	
 	# Unit Tests
 	add_executable(unit_tests
+		_test/math/Basic.cpp
 		_test/math/DTW.cpp
 		_test/math/MFCC.cpp
-		_test/math/Statistics.cpp
 		_test/audio/Processor.cpp
 		_test/model/Recognizer.cpp
 	)

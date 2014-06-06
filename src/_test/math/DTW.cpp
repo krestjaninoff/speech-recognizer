@@ -1,6 +1,7 @@
 #include "../math/DTW.h"
 #include "gtest/gtest.h"
 
+using namespace yazz;
 using namespace yazz::math;
 
 TEST(MATH_DTW, CALC_DISTANCE)

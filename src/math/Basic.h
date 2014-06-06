@@ -1,5 +1,5 @@
-#ifndef STATISTICS_H_
-#define STATISTICS_H_
+#ifndef BASIC_MATH_H_
+#define BASIC_MATH_H_
 
 #include <audio.h>
 #include <stdint.h>
@@ -13,7 +13,7 @@ namespace math {
 /**
  * Statistics related calculations
  */
-class Statistics {
+class Basic {
 public:
 
 	/**
@@ -33,4 +33,4 @@ public:
 } /* namespace math */
 } /* namespace yazz */
 
-#endif /* STATISTICS_H_ */
+#endif /* BASIC_MATH_H_ */

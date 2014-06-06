@@ -1,7 +1,7 @@
 #include <cmath>
 #include <stdlib.h>
 #include <Frame.h>
-#include "../math/Statistics.h"
+#include "../math/Basic.h"
 #include "../math/MFCC.h"
 
 namespace yazz {
@@ -18,8 +18,8 @@ namespace audio {
 	void Frame::init(const raw_t* source, const double* sourceNormalized,
 			uint32_t start, uint32_t finish) {
 
-		this->rms = Statistics::rms(source, start, finish);
-		this->entropy = Statistics::entropy(sourceNormalized, start, finish, ENTROPY_BINS, -1, 1);
+		this->rms = Basic::rms(source, start, finish);
+		this->entropy = Basic::entropy(sourceNormalized, start, finish, ENTROPY_BINS, -1, 1);
 	}
 
 	double* Frame::initMFCC(const double* source, uint32_t start, uint32_t finish,

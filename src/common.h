@@ -1,6 +1,7 @@
 /**
  * Common project's settings
  */
+
 #ifndef COMMON_H_
 #define COMMON_H_
 
@@ -30,6 +31,11 @@ namespace yazz {
 	#define EOL "\n"
 	#define toString( x ) dynamic_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
+
+
+	// Test settings
+
+	const double EPS_TEST = 1e-4;
 
 } // namespace yazz
 
