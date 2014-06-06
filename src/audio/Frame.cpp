@@ -15,15 +15,18 @@ namespace audio {
 		delete [] this->mfcc;
 	}
 
-	void Frame::init(const raw_t* source, const double* sourceNormalized, uint32_t start, uint32_t finish) {
+	void Frame::init(const raw_t* source, const double* sourceNormalized,
+			uint32_t start, uint32_t finish) {
 
 		this->rms = Statistics::rms(source, start, finish);
 		this->entropy = Statistics::entropy(sourceNormalized, start, finish, ENTROPY_BINS, -1, 1);
 	}
 
-	double* Frame::initMFCC(const double* source, uint32_t start, uint32_t finish, uint32_t frenq) {
+	double* Frame::initMFCC(const double* source, uint32_t start, uint32_t finish,
+			uint32_t freq) {
 
-		this->mfcc = MFCC::transform(source, start, finish, frenq);
+		this->mfcc = MFCC::transform(source, start, finish, MFCC_SIZE, freq,
+				MFCC_FREQ_MIN, MFCC_FREQ_MAX);
 		return this->mfcc;
 	}
 

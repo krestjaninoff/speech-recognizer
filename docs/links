@@ -1,6 +1,12 @@
+Yandex Speach
+  http://habrahabr.ru/company/yandex/blog/198556/
+
+MFCC
+  http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/
+  http://mirlab.org/jang/books/audiosignalprocessing/speechFeatureMfcc.asp?title=12-2%20MFCC
+
 Hidden Markov Models
   http://ru.wikibooks.org/wiki/%D0%A1%D0%BA%D1%80%D1%8B%D1%82%D1%8B%D0%B5_%D0%BC%D0%B0%D1%80%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B5_%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8
   http://logic.pdmi.ras.ru/~sergey/teaching/asr/notes-09-hmm.pdf
 
-Yandex Speach
-  http://habrahabr.ru/company/yandex/blog/198556/
+Also see comments for MFCC class.
