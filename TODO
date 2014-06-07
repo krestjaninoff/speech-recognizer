@@ -12,17 +12,3 @@ Shelved tasks
 ** Sequence of arguments shouldn't be matter
 ** Appropriate error messages
 
-
-Dinctionary:
-
-odin, dva, tri, chetire, pyat, shest, sem, vosem, devyat, desyat
-
-
-Cmd samples 
-
-* Listing all the available models: yazz -l
-* Splitting a source into samples: yazz -i samples/female1.wav -s_split
-* Adding a sample into a model: yazz -i samples/female1/1.wav -a odin
-* Recognition of a sample: yazz -i samples/female1/1.wav -r
-
-* Unit tests: yazz_test --gtest_filter=MATH_MFCC*
