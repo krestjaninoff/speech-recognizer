@@ -1,4 +1,5 @@
 #include "../math/DTW.h"
+#include "../common.h"
 #include "gtest/gtest.h"
 
 using namespace yazz;
@@ -28,7 +29,7 @@ TEST(MATH_DTW, CALC_DISTANCE)
 	seq2[5] = -2;
 
 	double distance = DTW::calcDistance(seq1, seq1size, seq2, seq2size);
-	EXPECT_NEAR(34.2222, distance, 0.001);
+	EXPECT_NEAR(34.2222, distance, EPS_TEST);
 }
 
 

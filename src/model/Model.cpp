@@ -9,7 +9,7 @@ using namespace std;
 namespace yazz {
 namespace math {
 
-	Model::Model(string text):
+	Model::Model(string& text):
 			text(text) {
 		this->id = -1;
 		this->samples = new vector<MFCCSample>();

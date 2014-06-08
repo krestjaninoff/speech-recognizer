@@ -31,7 +31,8 @@ namespace command {
 			for (map<uint32_t, Model*>::const_iterator model = models->begin();
 					model != models->end(); ++model) {
 
-				cout << " - \"" <<  (*model).second->getText() << "\" (" << (*model).second->getSamples().size() << ")" << endl;
+				cout << " - \"" <<  (*model).second->getText() << "\" (" <<
+						(*model).second->getSamples().size() << ")" << endl;
 			}
 
 		} else {
@@ -169,7 +170,8 @@ namespace command {
 		// Split wav data into words
 		processor->split();
 		if (processor->getWords()->size() != 1) {
-			cerr << "Sample file contains " << processor->getWords()->size() << " words, but we need exactly ONE word" << endl;
+			cerr << "Sample file contains " << processor->getWords()->size()
+					<< " words, but we need exactly ONE word" << endl;
 			return NULL;
 		}
 

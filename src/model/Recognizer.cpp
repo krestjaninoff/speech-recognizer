@@ -38,7 +38,8 @@ namespace math {
 			}
 		}
 
-		cout << "The best model is \"" << bestModel->getText().c_str() << "\" with " << minDistance << " distance" << endl;;
+		cout << "The best model is \"" << bestModel->getText().c_str() << "\" with " <<
+				minDistance << " distance" << endl;
 
 		return bestModel;
 	}

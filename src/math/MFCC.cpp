@@ -97,7 +97,7 @@ double** MFCC::getMelFilters(uint8_t mfccSize, uint32_t filterLength, uint32_t f
 
 	// Create mel bin
 	for (unsigned short m = 1; m < mfccSize + 1; m++) {
-		fb[m] = fb[0] + m * (fb[mfccSize + 1] - fb[0]) / (double) (mfccSize + 1);
+		fb[m] = fb[0] + m * (fb[mfccSize + 1] - fb[0]) / (mfccSize + 1);
 	}
 
 	//frequency = 0.5 * frequency;
@@ -109,9 +109,7 @@ double** MFCC::getMelFilters(uint8_t mfccSize, uint32_t filterLength, uint32_t f
 		// Map those frequencies to the nearest FT bin
 		fb[m] = floor((filterLength + 1) * fb[m] / (double) frequency);
 
-		if (m > 0 && (fb[m] - fb[m-1]) < numeric_limits<double>::epsilon()) {
-			assert("FT bin too small");
-		}
+		assert("FT bin too small" && m > 0 && (fb[m] - fb[m-1]) < numeric_limits<double>::epsilon());
 	}
 
 	// Calc filter banks
@@ -155,10 +153,9 @@ double* MFCC::calcPower(const double* fourierRaw, uint32_t fourierLength,
 			logPower[m] += melFilters[m][k] * pow(fourierRaw[k], 2);
 		}
 
+		assert("Spectrum power is less than zero" && logPower[m] < numeric_limits<double>::epsilon());
+
 		// NOTE I'm not sure that we need to take logs since we normalized the input data
-		if (logPower[m] < numeric_limits<double>::epsilon()) {
-			assert("Spectrum power is less than zero");
-		}
 		logPower[m] = log(logPower[m]);
 	}
 

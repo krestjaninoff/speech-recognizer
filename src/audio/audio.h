@@ -33,9 +33,10 @@ namespace audio {
 	/**
 	 * Minimal size of word (in frames)
 	 * <p>
-	 * Let's put that minimal length of word is 100ms.
+	 * According my experiments average length of the words in my dictionary is 500ms.
+	 * Let's put that the minimal length of word is 200ms.
 	 */
-	const unsigned short WORD_MIN_SIZE = (100 / FRAME_LENGTH) / (1 - FRAME_OVERLAP);
+	const unsigned short WORD_MIN_SIZE = (200 / FRAME_LENGTH) / (1 - FRAME_OVERLAP);
 
 	/**
 	 * Minimal amount of framer between two words

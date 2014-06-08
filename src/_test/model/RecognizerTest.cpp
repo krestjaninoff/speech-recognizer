@@ -35,7 +35,7 @@ static void testSetOfSamples(string folder) {
 	EXPECT_EQ("desyat",  recognizeSample(folder + "/10.wav"));
 }
 
-TEST(AUDIO_PROCESSOR, DISABLED_SPLITTING)
+TEST(AUDIO_RECOGNIZER, DISABLED_RECOGNIZE)
 {
 	// NOTICE The models in the storage are trained on male2, male3 and female1 samples.
 	// That's why we use male1 (who is not in the list) for tests.

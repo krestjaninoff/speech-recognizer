@@ -24,12 +24,6 @@ public:
 	 */
 	uint32_t getId() const { return this->id; }
 
-	/**
-	 * Text meaning of the word
-	 */
-	void setText(const std::string& text) { this->text = text; }
-	const std::string& getText() const { return text; };
-
 	void setMfcc(double* mfcc, uint32_t size) {
 		this->mfcc = mfcc; this->mfccSize = size; }
 	double* getMfcc() const { return this->mfcc; }
@@ -37,7 +31,6 @@ public:
 
 private:
 	uint32_t id;
-	std::string text;
 
 	uint32_t mfccSize;
 	double* mfcc;

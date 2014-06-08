@@ -16,7 +16,7 @@ TEST(MATH_BASIC, RMS)
 }
 
 /**
- * Octave implementation
+ * Octave code:
  *
  * I = [2,4,3,1,6,3,8,2,3,6,1,7]
  * NBin =  4

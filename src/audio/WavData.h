@@ -6,7 +6,6 @@
  * @see http://en.wikipedia.org/wiki/WAV
  * @see http://en.wikipedia.org/wiki/Linear_pulse-code_modulation
  * @see https://ccrma.stanford.edu/courses/422/projects/WaveFormat/
- * @see https://code.google.com/p/aquila/source
  */
 #ifndef WAV_DATA_H_
 #define WAV_DATA_H_

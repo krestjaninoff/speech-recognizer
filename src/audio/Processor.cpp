@@ -77,7 +77,8 @@ namespace audio {
 			if (indexEnd < size) {
 
 				Frame* frame = new Frame(frameId);
-				frame->init(getWavData()->getRawData(), getWavData()->getNormalizedData(), indexBegin, indexEnd);
+				frame->init(getWavData()->getRawData(), getWavData()->getNormalizedData(),
+						indexBegin, indexEnd);
 
 				this->frames->insert(this->frames->begin() + frameId, frame);
 				this->frameToRaw->insert(std::make_pair(frameId, make_pair(indexBegin, indexEnd)));
@@ -91,11 +92,12 @@ namespace audio {
 		assert(frames->size() > 10);
 
 		// Let's find max and min rms/entropy
-		double rms, rmsMax, rmsSilenceMax = 0;
+		double rms, rmsMax, rmsSilence = 0;
 		rms = rmsMax = this->frames->at(0)->getRms();
 
 		// Try to guess the best threshold value
 		bool hasSilence = false;
+		uint32_t cnt = 0;
 		for (vector<Frame*>::const_iterator frame = this->frames->begin();
 					frame != this->frames->end(); ++frame) {
 
@@ -105,12 +107,14 @@ namespace audio {
 			if ((*frame)->getEntropy() < ENTROPY_THRESHOLD) {
 
 				hasSilence = true;
-				rmsSilenceMax = std::max(rmsSilenceMax, (*frame)->getRms());
+				rmsSilence += (*frame)->getRms();
+				cnt++;
 			}
 		}
+		rmsSilence /= cnt;
 
 		this->rmsMax = rmsMax;
-		this->wordsThreshold = rmsSilenceMax;
+		this->wordsThreshold = rmsSilence * 2;
 
 		// Divide frames into words
 		uint32_t wordId = -1;
@@ -137,7 +141,8 @@ namespace audio {
 						uint32_t distance = 0;
 						if (0 != lastWord) {
 
-							uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)[lastWord->getId()].second;
+							uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)
+									[lastWord->getId()].second;
 							distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
 						}
 
@@ -155,15 +160,28 @@ namespace audio {
 
 						// We need to add the current word to the previous one
 						} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-							uint32_t firstFrameInPreviousWordNumber =
-									(*this->wordToFrames)[lastWord->getId()].first;
 
-							this->wordToFrames->erase(lastWord->getId());
-							this->wordToFrames->insert(make_pair(lastWord->getId(),
-									make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
+							// Compute RMS for current word
+							double currentWordRms = 0;
+							for (uint32_t i = firstFrameInCurrentWordNumber;
+									i <  (*frame)->getId(); i++) {
+								currentWordRms += this->frames->at(i)->getRms();
+							}
+							currentWordRms /= (*frame)->getId() - firstFrameInCurrentWordNumber;
 
-							DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
-									(int) (*this->wordToFrames)[lastWord->getId()].first, (int) (*frame)->getId());
+							// Add the word only if it has valuable RMS
+							if (currentWordRms > this->wordsThreshold * 2) {
+								uint32_t firstFrameInPreviousWordNumber =
+										(*this->wordToFrames)[lastWord->getId()].first;
+
+								this->wordToFrames->erase(lastWord->getId());
+								this->wordToFrames->insert(make_pair(lastWord->getId(),
+										make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
+
+								DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
+										(int) (*this->wordToFrames)[lastWord->getId()].first,
+										(int) (*frame)->getId());
+							}
 						}
 
 						firstFrameInCurrentWordNumber = -1;
@@ -177,7 +195,8 @@ namespace audio {
 			lastWord = new Word(wordId);
 
 			this->wordToFrames->insert(make_pair(lastWord->getId(),
-					make_pair(this->frames->at(0)->getId(), this->frames->at(this->frames->size() - 1)->getId())));
+					make_pair(this->frames->at(0)->getId(),
+							this->frames->at(this->frames->size() - 1)->getId())));
 			this->words->push_back(lastWord);
 		}
 
@@ -189,7 +208,7 @@ namespace audio {
 				DEBUG("Word %d is too short and will be avoided", (int) (*word)->getId());
 
 				this->wordToFrames->erase((*word)->getId());
-				this->words->erase(word);
+				word = this->words->erase(word);
 			} else {
 				 ++word;
 			}
@@ -218,16 +237,6 @@ namespace audio {
 		}
 
 		word.setMfcc(mfcc, MFCC_SIZE * framesCnt);
-
-		/*
-		if (DEBUG_ENABLED) {
-			DEBUG("MFCC for %d are: ", (int) word.getId());
-			for (uint32_t i = 0; i < word.getMfccSize(); i++) {
-				DEBUG("%f ", word.getMfcc()[i]);
-			}
-			DEBUG("_");
-		}
-		*/
 	}
 
 	void Processor::saveWordAsAudio(const std::string& file, const Word& word) const {
@@ -295,7 +304,8 @@ namespace audio {
 
 	uint32_t Processor::getFramesCount(const Word& word) const {
 
-		 uint32_t cnt = (*this->wordToFrames)[word.getId()].second - (*this->wordToFrames)[word.getId()].first;
+		 uint32_t cnt = (*this->wordToFrames)[word.getId()].second -
+				 (*this->wordToFrames)[word.getId()].first;
 		 return cnt;
 	}
 

@@ -23,12 +23,12 @@ namespace math {
 			uint8_t binsCount, double minRaw, double maxRaw) {
 		double entropy = 0;
 
-		double binSize = abs(maxRaw - minRaw) / (double) binsCount;
+		double binSize = abs(maxRaw - minRaw) / static_cast<double>(binsCount);
 		if (fabs(binSize) < numeric_limits<double>::epsilon()) {
 			return 0;
 		}
 
-		double* p = new double[binsCount];
+		double p[binsCount];
 		for (uint8_t i = 0; i < binsCount; i++) {
 			p[i] = 0.;
 		}
@@ -58,8 +58,6 @@ namespace math {
 				entropy += p[i] * log2(p[i]);
 			}
 		}
-
-		delete [] p;
 
 		entropy = -entropy;
 		return entropy;

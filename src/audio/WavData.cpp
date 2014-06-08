@@ -92,8 +92,9 @@ void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wa
 	uint32_t sampleNumber = 0;
 	for (; sampleNumber < numberOfSamplesXChannels && !fs.eof(); sampleNumber++) {
 
-		// How can we match 8 bit [0, X] values into 16 bit [-Y, Y]?
-		if (8 == wavHeader.bitsPerSample) {
+		// TODO Should we map 8 bit [0, X] values into 16 bit [-Y, Y]?
+		const uint8_t bitsPerSample = 8;
+		if (bitsPerSample == wavHeader.bitsPerSample) {
 			if (1 == wavHeader.numOfChan) {
 				fs.read((char*)(&value8), sizeof(uint8_t));
 				value = static_cast<raw_t>(value8);
