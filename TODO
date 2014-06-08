@@ -1,10 +1,7 @@
 TODO:
 
-* FIX SAVING LOGIC
-
+* FIX storage saving logic (>1 model)
 * Memory leaks
-* Code style
-
 
 Shelved tasks
 
