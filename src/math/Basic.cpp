@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -28,13 +29,13 @@ namespace math {
 			return 0;
 		}
 
-		double p[binsCount];
+		double* p = new double[binsCount];
 		for (uint8_t i = 0; i < binsCount; i++) {
 			p[i] = 0.;
 		}
 
 		// Calculate probabilities
-		int index;
+		uint8_t index;
 		for (uint32_t i = start; i <= finish; i++) {
 			double value = source[i];
 			index = floor((value - minRaw) / binSize);
@@ -58,6 +59,8 @@ namespace math {
 				entropy += p[i] * log2(p[i]);
 			}
 		}
+
+		delete [] p;
 
 		entropy = -entropy;
 		return entropy;
