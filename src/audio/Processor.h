@@ -54,7 +54,6 @@ private:
 
 	void divideIntoFrames();
 
-	double getThresholdCandidate(double min, double avg, double max);
 	void divideIntoWords();
 	uint32_t processSilence(vector<Frame*>::const_iterator frame,
 			Word*& lastWord, long & firstFrameInCurrentWordNumber,
