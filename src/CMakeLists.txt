@@ -36,7 +36,8 @@ target_link_libraries(yazz command visual model audio math)
 #
 # Resources
 #
-file(COPY ${CMAKE_SOURCE_DIR}/../samples DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/../resources/samples DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/../resources/models.dat DESTINATION .)
 
 
 #

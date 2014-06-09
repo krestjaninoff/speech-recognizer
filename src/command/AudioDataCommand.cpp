@@ -66,10 +66,11 @@ namespace command {
 
 		// Create the Processor
 		audio::Processor* processor = new Processor(context.wavData);
+		processor->init();
 		context.processor = processor;
 
 		// Split wav data into words
-		processor->split();
+		processor->divideIntoWords();
 
 		// Save results
 		DEBUG("Words: %d", processor->getWords()->size());

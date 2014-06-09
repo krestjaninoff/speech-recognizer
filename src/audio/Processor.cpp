@@ -42,7 +42,12 @@ namespace audio {
 		}
 	}
 
-	void Processor::split() {
+	Word* Processor::getAsWholeWord() {
+		useAllSamplesAsOneWord();
+		return this->words->at(0);
+	}
+
+	void Processor::init() {
 
 		// Init "samples per frame" measure
 		uint32_t bytesPerFrame = static_cast<uint32_t>(
@@ -54,7 +59,6 @@ namespace audio {
 
 		// The main part of splitting
 		divideIntoFrames();
-		divideIntoWords();
 	}
 
 	void Processor::divideIntoFrames() {
@@ -65,8 +69,6 @@ namespace audio {
 		unsigned int framesCount =
 			(getWavData()->getHeader().subchunk2Size / (wavData->getHeader().bitsPerSample / 8))
 				/ samplesPerNonOverlap;
-
-		this->frames->reserve(framesCount);
 
 		uint32_t indexBegin = 0, indexEnd = 0;
 		for (uint32_t frameId = 0, size = wavData->getNumberOfSamples(); frameId < framesCount;
@@ -115,23 +117,23 @@ namespace audio {
 				} else {
 					if (firstFrameInCurrentWordNumber >= 0) {
 
-					// Let's find distance between start of the current word and end of the previous word
-					processSilence(frame, lastWord,	firstFrameInCurrentWordNumber, wordId);
+						// Let's find distance between start of the current word and end of the previous word
+						processSilence(frame, lastWord,	firstFrameInCurrentWordNumber, wordId);
 					}
 				}
 			}
 
+			// Clean up short words
+			cleanUpWords();
+
 		// There is no any silence in the sound
 		} else {
-			useWholeSampleAsWord();
+			useAllSamplesAsOneWord();
 		}
 
-		// Clean up short words
-		cleanUpWords();
-
 		// If we have only one word let's consider whole sample
-		if (1 == this->words->size()) {
-			useWholeSampleAsWord();
+		if (hasSilence && 1 == this->words->size()) {
+			useAllSamplesAsOneWord();
 		}
 	}
 
@@ -163,8 +165,7 @@ namespace audio {
 
 			// Compute RMS for current word
 			double currentWordRms = 0;
-			for (uint32_t i = firstFrameInCurrentWordNumber; i < (*frame)->getId();
-					i++) {
+			for (uint32_t i = firstFrameInCurrentWordNumber; i < (*frame)->getId();	i++) {
 				currentWordRms += this->frames->at(i)->getRms();
 			}
 			currentWordRms /= (*frame)->getId() - firstFrameInCurrentWordNumber;
@@ -175,15 +176,13 @@ namespace audio {
 						(*this->wordToFrames)[lastWord->getId()].first;
 
 				this->wordToFrames->erase(lastWord->getId());
-				this->wordToFrames->insert(
-						make_pair(lastWord->getId(),
-								make_pair(firstFrameInPreviousWordNumber,
-										(*frame)->getId())));
+				this->wordToFrames->insert(make_pair(lastWord->getId(),
+						make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
 
 				DEBUG("Word %d will be extended (%d - %d)",
-						(int ) lastWord->getId(),
-						(int ) (*this->wordToFrames)[lastWord->getId()].first,
-						(int ) (*frame)->getId());
+						(int) lastWord->getId(),
+						(int) (*this->wordToFrames)[lastWord->getId()].first,
+						(int) (*frame)->getId());
 			}
 		}
 
@@ -210,7 +209,7 @@ namespace audio {
 		}
 	}
 
-	void Processor::useWholeSampleAsWord() {
+	void Processor::useAllSamplesAsOneWord() {
 		this->words->clear();
 		this->wordToFrames->clear();
 

@@ -106,7 +106,6 @@ namespace command {
 	 * We shouldn't rewrite the whole file. This is a point to fix.
 	 */
 	bool Storage::persist() {
-		cout << "Storage not found, creating an empty one... ";
 
 		std::fstream fs;
 		fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);

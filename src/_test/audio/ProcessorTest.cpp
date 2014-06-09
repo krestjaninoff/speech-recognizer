@@ -9,7 +9,8 @@ using namespace yazz::audio;
 static int splitSample(const char* file) {
 	WavData* wavData = WavData::readFromFile(file);
 	Processor* processor = new Processor(wavData);
-	processor->split();
+	processor->init();
+	processor->divideIntoWords();
 
 	int wordsCount = processor->getWords()->size();
 

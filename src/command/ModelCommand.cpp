@@ -165,20 +165,13 @@ namespace command {
 
 		// Create the Processor
 		Processor* processor = new Processor(context.wavData);
+		processor->init();
 		context.processor = processor;
-
-		// Split wav data into words
-		processor->split();
-		if (processor->getWords()->size() != 1) {
-			cerr << "Sample file contains " << processor->getWords()->size()
-					<< " words, but we need exactly ONE word" << endl;
-			return NULL;
-		}
 
 		cout << "Calculating MFCC for input data... " << endl;
 
 		// Calc & show mfcc
-		Word* word = processor->getWords()->at(0);
+		Word* word = processor->getAsWholeWord();
 		processor->initMfcc(*word);
 
 		return word;

@@ -24,7 +24,7 @@ public:
 	Processor(WavData* wavData);
 	~Processor();
 
-	void split();
+	void init();
 	void initMfcc(Word& word);
 
 	const WavData* getWavData() const { return this->wavData; }
@@ -33,6 +33,9 @@ public:
 
 	double getWordsThreshold() const { return this->wordsThreshold; }
 	double getRmsMax() const { return this->rmsMax; }
+
+	Word* getAsWholeWord();
+	void divideIntoWords();
 
 	bool isPartOfAWord(const Frame& frame) const;
 	uint32_t getFramesCount(const Word& word) const;
@@ -54,12 +57,11 @@ private:
 
 	void divideIntoFrames();
 
-	void divideIntoWords();
 	uint32_t processSilence(vector<Frame*>::const_iterator frame,
 			Word*& lastWord, long & firstFrameInCurrentWordNumber,
 			uint32_t& wordId);
 	void cleanUpWords();
-	void useWholeSampleAsWord();
+	void useAllSamplesAsOneWord();
 	bool findSilenceThreshold();
 };
 

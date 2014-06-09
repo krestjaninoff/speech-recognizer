@@ -64,8 +64,8 @@ bool WavData::checkHeader(const WavHeader& wavHeader) {
 	}
 
 	unsigned long bitsPerChannel = wavHeader.bitsPerSample / wavHeader.numOfChan;
-	if (8 != bitsPerChannel && 16 != bitsPerChannel) {
-		fprintf(stderr, "Invalid WAV format: only 8 and 16-bit per channel is supported\n");
+	if (16 != bitsPerChannel) {
+		fprintf(stderr, "Invalid WAV format: only 16-bit per channel is supported\n");
 		return false;
 	}
 
@@ -80,7 +80,6 @@ bool WavData::checkHeader(const WavHeader& wavHeader) {
 
 void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wavFile) {
 	raw_t value, minValue = 0, maxValue = 0;
-	uint8_t value8, valueLeft8, valueRight8;
 	int16_t value16, valueLeft16, valueRight16;
 
 	uint32_t bytesPerSample = static_cast<uint32_t>(wavHeader.bitsPerSample / 8);
@@ -92,28 +91,14 @@ void WavData::readData(std::fstream& fs, const WavHeader& wavHeader, WavData& wa
 	uint32_t sampleNumber = 0;
 	for (; sampleNumber < numberOfSamplesXChannels && !fs.eof(); sampleNumber++) {
 
-		// TODO Should we map 8 bit [0, X] values into 16 bit [-Y, Y]?
-		const uint8_t bitsPerSample = 8;
-		if (bitsPerSample == wavHeader.bitsPerSample) {
-			if (1 == wavHeader.numOfChan) {
-				fs.read((char*)(&value8), sizeof(uint8_t));
-				value = static_cast<raw_t>(value8);
+		if (1 == wavHeader.numOfChan) {
+			fs.read((char*)(&value16), sizeof(int16_t));
+			value = static_cast<raw_t>(value16);
 
-			} else {
-				fs.read((char*)(&valueLeft8), sizeof(uint8_t));
-				fs.read((char*)(&valueRight8), sizeof(uint8_t));
-				value = static_cast<raw_t>((abs(valueLeft8) + abs(valueRight8)) / 2);
-			}
 		} else {
-			if (1 == wavHeader.numOfChan) {
-				fs.read((char*)(&value16), sizeof(int16_t));
-				value = static_cast<raw_t>(value16);
-
-			} else {
-				fs.read((char*)(&valueLeft16), sizeof(int16_t));
-				fs.read((char*)(&valueRight16), sizeof(int16_t));
-				value = static_cast<raw_t>((abs(valueLeft16) + abs(valueRight16)) / 2);
-			}
+			fs.read((char*)(&valueLeft16), sizeof(int16_t));
+			fs.read((char*)(&valueRight16), sizeof(int16_t));
+			value = static_cast<raw_t>((abs(valueLeft16) + abs(valueRight16)) / 2);
 		}
 
 		if (maxValue < value) {
