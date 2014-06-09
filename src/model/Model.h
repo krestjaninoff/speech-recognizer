@@ -25,13 +25,13 @@ struct MFCCSample {
 class Model {
 public:
 
-	Model(string& text);
+	Model(string text);
 	~Model();
 
 	uint32_t getId() const { return this->id; }
 	void setId(uint32_t id) { this->id = id; }
 
-	const string& getText() const { return this->text; }
+	const string getText() const { return this->text; }
 
 	void addSample(double* mfcc, uint32_t size);
 	const vector<MFCCSample>& getSamples() const { return *this->samples; }

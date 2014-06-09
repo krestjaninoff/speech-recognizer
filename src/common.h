@@ -22,7 +22,7 @@ namespace yazz {
 
 	// Helpers
 
-	#define DEBUG_ENABLED true
+	#define DEBUG_ENABLED false
 	#define DEBUG(...)  \
 		do { if (DEBUG_ENABLED) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } } while (0)
 

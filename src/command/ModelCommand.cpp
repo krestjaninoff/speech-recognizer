@@ -129,7 +129,7 @@ namespace command {
 		// Try to recognize
 		Recognizer rec(modelsFiltered);
 		const Model* model = rec.recognize(*word);
-		string theWord = NULL;
+		string theWord = "";
 
 		// Print results
 		if (NULL != model) {
@@ -143,7 +143,7 @@ namespace command {
 		string theWord = doRecognize(context, modelNamesChar);
 
 		// Print results
-		if (theWord.empty()) {
+		if (!theWord.empty()) {
 			cout << endl << "!!!" << endl;
 			cout << "The answer is: " << theWord;
 			cout << endl << "!!!" << endl;
