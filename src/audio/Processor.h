@@ -56,6 +56,12 @@ private:
 
 	double getThresholdCandidate(double min, double avg, double max);
 	void divideIntoWords();
+	uint32_t processSilence(vector<Frame*>::const_iterator frame,
+			Word*& lastWord, long & firstFrameInCurrentWordNumber,
+			uint32_t& wordId);
+	void cleanUpWords();
+	void useWholeSampleAsWord();
+	bool findSilenceThreshold();
 };
 
 //typedef std::unique_ptr<Processor> ProcessorPtr;

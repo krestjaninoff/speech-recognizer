@@ -43,7 +43,7 @@ public:
 private:
 	uint32_t id;
 
-	string& text;
+	string text;
 	vector<MFCCSample>* samples;
 };
 

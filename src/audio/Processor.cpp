@@ -91,30 +91,8 @@ namespace audio {
 	void Processor::divideIntoWords() {
 		assert(frames->size() > 10);
 
-		// Let's find max and min rms/entropy
-		double rms, rmsMax, rmsSilence = 0;
-		rms = rmsMax = this->frames->at(0)->getRms();
-
-		// Try to guess the best threshold value
-		bool hasSilence = false;
-		uint32_t cnt = 0;
-		for (vector<Frame*>::const_iterator frame = this->frames->begin();
-					frame != this->frames->end(); ++frame) {
-
-			rms = (*frame)->getRms();
-			rmsMax = std::max(rmsMax, rms);
-
-			if ((*frame)->getEntropy() < ENTROPY_THRESHOLD) {
-
-				hasSilence = true;
-				rmsSilence += (*frame)->getRms();
-				cnt++;
-			}
-		}
-		rmsSilence /= cnt;
-
-		this->rmsMax = rmsMax;
-		this->wordsThreshold = rmsSilence * 2;
+		// Let's find silence threshold
+		bool hasSilence = findSilenceThreshold();
 
 		// Divide frames into words
 		uint32_t wordId = -1;
@@ -137,82 +115,142 @@ namespace audio {
 				} else {
 					if (firstFrameInCurrentWordNumber >= 0) {
 
-						// Let's find distance between start of the current word and end of the previous word
-						uint32_t distance = 0;
-						if (0 != lastWord) {
-
-							uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)
-									[lastWord->getId()].second;
-							distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
-						}
-
-						// We have a new word
-						if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
-							wordId++;
-							lastWord = new Word(wordId);
-
-							this->wordToFrames->insert(make_pair(lastWord->getId(),
-									make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
-							this->words->push_back(lastWord);
-
-							DEBUG("We have a word %d (%d - %d)", (int) lastWord->getId(),
-									(int) firstFrameInCurrentWordNumber, (int) (*frame)->getId());
-
-						// We need to add the current word to the previous one
-						} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
-
-							// Compute RMS for current word
-							double currentWordRms = 0;
-							for (uint32_t i = firstFrameInCurrentWordNumber;
-									i <  (*frame)->getId(); i++) {
-								currentWordRms += this->frames->at(i)->getRms();
-							}
-							currentWordRms /= (*frame)->getId() - firstFrameInCurrentWordNumber;
-
-							// Add the word only if it has valuable RMS
-							if (currentWordRms > this->wordsThreshold * 2) {
-								uint32_t firstFrameInPreviousWordNumber =
-										(*this->wordToFrames)[lastWord->getId()].first;
-
-								this->wordToFrames->erase(lastWord->getId());
-								this->wordToFrames->insert(make_pair(lastWord->getId(),
-										make_pair(firstFrameInPreviousWordNumber, (*frame)->getId())));
-
-								DEBUG("Word %d will be extended (%d - %d)", (int) lastWord->getId(),
-										(int) (*this->wordToFrames)[lastWord->getId()].first,
-										(int) (*frame)->getId());
-							}
-						}
-
-						firstFrameInCurrentWordNumber = -1;
+					// Let's find distance between start of the current word and end of the previous word
+					processSilence(frame, lastWord,	firstFrameInCurrentWordNumber, wordId);
 					}
 				}
 			}
 
 		// There is no any silence in the sound
 		} else {
-			wordId++;
-			lastWord = new Word(wordId);
-
-			this->wordToFrames->insert(make_pair(lastWord->getId(),
-					make_pair(this->frames->at(0)->getId(),
-							this->frames->at(this->frames->size() - 1)->getId())));
-			this->words->push_back(lastWord);
+			useWholeSampleAsWord();
 		}
 
 		// Clean up short words
+		cleanUpWords();
+
+		// If we have only one word let's consider whole sample
+		if (1 == this->words->size()) {
+			useWholeSampleAsWord();
+		}
+	}
+
+	uint32_t Processor::processSilence(vector<Frame*>::const_iterator frame,
+			Word*& lastWord, long & firstFrameInCurrentWordNumber,	uint32_t& wordId) {
+
+		// Let's find distance between start of the current word and end of the previous word
+		uint32_t distance = 0;
+		if (0 != lastWord) {
+
+			uint32_t lastFrameInPreviousWordNumber = (*this->wordToFrames)[lastWord->getId()].second;
+			distance = firstFrameInCurrentWordNumber - lastFrameInPreviousWordNumber;
+		}
+
+		// We have a new word
+		if (0 == lastWord || distance >= WORDS_MIN_DISTANCE) {
+			wordId++;
+			lastWord = new Word(wordId);
+
+			this->wordToFrames->insert(	make_pair(lastWord->getId(),
+							make_pair(firstFrameInCurrentWordNumber, (*frame)->getId())));
+			this->words->push_back(lastWord);
+
+			DEBUG("We have a word %d (%d - %d)", (int ) lastWord->getId(),
+					(int ) firstFrameInCurrentWordNumber, (int ) (*frame)->getId());
+
+		// We need to add the current word to the previous one
+		} else if (0 != lastWord && distance < WORDS_MIN_DISTANCE) {
+
+			// Compute RMS for current word
+			double currentWordRms = 0;
+			for (uint32_t i = firstFrameInCurrentWordNumber; i < (*frame)->getId();
+					i++) {
+				currentWordRms += this->frames->at(i)->getRms();
+			}
+			currentWordRms /= (*frame)->getId() - firstFrameInCurrentWordNumber;
+
+			// Add the word only if it has valuable RMS
+			if (currentWordRms > this->wordsThreshold * 2) {
+				uint32_t firstFrameInPreviousWordNumber =
+						(*this->wordToFrames)[lastWord->getId()].first;
+
+				this->wordToFrames->erase(lastWord->getId());
+				this->wordToFrames->insert(
+						make_pair(lastWord->getId(),
+								make_pair(firstFrameInPreviousWordNumber,
+										(*frame)->getId())));
+
+				DEBUG("Word %d will be extended (%d - %d)",
+						(int ) lastWord->getId(),
+						(int ) (*this->wordToFrames)[lastWord->getId()].first,
+						(int ) (*frame)->getId());
+			}
+		}
+
+		firstFrameInCurrentWordNumber = -1;
+		return distance;
+	}
+
+	// Clean up short words
+	void Processor::cleanUpWords() {
+
 		for (vector<Word*>::iterator word = this->words->begin();
 				word != this->words->end();) {
 
 			if (getFramesCount(**word) < WORD_MIN_SIZE) {
-				DEBUG("Word %d is too short and will be avoided", (int) (*word)->getId());
+				DEBUG("Word %d is too short and will be avoided",
+						(int ) (*word)->getId());
 
 				this->wordToFrames->erase((*word)->getId());
 				word = this->words->erase(word);
+
 			} else {
-				 ++word;
+				++word;
 			}
 		}
+	}
+
+	void Processor::useWholeSampleAsWord() {
+		this->words->clear();
+		this->wordToFrames->clear();
+
+		Word* theWord = new Word(0);
+
+		this->wordToFrames->insert(	make_pair(theWord->getId(), make_pair(
+				this->frames->at(0)->getId(),
+				this->frames->at(this->frames->size() - 1)->getId())));
+		this->words->push_back(theWord);
+
+		DEBUG("Seems we have only one word in the sample... All frames will be added into the word!");
+	}
+
+	bool Processor::findSilenceThreshold() {
+
+		// Let's find max and min rms/entropy
+		double rms, rmsMax, rmsSilence = 0;
+		rms = rmsMax = this->frames->at(0)->getRms();
+
+		// Try to guess the best threshold value
+		bool hasSilence = false;
+		uint32_t cnt = 0;
+		for (vector<Frame*>::const_iterator frame = this->frames->begin();
+				frame != this->frames->end(); ++frame) {
+
+			rms = (*frame)->getRms();
+			rmsMax = std::max(rmsMax, rms);
+
+			if ((*frame)->getEntropy() < ENTROPY_THRESHOLD) {
+				hasSilence = true;
+				rmsSilence += (*frame)->getRms();
+				cnt++;
+			}
+		}
+		rmsSilence /= cnt;
+
+		this->rmsMax = rmsMax;
+		this->wordsThreshold = rmsSilence * 2;
+
+		return hasSilence;
 	}
 
 	void Processor::initMfcc(Word& word) {
