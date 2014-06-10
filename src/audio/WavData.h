@@ -52,8 +52,8 @@ public:
 		if (NULL != this->rawData) {
 			delete [] this->rawData;
 		}
-		if (NULL != this->normalizaedData) {
-			delete [] this->normalizaedData;
+		if (NULL != this->normalizedData) {
+			delete [] this->normalizedData;
 		}
 	}
 
@@ -70,12 +70,12 @@ public:
 
 	const WavHeader& getHeader() const { return header; }
 	const raw_t* getRawData() const { return rawData; }
-	const double* getNormalizedData() const { return normalizaedData; }
+	const double* getNormalizedData() const { return normalizedData; }
 
 private:
 	WavHeader		header;
 	raw_t*			rawData;
-	double*			normalizaedData;
+	double*			normalizedData;
 
 	raw_t			maxVal;
 	raw_t			minVal;
@@ -84,7 +84,7 @@ private:
 	WavData(WavHeader header) {
 		this->header = header;
 		this->rawData = NULL;
-		this->normalizaedData = NULL;
+		this->normalizedData = NULL;
 
 		this->maxVal = 0;
 		this->minVal = 0;

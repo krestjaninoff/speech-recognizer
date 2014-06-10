@@ -36,6 +36,7 @@ namespace command {
 
 		// Split wav data into words
 		processor->init();
+		processor->divideIntoWords();
 
 		// Draw the diagram
 		Painter::drawFrames(context.processor, file.c_str());

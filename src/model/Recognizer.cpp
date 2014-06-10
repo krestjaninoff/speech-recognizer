@@ -1,7 +1,9 @@
+#include <audio.h>
 #include <DTW.h>
 #include <Recognizer.h>
 #include <iostream>
 #include <iterator>
+#include <string>
 
 namespace yazz {
 namespace math {
@@ -25,8 +27,8 @@ namespace math {
 			for (vector<MFCCSample>::const_iterator sample = (*model)->getSamples().begin();
 					sample != (*model)->getSamples().end(); ++sample) {
 
-				distance += DTW::calcDistance(word.getMfcc(), word.getMfccSize(),
-						(*sample).data, (*sample).size);
+				distance += DTW::calcDistanceVector(word.getMfcc(), word.getMfccSize(),
+						(*sample).data, (*sample).size, MFCC_SIZE);
 			}
 			distance /= (*model)->getSamples().size();
 
