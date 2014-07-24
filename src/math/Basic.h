@@ -1,11 +1,10 @@
 #ifndef BASIC_MATH_H_
 #define BASIC_MATH_H_
 
-#include <audio.h>
+#include "../config.h"
 #include <stdint.h>
 
 using namespace std;
-using namespace yazz::audio;
 
 namespace yazz {
 namespace math {

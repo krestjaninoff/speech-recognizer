@@ -1,4 +1,4 @@
-#include <audio.h>
+#include "../config.h"
 #include <DTW.h>
 #include <Recognizer.h>
 #include <iostream>

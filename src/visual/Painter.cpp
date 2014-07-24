@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <audio.h>
+#include "../config.h"
 #include <Frame.h>
 #include <png.h>
 #include <pngconf.h>

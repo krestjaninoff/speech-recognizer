@@ -1,11 +1,10 @@
 #ifndef Processor_H_
 #define Processor_H_
 
-#include "../common.h"
+#include "../config.h"
 #include <vector>
 #include <map>
 #include <utility>
-#include "audio.h"
 #include "WavData.h"
 #include "Frame.h"
 #include "Word.h"

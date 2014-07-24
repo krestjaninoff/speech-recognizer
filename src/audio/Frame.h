@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include "audio.h"
+#include "../config.h"
 #include "../math/MFCC.h"
 
 using namespace yazz::math;

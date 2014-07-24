@@ -10,7 +10,7 @@
 #include <sstream>
 #include <vector>
 
-#include "../common.h"
+#include "../config.h"
 
 #ifdef __MINGW32__
 #include <io.h>

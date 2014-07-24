@@ -10,7 +10,7 @@
 #ifndef WAV_DATA_H_
 #define WAV_DATA_H_
 
-#include <audio.h>
+#include "../config.h"
 #include <cstdint>
 #include <iostream>
 #include <string>

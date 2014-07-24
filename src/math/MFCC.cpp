@@ -4,7 +4,7 @@
 #include <cstring>
 #include <limits>
 #include <assert.h>
-#include "../common.h"
+#include "../config.h"
 
 using namespace std;
 

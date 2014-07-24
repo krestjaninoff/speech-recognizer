@@ -5,16 +5,15 @@
 #include <vector>
 #include <math.h>
 #include "math.h"
-#include "../audio/audio.h"
+#include "../config.h"
 
 using namespace std;
-using namespace yazz::audio;
 
 namespace yazz {
 namespace math {
 
 /**
- * Helper for transformation raw audio data into mel-frequency "cepstrum"
+ * Logic for transformation raw audio data into mel-frequency "cepstrum"
  *
  * @see http://en.wikipedia.org/wiki/Mel-frequency_cepstrum
  * @see http://www.pvsm.ru/programmirovanie/4344
@@ -78,6 +77,14 @@ public:
 	// Mel convertors
 	static double convertToMel(double f) { return 1125. * log(1. + f/700.); }
 	static double convertFromMel(double m) { return 700. * (exp(m/1125.) - 1); }
+};
+
+/**
+ * MFCC sample
+ */
+struct MFCCSample {
+	uint32_t   size;
+    double*	   data;
 };
 
 } /* namespace math */

@@ -1,5 +1,5 @@
 #include "../math/DTW.h"
-#include "../common.h"
+#include "../config.h"
 #include "gtest/gtest.h"
 
 using namespace yazz;

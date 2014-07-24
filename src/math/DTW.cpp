@@ -1,8 +1,7 @@
 #include <DTW.h>
 #include <cmath>
 #include <cstdio>
-
-#include "../common.h"
+#include "../config.h"
 
 namespace yazz {
 namespace math {

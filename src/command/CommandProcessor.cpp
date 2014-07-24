@@ -5,7 +5,7 @@
 #include <VisualizationCommand.h>
 #include <iostream>
 
-#include "../common.h"
+#include "../config.h"
 
 namespace yazz {
 namespace command {

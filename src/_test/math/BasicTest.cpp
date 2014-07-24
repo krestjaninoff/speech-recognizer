@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gtest/gtest-message.h>
 #include <gtest/internal/gtest-internal.h>
-#include "../common.h"
+#include "../config.h"
 #include <Basic.h>
 
 using namespace yazz;
