@@ -1,4 +1,4 @@
-#include <Model.h>
+#include <SimpleModel.h>
 #include <ModelCommand.h>
 #include <Processor.h>
 #include <Recognizer.h>
@@ -23,12 +23,12 @@ namespace command {
 			return;
 		}
 
-		const map<uint32_t, Model*>* models = context.storage->getModels();
+		const map<uint32_t, SimpleModel*>* models = context.storage->getModels();
 
 		if (models->size() > 0) {
 			cout << "Available models are:" << endl;
 
-			for (map<uint32_t, Model*>::const_iterator model = models->begin();
+			for (map<uint32_t, SimpleModel*>::const_iterator model = models->begin();
 					model != models->end(); ++model) {
 
 				cout << " - \"" <<  (*model).second->getText() << "\" (" <<
@@ -65,9 +65,9 @@ namespace command {
 		}
 
 		// Find or create the model
-		Model* theModel = NULL;
-		const map<uint32_t, Model*>* models = context.storage->getModels();
-		for (map<uint32_t, Model*>::const_iterator model = models->begin();
+		SimpleModel* theModel = NULL;
+		const map<uint32_t, SimpleModel*>* models = context.storage->getModels();
+		for (map<uint32_t, SimpleModel*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
 			if (0 == strcmp(modelName.c_str(), (*model).second->getText().c_str())) {
@@ -79,7 +79,7 @@ namespace command {
 		// Create the model if it does not exist
 		string modelNameStr(modelName);
 		if (NULL == theModel) {
-			theModel = new Model(modelNameStr);
+			theModel = new SimpleModel(modelNameStr);
 			context.storage->addModel(theModel);
 		}
 
@@ -107,15 +107,15 @@ namespace command {
 		Word* word = getWord(context);
 
 		// Get available models
-		vector<Model*>* modelsFiltered = new vector<Model*>();
-		const map<uint32_t, Model*>* models = context.storage->getModels();
+		vector<SimpleModel*>* modelsFiltered = new vector<SimpleModel*>();
+		const map<uint32_t, SimpleModel*>* models = context.storage->getModels();
 
 		vector<string> modelNames;
 		if (NULL != modelNamesChar) {
 			modelNames = parseString(modelNamesChar, ',');
 		}
 
-		for (map<uint32_t, Model*>::const_iterator model = models->begin();
+		for (map<uint32_t, SimpleModel*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
 			string modelName((*model).second->getText());
@@ -128,7 +128,7 @@ namespace command {
 
 		// Try to recognize
 		Recognizer rec(modelsFiltered);
-		const Model* model = rec.recognize(*word);
+		const SimpleModel* model = rec.recognize(*word);
 		string theWord = "";
 
 		// Print results

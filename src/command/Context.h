@@ -7,6 +7,7 @@
 #include <WavData.h>
 
 using namespace yazz::audio;
+using namespace yazz::model;
 
 namespace yazz {
 namespace command {

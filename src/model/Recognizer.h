@@ -1,7 +1,7 @@
 #ifndef RECOGNIZER_H_
 #define RECOGNIZER_H_
 
-#include <Model.h>
+#include <SimpleModel.h>
 #include <Word.h>
 #include <vector>
 
@@ -9,7 +9,7 @@ using namespace std;
 using namespace yazz::audio;
 
 namespace yazz {
-namespace math {
+namespace model {
 
 /**
  * Recognizer tries to determine which model suits better for the specific word
@@ -17,16 +17,16 @@ namespace math {
 class Recognizer {
 public:
 
-	Recognizer(vector<Model*>* models);
+	Recognizer(vector<SimpleModel*>* models);
 	~Recognizer();
 
-	const Model* recognize(const Word& word);
+	const SimpleModel* recognize(const Word& word);
 
 private:
-	const vector<Model*>* models;
+	const vector<SimpleModel*>* models;
 };
 
-} /* namespace math */
+} /* namespace model */
 } /* namespace yazz */
 
 #endif /* RECOGNIZER_H_ */

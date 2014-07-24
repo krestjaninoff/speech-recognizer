@@ -1,7 +1,7 @@
 TODO:
 
-* FIX storage saving logic (>1 model)
-* Memory leaks
+* Introduce HmmModel
+* Introduce CodeBook and related Cmd stuff
 
 Shelved tasks
 

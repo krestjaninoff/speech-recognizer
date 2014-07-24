@@ -9,7 +9,7 @@
 using namespace std;
 
 namespace yazz {
-namespace math {
+namespace model {
 
 /**
  * MFCC sample
@@ -22,11 +22,11 @@ struct MFCCSample {
 /**
  * Model is a set of MFCC and related text
  */
-class Model {
+class SimpleModel {
 public:
 
-	Model(string text);
-	~Model();
+	SimpleModel(string text);
+	~SimpleModel();
 
 	uint32_t getId() const { return this->id; }
 	void setId(uint32_t id) { this->id = id; }
@@ -37,8 +37,8 @@ public:
 	const vector<MFCCSample>& getSamples() const { return *this->samples; }
 
 
-	friend std::ostream& operator<<(std::ostream& fs, const Model& obj);
-	friend std::istream& operator>>(std::istream& fs, Model& obj);
+	friend std::ostream& operator<<(std::ostream& fs, const SimpleModel& obj);
+	friend std::istream& operator>>(std::istream& fs, SimpleModel& obj);
 
 private:
 	uint32_t id;
@@ -47,7 +47,7 @@ private:
 	vector<MFCCSample>* samples;
 };
 
-} /* namespace math */
+} /* namespace model */
 } /* namespace yazz */
 
 #endif /* MODEL_H_ */

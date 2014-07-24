@@ -5,10 +5,12 @@
 #include <iterator>
 #include <string>
 
-namespace yazz {
-namespace math {
+using namespace yazz::math;
 
-	Recognizer::Recognizer(vector<Model*>* models) {
+namespace yazz {
+namespace model {
+
+	Recognizer::Recognizer(vector<SimpleModel*>* models) {
 		this->models = models;
 	}
 
@@ -16,11 +18,11 @@ namespace math {
 		delete this->models;
 	}
 
-	const Model* Recognizer::recognize(const Word& word) {
-		Model* bestModel = NULL;
+	const SimpleModel* Recognizer::recognize(const Word& word) {
+		SimpleModel* bestModel = NULL;
 		double minDistance = 0.;
 
-		for (vector<Model*>::const_iterator model = this->models->begin();
+		for (vector<SimpleModel*>::const_iterator model = this->models->begin();
 				model != this->models->end(); ++model) {
 
 			double distance = 0.;
@@ -46,5 +48,5 @@ namespace math {
 		return bestModel;
 	}
 
-} /* namespace math */
+} /* namespace model */
 } /* namespace yazz */

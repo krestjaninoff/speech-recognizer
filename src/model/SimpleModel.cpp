@@ -1,4 +1,4 @@
-#include <Model.h>
+#include <SimpleModel.h>
 #include <stddef.h>
 #include <cstdint>
 #include <iostream>
@@ -7,24 +7,24 @@
 using namespace std;
 
 namespace yazz {
-namespace math {
+namespace model {
 
-	Model::Model(string text):
+	SimpleModel::SimpleModel(string text):
 			text(text) {
 		this->id = -1;
 		this->samples = new vector<MFCCSample>();
 	}
 
-	Model::~Model() {
+	SimpleModel::~SimpleModel() {
 		delete this->samples;
 	}
 
-	void Model::addSample(double* mfcc, uint32_t size) {
+	void SimpleModel::addSample(double* mfcc, uint32_t size) {
 		MFCCSample sample = {size, mfcc};
 		this->samples->push_back(sample);
 	}
 
-	ostream& operator<<(ostream& fs, const Model& obj) {
+	ostream& operator<<(ostream& fs, const SimpleModel& obj) {
 
 		fs.write((char*) &obj.id, sizeof(uint32_t));
 
@@ -47,7 +47,7 @@ namespace math {
 		return fs;
 	}
 
-	istream& operator>>(istream& fs, Model& obj) {
+	istream& operator>>(istream& fs, SimpleModel& obj) {
 
 		fs.read((char*)(&obj.id), sizeof(uint32_t));
 
@@ -79,5 +79,5 @@ namespace math {
 		return fs;
 	}
 
-} /* namespace math */
+} /* namespace model */
 } /* namespace yazz */

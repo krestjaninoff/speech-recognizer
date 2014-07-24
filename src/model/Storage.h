@@ -1,17 +1,17 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include <Model.h>
+#include <SimpleModel.h>
 #include <Word.h>
 #include <cstdint>
 #include <map>
 
 using namespace std;
-using namespace yazz::math;
+using namespace yazz::model;
 using namespace yazz::audio;
 
 namespace yazz {
-namespace command {
+namespace model {
 
 /**
  * Just a simple binary storage
@@ -33,12 +33,12 @@ public:
 	/**
 	 * Load models from its storage
 	 */
-	const map<uint32_t, Model*>* getModels() { return this->models; }
+	const map<uint32_t, SimpleModel*>* getModels() { return this->models; }
 
 	/**
 	 * Add model
 	 */
-	uint32_t addModel(Model* model);
+	uint32_t addModel(SimpleModel* model);
 
 	/**
 	 * Add the sample into the model
@@ -60,7 +60,7 @@ private:
 	/**
 	 * Models
 	 */
-	map<uint32_t, Model*>* models;
+	map<uint32_t, SimpleModel*>* models;
 
 	/**
 	 * Models data base
@@ -74,7 +74,7 @@ private:
 };
 
 
-} /* namespace command */
+} /* namespace model */
 } /* namespace yazz */
 
 #endif /* STORAGE_H_ */

@@ -10,7 +10,7 @@
 #endif
 
 namespace yazz {
-namespace command {
+namespace model {
 
 	const char* Storage::STORAGE_FILE = "models.dat";
 	const char* Storage::STORAGE_HEADER = "YAZZ";
@@ -23,7 +23,7 @@ namespace command {
 	Storage::~Storage() {
 
 		if (NULL != this->models) {
-			for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
+			for (std::map<uint32_t, SimpleModel*>::const_iterator model = this->models->begin();
 					model != this->models->end(); ++model) {
 				delete (*model).second;
 			}
@@ -38,7 +38,7 @@ namespace command {
 		if (NULL != this->models) {
 			return true;
 		}
-		this->models = new map<uint32_t, Model*>();
+		this->models = new map<uint32_t, SimpleModel*>();
 
 		if (access(STORAGE_FILE, F_OK) != -1) {
 			cout << "Loading models from the storage... " << endl;
@@ -62,7 +62,7 @@ namespace command {
 
 			string tmpName("");
 			for (uint32_t i = 0; i < this->maxId; i++) {
-				Model* model = new Model(tmpName);
+				SimpleModel* model = new SimpleModel(tmpName);
 				fs >> *model;
 
 				this->models->insert(make_pair(model->getId(), model));
@@ -86,7 +86,7 @@ namespace command {
 		return true;
 	}
 
-	uint32_t Storage::addModel(Model* model) {
+	uint32_t Storage::addModel(SimpleModel* model) {
 
 		model->setId(++this->maxId);
 		this->models->insert(make_pair(this->maxId, model));
@@ -96,7 +96,7 @@ namespace command {
 
 	void Storage::addSample(uint32_t modelId, const Word& word) {
 
-		Model* model = (*this->models)[modelId];
+		SimpleModel* model = (*this->models)[modelId];
 		model->addSample(word.getMfcc(), word.getMfccSize());
 	}
 
@@ -118,10 +118,10 @@ namespace command {
 		fs.write(STORAGE_HEADER, sizeof(char) * 4);
 		fs.write((char*) &this->maxId, sizeof(uint32_t));
 
-		for (std::map<uint32_t, Model*>::const_iterator model = this->models->begin();
+		for (std::map<uint32_t, SimpleModel*>::const_iterator model = this->models->begin();
 				model != this->models->end(); ++model) {
 
-			const Model& tmpModel = *((*model).second);
+			const SimpleModel& tmpModel = *((*model).second);
 			fs << tmpModel;
 		}
 
@@ -131,5 +131,5 @@ namespace command {
 		return true;
 	}
 
-} /* namespace command */
+} /* namespace model */
 } /* namespace yazz */
