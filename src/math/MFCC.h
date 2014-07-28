@@ -79,14 +79,6 @@ public:
 	static double convertFromMel(double m) { return 700. * (exp(m/1125.) - 1); }
 };
 
-/**
- * MFCC sample
- */
-struct MFCCSample {
-	uint32_t   size;
-    double*	   data;
-};
-
 } /* namespace math */
 } /* namespace yazz */
 

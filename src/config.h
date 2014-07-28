@@ -66,6 +66,11 @@ namespace yazz {
 	const short ENTROPY_BINS = 75;
 	const double ENTROPY_THRESHOLD = 0.1;
 
+	/**
+	 * Codebook threshold
+	 */
+	const double CODEBOOK_THRESHOLD = 5;
+
 
 	// Helpers
 

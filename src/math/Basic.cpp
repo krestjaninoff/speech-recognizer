@@ -66,5 +66,15 @@ namespace math {
 		return entropy;
 	}
 
+	double Basic::euclideanDistance(double* a, double* b, size_t size) {
+		double distance = 0;
+
+		for (size_t i = 0; i < size; i++) {
+			distance += pow((a[i] - b[i]), 2);
+		}
+
+		return sqrt(distance);
+	}
+
 } /* namespace math */
 } /* namespace yazz */
