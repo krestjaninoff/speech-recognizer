@@ -3,9 +3,9 @@ project(model)
 
 set(SOURCE
 	MfccEntry.cpp
-	HmmModel.cpp
+	HmModel.cpp
 	CodeBook.cpp
-	Recognizer.cpp
+	Processor.cpp
 	Storage.cpp
 )
 

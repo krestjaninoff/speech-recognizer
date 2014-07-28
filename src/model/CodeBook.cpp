@@ -10,10 +10,10 @@ CodeBook::CodeBook() {
 CodeBook::~CodeBook() {
 	if (NULL != this->book) {
 
-		std::map<observation_t, CodeBookEntry*>::iterator iterator;
-		for (iterator = this->book->begin(); iterator != this->book->end(); iterator++) {
-			if (NULL != iterator->second) {
-				delete iterator->second;
+		std::map<observation_t, CodeBookEntry*>::iterator iter;
+		for (iter = this->book->begin(); iter != this->book->end(); iter++) {
+			if (NULL != iter->second) {
+				delete iter->second;
 			}
 		}
 
@@ -49,7 +49,7 @@ void CodeBook::addLabeledSanple(observation_t label, MfccEntry& mfccEntry) {
 
 observation_t CodeBook::findLabelBySample(MfccEntry& mfccEntry) {
 	double minDistance = -1;
-	observation_t label = '\0';
+	observation_t label = CODEBOOK_UNKNOWN_VALUE;
 
 	std::map<observation_t, CodeBookEntry*>::iterator iterator;
 	for (iterator = this->book->begin(); iterator != this->book->end(); iterator++) {

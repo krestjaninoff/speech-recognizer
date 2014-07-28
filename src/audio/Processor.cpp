@@ -31,13 +31,31 @@ Processor::Processor(WavData* wavData) {
 }
 
 Processor::~Processor() {
-	if (this->words) {
+	if (NULL != this->words) {
+		vector<Frame*>::const_iterator iter;
+
+		for (iter = this->words->begin(); model != this->words->end(); ++model) {
+			delete *iter;
+		}
+
 		delete this->words;
+	}
+
+	if (NULL != this->wordToFrames) {
 		delete this->wordToFrames;
 	}
 
-	if (this->frames) {
+	if (NULL != this->frames) {
+		vector<Frame*>::const_iterator iter;
+
+		for (iter = this->frames->begin(); model != this->frames->end(); ++model) {
+			delete *iter;
+		}
+
 		delete this->frames;
+	}
+
+	if (NULL != this->frameToRaw) {
 		delete this->frameToRaw;
 	}
 }

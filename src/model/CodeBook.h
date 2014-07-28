@@ -3,6 +3,8 @@
 
 #include <MfccEntry.h>
 
+using namespace std;
+
 namespace yazz {
 namespace model {
 
@@ -31,8 +33,13 @@ public:
 	observation_t findLabelBySample(MfccEntry& mfccEntry);
 
 private:
-	std::map<observation_t, CodeBookEntry*>* book;
+	map<observation_t, CodeBookEntry*>* book;
 };
+
+/**
+ * Default value for unrecognised mfcc samples
+ */
+static char CODEBOOK_UNKNOWN_VALUE = '?';
 
 } /* namespace model */
 } /* namespace yazz */

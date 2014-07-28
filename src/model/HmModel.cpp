@@ -1,9 +1,9 @@
-#include <HmmModel.h>
+#include <HmModel.h>
 
 namespace yazz {
 namespace model {
 
-HmmModel::HmmModel() {
+HmModel::HmModel() {
 	this->id = 0;
 
 	this->states = NULL;
@@ -19,7 +19,7 @@ HmmModel::HmmModel() {
 	this->text = '\0';
 }
 
-HmmModel::~HmmModel() {
+HmModel::~HmModel() {
 	if (NULL != this->states) {
 		delete [] this->states;
 	}
@@ -46,7 +46,7 @@ HmmModel::~HmmModel() {
 	}
 }
 
-void HmmModel::init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
+void HmModel::init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
 			double** transitions, double** emissions, double* initialDst, string& text) {
 	this->id = 0;
 
@@ -63,7 +63,7 @@ void HmmModel::init(state_t* states, size_t stateCnt, observation_t* observation
 	this->text = text;
 }
 
-ostream& operator<<(ostream& fs, const HmmModel& obj) {
+ostream& operator<<(ostream& fs, const HmModel& obj) {
 
 	fs.write((char*) &obj.id, sizeof(uint32_t));
 
@@ -95,7 +95,7 @@ ostream& operator<<(ostream& fs, const HmmModel& obj) {
 	return fs;
 }
 
-istream& operator>>(istream& fs, HmmModel& obj) {
+istream& operator>>(istream& fs, HmModel& obj) {
 
 	fs.read((char*)(&obj.id), sizeof(uint32_t));
 

@@ -1,7 +1,8 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include <SimpleModel.h>
+#include <HmModel.h>
+#include <CodeBook.h>
 #include <Word.h>
 #include <cstdint>
 #include <map>
@@ -33,12 +34,12 @@ public:
 	/**
 	 * Load models from its storage
 	 */
-	const map<uint32_t, SimpleModel*>* getModels() { return this->models; }
+	const map<string&, HmModel*>* getModels() { return this->models; }
 
 	/**
 	 * Add model
 	 */
-	uint32_t addModel(SimpleModel* model);
+	uint32_t addModel(HmModel* model);
 
 	/**
 	 * Add the sample into the model
