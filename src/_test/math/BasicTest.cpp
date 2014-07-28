@@ -7,8 +7,8 @@
 using namespace yazz;
 using namespace yazz::math;
 
-TEST(MATH_BASIC, RMS)
-{
+TEST(MATH_BASIC, RMS) {
+
 	raw_t f[] = {2, 4, 3, 1};
 	double rms = Basic::rms(f, 0, 3);
 
@@ -24,8 +24,8 @@ TEST(MATH_BASIC, RMS)
  * P += (P == 0);
  * retval = -sum (P .* log2 (P));
  */
-TEST(MATH_BASIC, ENTROPY)
-{
+TEST(MATH_BASIC, ENTROPY) {
+
 	double f[] = {2, 4, 3, 1, 6, 3, 9, 2, 3, 6, 1, 7};
 	uint8_t binCnt = 4;
 	double min = 1;

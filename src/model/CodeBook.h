@@ -7,7 +7,7 @@ namespace yazz {
 namespace model {
 
 /**
- * A vector template for a special label
+ * Vector template for a special label
  */
 struct CodeBookEntry {
 	MfccEntry*	avgVector;

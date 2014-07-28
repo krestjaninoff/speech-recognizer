@@ -7,6 +7,7 @@
 using namespace yazz::audio;
 
 static int splitSample(const char* file) {
+
 	WavData* wavData = WavData::readFromFile(file);
 	Processor* processor = new Processor(wavData);
 	processor->init();
@@ -20,8 +21,7 @@ static int splitSample(const char* file) {
 	return wordsCount;
 }
 
-TEST(AUDIO_PROCESSOR, SPLITTING)
-{
+TEST(AUDIO_PROCESSOR, SPLITTING) {
 	int wordsCount;
 
 	wordsCount = splitSample("samples/male1.wav");

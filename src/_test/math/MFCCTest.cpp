@@ -63,6 +63,7 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
  * hold off
  */
 TEST(MATH_MFCC, MEL_FILTERS) {
+
 	uint8_t mfccCnt = 6;
 	uint32_t frameSize = 100;
 	uint32_t frequency = 4000;

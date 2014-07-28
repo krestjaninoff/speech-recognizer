@@ -5,8 +5,8 @@
 using namespace yazz;
 using namespace yazz::math;
 
-TEST(MATH_DTW, CALC_DISTANCE)
-{
+TEST(MATH_DTW, CALC_DISTANCE) {
+
 	uint32_t seq1size = 9;
 	double* seq1 = new double[seq1size];
 	seq1[0] = -2;

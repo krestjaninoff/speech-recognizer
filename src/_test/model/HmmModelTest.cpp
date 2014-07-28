@@ -5,8 +5,7 @@
 
 using namespace yazz::model;
 
-TEST(HMM_MODEL, READ_WRITE)
-{
+TEST(HMM_MODEL, READ_WRITE) {
 	string text = "dva";
 
 	size_t stateCnt = 3;
