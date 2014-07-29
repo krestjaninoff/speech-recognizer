@@ -19,17 +19,14 @@ namespace model {
  */
 class Processor {
 public:
-	Processor(map<string&, HmModel*>* models, CodeBook* codeBook);
+	Processor(Storage& storage);
 	~Processor();
 
-	HmModel* getModelByText(const string& text);
 	void trainModel(HmModel* model, vector<MfccEntry*>* data);
-
 	HmModel* findBestModel(const vector<MfccEntry*>* data);
 
 private:
-	const map<string&, HmModel*>* models;
-	const CodeBook* codeBook;
+	Storage& storage;
 
 	const vector<observation_t>* mfccToLabels(const vector<MfccEntry*>* mfcc);
 };

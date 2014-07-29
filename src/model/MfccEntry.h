@@ -21,6 +21,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& fs, const MfccEntry& obj);
 	friend std::istream& operator>>(std::istream& fs, MfccEntry& obj);
 
+	void print();
 private:
 	size_t	size;
 	double*	data;

@@ -38,5 +38,17 @@ istream& operator>>(istream& fs, MfccEntry& obj) {
 	return fs;
 }
 
+void MfccEntry::print() {
+	for (size_t i = 0; i < this->size; i++) {
+		cout << this->data[i];
+
+		if (i < this->size - 1) {
+			cout << ", ";
+		}
+	}
+
+	cout << "]" << endl;
+}
+
 } /* namespace model */
 } /* namespace yazz */

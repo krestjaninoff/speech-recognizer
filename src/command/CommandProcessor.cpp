@@ -12,6 +12,7 @@ namespace command {
 
 /**
  * Commands map
+ * TODO Reconsider the list of commands
  */
 static struct option longOptions[] = {
 	{ "version", no_argument, 0, 'v' },

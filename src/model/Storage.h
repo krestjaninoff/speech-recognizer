@@ -17,7 +17,7 @@ namespace model {
 /**
  * Just a simple binary storage
  * <p>
- * Its implementation is quite ineffective. But this is better than nothing :)
+ * Note, this implementation is quite ineffective. But this is better than nothing :)
  */
 class Storage {
 
@@ -31,10 +31,11 @@ public:
 	 */
 	bool init();
 
+
 	/**
-	 * Load models from its storage
+	 * Get list of the available models
 	 */
-	const map<string&, HmModel*>* getModels() { return this->models; }
+	const map<uint32_t, HmModel*>* getModels() { return this->models; }
 
 	/**
 	 * Add model
@@ -42,9 +43,26 @@ public:
 	uint32_t addModel(HmModel* model);
 
 	/**
-	 * Add the sample into the model
+	 * Delete model
 	 */
-	void addSample(uint32_t modelId, const Word& word);
+	void deleteModel(uint32_t id);
+
+
+	/**
+	 * Get codebook
+	 */
+	const CodeBook* getCodeBook() { return this->codeBook; }
+
+	/**
+	 * Add label (update if exists)
+	 */
+	void addLabel(observation_t label, MfccEntry* mfccEntry);
+
+	/**
+	 * Delete label
+	 */
+	void deleteLabel(observation_t label);
+
 
 	/**
 	 * Flush data into FS
@@ -59,9 +77,14 @@ private:
 	uint32_t maxId;
 
 	/**
-	 * Models
+	 * List of models
 	 */
-	map<uint32_t, SimpleModel*>* models;
+	map<uint32_t, HmModel*>* models;
+
+	/**
+	 * Code book
+	 */
+	CodeBook* codeBook;
 
 	/**
 	 * Models data base

@@ -18,27 +18,34 @@ const char* Storage::STORAGE_HEADER = "YAZZ";
 Storage::Storage() {
 	this->maxId = 0;
 	this->models = NULL;
+	this->codeBook = NULL;
 }
 
 Storage::~Storage() {
 
 	if (NULL != this->models) {
-		for (std::map<uint32_t, SimpleModel*>::const_iterator model = this->models->begin();
-				model != this->models->end(); ++model) {
-			delete (*model).second;
+		map<string&, HmModel*>::const_iterator iter;
+		for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
+			delete *iter->second;
 		}
 
 		delete this->models;
+	}
+
+	if (NULL != this->codeBook) {
+		delete codeBook;
 	}
 }
 
 bool Storage::init() {
 
 	// Check if already initialized
-	if (NULL != this->models) {
+	if (NULL != this->models && NULL != this->codeBook) {
 		return true;
 	}
-	this->models = new map<uint32_t, SimpleModel*>();
+
+	this->models = new map<uint32_t, HmModel*>();
+	this->codeBook = new CodeBook();
 
 	if (access(STORAGE_FILE, F_OK) != -1) {
 		cout << "Loading models from the storage... " << endl;
@@ -60,13 +67,14 @@ bool Storage::init() {
 
 		fs.read((char*) &this->maxId, sizeof(uint32_t));
 
-		string tmpName("");
 		for (uint32_t i = 0; i < this->maxId; i++) {
-			SimpleModel* model = new SimpleModel(tmpName);
+			HmModel* model = new HmModel();
 			fs >> *model;
 
 			this->models->insert(make_pair(model->getId(), model));
 		}
+
+		fs >> *(this->codeBook);
 
 		fs.close();
 
@@ -86,7 +94,7 @@ bool Storage::init() {
 	return true;
 }
 
-uint32_t Storage::addModel(SimpleModel* model) {
+uint32_t Storage::addModel(HmModel* model) {
 
 	model->setId(++this->maxId);
 	this->models->insert(make_pair(this->maxId, model));
@@ -94,11 +102,18 @@ uint32_t Storage::addModel(SimpleModel* model) {
 	return this->maxId;
 }
 
-void Storage::addSample(uint32_t modelId, const Word& word) {
-
-	SimpleModel* model = (*this->models)[modelId];
-	model->addSample(word.getMfcc(), word.getMfccSize());
+void Storage::deleteModel(uint32_t id) {
+	this->models->erase(id);
 }
+
+void Storage::addLabel(observation_t label, MfccEntry* mfccEntry) {
+	return this->codeBook->addLabel(label, mfccEntry);
+}
+
+void Storage::deleteLabel(observation_t label) {
+	this->codeBook->removeLabel(label);
+}
+
 
 /**
  * Save models into the file
@@ -118,12 +133,13 @@ bool Storage::persist() {
 	fs.write(STORAGE_HEADER, sizeof(char) * 4);
 	fs.write((char*) &this->maxId, sizeof(uint32_t));
 
-	for (std::map<uint32_t, SimpleModel*>::const_iterator model = this->models->begin();
-			model != this->models->end(); ++model) {
-
-		const SimpleModel& tmpModel = *((*model).second);
-		fs << tmpModel;
+	map<string&, HmModel*>::const_iterator iter;
+	for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
+		HmModel& model = *(*iter->second);
+		fs << model;
 	}
+
+	fs << *(this->codeBook);
 
 	fs.close();
 	cout << "done!" << endl;

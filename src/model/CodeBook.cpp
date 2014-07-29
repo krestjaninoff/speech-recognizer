@@ -21,7 +21,7 @@ CodeBook::~CodeBook() {
 	}
 }
 
-void CodeBook::addLabeledSanple(observation_t label, MfccEntry& mfccEntry) {
+void CodeBook::addLabel(observation_t label, MfccEntry* mfccEntry) {
 	CodeBookEntry* entry;
 
 	// It's the first label
@@ -36,7 +36,7 @@ void CodeBook::addLabeledSanple(observation_t label, MfccEntry& mfccEntry) {
 	} else {
 		entry = this->book[label];
 		double* avgVector = entry->avgVector->getData();
-		double* currentVector = mfccEntry.getData();
+		double* currentVector = mfccEntry->getData();
 
 		for (size_t i = 0; i < entry->avgVector->getSize(); i++) {
 			double diff = (avgVector[i] - currentVector[i]) / static_cast<double>(entry->samplesCnt);
@@ -47,15 +47,19 @@ void CodeBook::addLabeledSanple(observation_t label, MfccEntry& mfccEntry) {
 	}
 }
 
-observation_t CodeBook::findLabelBySample(MfccEntry& mfccEntry) {
+void CodeBook::removeLabel(observation_t label) {
+	this->book->erase(label);
+}
+
+observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 	double minDistance = -1;
-	observation_t label = CODEBOOK_UNKNOWN_VALUE;
+	observation_t label = UNKNOWN_VALUE;
 
 	std::map<observation_t, CodeBookEntry*>::iterator iterator;
 	for (iterator = this->book->begin(); iterator != this->book->end(); iterator++) {
 		MfccEntry* currentMfccEntry = iterator->second->avgVector;
 
-		double distance = math::Basic::euclideanDistance(mfccEntry.getData(),
+		double distance = math::Basic::euclideanDistance(mfccEntry->getData(),
 				currentMfccEntry->getData(), MFCC_SIZE);
 
 		if (fabs(distance) < CODEBOOK_THRESHOLD) {

@@ -16,14 +16,46 @@ class ModelCommand {
 public:
 
 	/**
-	 * Display the list of available models
+	 * Display the list of available models (print CodeBook)
 	 */
-	static void list(Context& context);
+	static void listLabels(Context& context);
 
 	/**
-	 * Add current sample into the model
+	 * Add a new label (or update existing one)
 	 */
-	static void add(Context& context, const char* modelName);
+	static void addLabel(Context& context, const char* label);
+
+	/**
+	 * Remove the label
+	 */
+	static void removeLabel(Context& context, const char* label);
+
+
+	/**
+	 * Display the list of available models
+	 */
+	static void listModels(Context& context);
+
+	/**
+	 * Display the model by its is
+	 */
+	static void displayModel(Context& context, const char* modelId);
+
+	/**
+	 * Create a new model
+	 */
+	static void addModel(Context& context, const char* modelName);
+
+	/**
+	 * Train the model
+	 */
+	static void trainModel(Context& context, const char* modelId);
+
+	/**
+	 * Delete the model
+	 */
+	static void deleteModel(Context& context, const char* modelId);
+
 
 	/**
 	 * Recognize input data using specified models (or all available models)

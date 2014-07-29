@@ -1,7 +1,7 @@
-#include <SimpleModel.h>
+#include <HmModel.h>
 #include <ModelCommand.h>
-#include <Processor.h>
-#include <Recognizer.h>
+#include "../audio/Processor.h"
+#include "../model/Processor.h"
 #include <string.h>
 #include <Storage.h>
 #include <WavData.h>
@@ -18,21 +18,66 @@
 namespace yazz {
 namespace command {
 
-void ModelCommand::list(Context& context) {
-	if (!context.storage->init()) {
-		return;
-	}
+void ModelCommand::listLabels(Context& context) {
+	const map<observation_t, CodeBookEntry*>* book = context.storage->getCodeBook()->getBook();
+	map<observation_t, CodeBookEntry*>::const_iterator iter;
 
-	const map<uint32_t, SimpleModel*>* models = context.storage->getModels();
+	cout << endl << "CodeBook:" << endl;
+	for (iter = book->begin(); iter != book->end(); ++iter) {
+		cout << "'" << *iter->first << "' (" << *iter->second->samplesCnt << "): [";
+
+		MfccEntry* mfcc = *iter->second->avgVector;
+		mfcc->print();
+	}
+}
+
+void ModelCommand::addLabel(Context& context, const char* label) {
+
+	cout << "Adding label '" << label << "' into the CodeBook..." << endl;
+	cout << endl;
+
+	observation_t observation = static_cast<observation_t>(label);
+
+	// Read the observation data
+	cout << "Enter MFCC vector elements (" << MFCC_SIZE << "): ";
+
+	double* data = new double[MFCC_SIZE];
+	double value;
+
+	for (unsigned short i = 0; i < MFCC_SIZE; i++) {
+		cin >> value;
+		data[i] = value;
+	}
+	cout << endl;
+
+	// Add or update the observation
+	MfccEntry* mfcc = new MfccEntry(data, MFCC_SIZE);
+	context.storage->addLabel(observation, mfcc);
+
+	cout << "The observation was successfully added!" << endl;
+}
+
+void ModelCommand::removeLabel(Context& context, const char* label) {
+
+	cout << "Deleting label '" << label << "' from the CodeBook...";
+
+	observation_t observation = static_cast<observation_t>(label);
+	context.storage->deleteLabel(observation);
+
+	cout << " done!" << endl;
+}
+
+void ModelCommand::listModels(Context& context) {
+
+	const map<uint32_t, HmModel*>* models = context.storage->getModels();
 
 	if (models->size() > 0) {
 		cout << "Available models are:" << endl;
 
-		for (map<uint32_t, SimpleModel*>::const_iterator model = models->begin();
+		for (map<uint32_t, HmModel*>::const_iterator model = models->begin();
 				model != models->end(); ++model) {
 
-			cout << " - \"" <<  (*model).second->getText() << "\" (" <<
-					(*model).second->getSamples().size() << ")" << endl;
+			cout << (*model).second->getId() << ": " << (*model).second->getText() << endl;
 		}
 
 	} else {
@@ -42,7 +87,25 @@ void ModelCommand::list(Context& context) {
 	cout << endl;
 }
 
-void ModelCommand::add(Context& context, const char* modelNameChar) {
+void ModelCommand::displayModel(Context& context, const char* modelIdStr) {
+
+	uint32_t modelId = static_cast<uint32_t>(modelIdStr);
+
+	const map<uint32_t, HmModel*>* models = context.storage->getModels();
+	HmModel* model = models[modelId];
+
+	if (NULL != model) {
+		model->print();
+
+	} else {
+		cout << "Model with id '" << modelIdStr << "' not found :(" << endl;
+	}
+}
+
+void ModelCommand::addModel(Context& context, const char* modelNameChar) {
+
+/*
+	// TODO Check for unknown observations!!!
 
 	// Check the model's name
 	if (NULL == modelNameChar) {
@@ -88,10 +151,22 @@ void ModelCommand::add(Context& context, const char* modelNameChar) {
 	context.storage->persist();
 
 	cout << "The new sample has been successfully added!" << endl;
+*/
 }
 
-string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
 
+static void ModelCommand::trainModel(Context& context, const char* modelId) {
+	// TODO Implement me
+}
+
+
+static void ModelCommand::deleteModel(Context& context, const char* modelId) {
+	// TODO Implement me
+}
+
+
+string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
+/*
 	// Check the storage
 	if (!context.storage->init()) {
 		return NULL;
@@ -137,6 +212,7 @@ string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
 	}
 
 	return theWord;
+*/
 }
 
 void ModelCommand::recognize(Context& context, const char* modelNamesChar) {
@@ -164,7 +240,7 @@ Word* ModelCommand::getWord(Context& context) {
 	cout << "Checking input data... " << endl;
 
 	// Create the Processor
-	Processor* processor = new Processor(context.wavData);
+	audio::Processor* processor = new audio::Processor(context.wavData);
 	processor->init();
 	context.processor = processor;
 
@@ -193,6 +269,3 @@ vector<string> ModelCommand::parseString(const string& source, char delimeter) {
 
 } /* namespace command */
 } /* namespace yazz */
-
-
-

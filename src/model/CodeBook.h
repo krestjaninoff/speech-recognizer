@@ -29,17 +29,22 @@ public:
 	CodeBook();
 	~CodeBook();
 
-	void addLabeledSanple(observation_t label, MfccEntry& mfccEntry);
-	observation_t findLabelBySample(MfccEntry& mfccEntry);
+	const map<observation_t, CodeBookEntry*>* getBook() const { return this->book; }
+
+	void addLabel(observation_t label, MfccEntry* mfccEntry);
+	void removeLabel(observation_t label);
+
+	observation_t findLabelBySample(MfccEntry* mfccEntry) const;
+
+	/**
+	 * Default value for unrecognised MFCC samples
+	 */
+	static char UNKNOWN_VALUE = '?';
 
 private:
 	map<observation_t, CodeBookEntry*>* book;
 };
 
-/**
- * Default value for unrecognised mfcc samples
- */
-static char CODEBOOK_UNKNOWN_VALUE = '?';
 
 } /* namespace model */
 } /* namespace yazz */

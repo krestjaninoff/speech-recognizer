@@ -142,5 +142,70 @@ istream& operator>>(istream& fs, HmModel& obj) {
 	return fs;
 }
 
+void HmModel::print() {
+
+	cout << "Model '" << this->text << "' (id: " << this->id << ")";
+	cout << endl << endl;
+
+	cout << "States: ";
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		cout << "'" << this->states[i] << "'";
+
+		if (i < this->stateCnt - 1) {
+			cout << ", ";
+		}
+	}
+	cout << endl << endl;
+
+	cout << "Observations: ";
+	for (size_t i = 0; i < this->observationCnt; i++) {
+		cout << "'" << this->observations[i] << "'";
+
+		if (i < this->observationCnt - 1) {
+			cout << ", ";
+		}
+	}
+	cout << endl << endl;
+
+	cout << "Transitions:" << endl;
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		for (size_t j = 0; j < this->stateCnt; j++) {
+
+			cout << this->transitions[i][j];
+
+			if (i < this->stateCnt - 1) {
+				cout << ",\t";
+			}
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	cout << "Emissions:" << endl;
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		for (size_t j = 0; j < this->observationCnt; j++) {
+
+			cout << this->emissions[i][j];
+
+			if (i < this->observationCnt - 1) {
+				cout << ",\t";
+			}
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	cout << "Initial distribution:" << endl;
+	for (size_t i = 0; i < this->stateCnt; i++) {
+
+		cout << this->initialDst[i];
+
+		if (i < this->stateCnt - 1) {
+			cout << ", ";
+		}
+	}
+	cout << endl;
+}
+
 } /* namespace model */
 } /* namespace yazz */

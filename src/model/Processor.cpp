@@ -10,28 +10,12 @@ using namespace yazz::math;
 namespace yazz {
 namespace model {
 
-Processor::Processor(map<string&, HmModel*>* models, CodeBook* codeBook) {
-	this->models = models;
-	this->codeBook = codeBook;
+Processor::Processor(Storage& storage) {
+	this->storage = storage;
 }
 
 Processor::~Processor() {
-	if (NULL != this->models) {
-		map<string&, HmModel*>::const_iterator iter;
-		for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
-			delete *iter->second;
-		}
-
-		delete this->models;
-	}
-
-	if (NULL != this->codeBook) {
-		delete codeBook;
-	}
-}
-
-HmModel* Processor::getModelByText(const string& text) {
-	return this->models[text];
+	// Note, Storage is an independent object, Processor doesn't own it.
 }
 
 void Processor::trainModel(HmModel* model, vector<MfccEntry*>* data) {
@@ -47,13 +31,15 @@ HmModel* Processor::findBestModel(const vector<MfccEntry*>* data) {
 	HmModel* bestModel = NULL;
 	double minDistance = 0.;
 
-	for (vector<HmModel*>::const_iterator model = this->models->begin();
-			model != this->models->end(); ++model) {
+	const map<uint32_t, HmModel*>* models = this->storage.getModels();
+	for (map<uint32_t, HmModel*>::const_iterator iter = models->begin();
+			iter != models->end(); ++iter) {
 
+		HmModel* model = *iter->second;
 		double probability = 0.;
 		// TODO Implement EM algorithm for "model" and "data"
 
-		cout << "Probability for model \"" << (*model)->getText().c_str() << "\" is " << probability << endl;
+		cout << "Probability for model \"" << model->getText().c_str() << "\" is " << probability << endl;
 
 		if (NULL == bestModel || probability < minDistance) {
 			minDistance = probability;
@@ -71,13 +57,14 @@ HmModel* Processor::findBestModel(const vector<MfccEntry*>* data) {
 
 const vector<observation_t>* Processor::mfccToLabels(const vector<MfccEntry*>* mfcc) {
 	vector<observation_t>* labels = new vector<observation_t>*();
+	const CodeBook* codeBook = this->storage.getCodeBook();
 
 	cout << "Labels:" << endl;
 
 	vector<MfccEntry*>::const_iterator iter;
 	for (iter = mfcc->begin(); iter != mfcc->end(); ++model) {
 		MfccEntry* entry = *iter;
-		observation_t label = this->codeBook->findLabelBySample(entry);
+		observation_t label = codeBook->findLabelBySample(entry);
 
 		labels->push_back(label);
 

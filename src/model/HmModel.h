@@ -39,10 +39,12 @@ public:
 	double** getEmissions() const { return this->emissions; }
 	double* getInitialDst() const { return this->initialDst; }
 
-	const string getText() const { return this->text; }
+	string getText() const { return this->text; }
 
 	friend std::ostream& operator<<(std::ostream& fs, const HmModel& obj);
 	friend std::istream& operator>>(std::istream& fs, HmModel& obj);
+
+	void print();
 
 private:
 	uint32_t id;
