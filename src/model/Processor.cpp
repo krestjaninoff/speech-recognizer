@@ -1,16 +1,16 @@
 #include "../config.h"
-#include <DTW.h>
-#include <Processor.h>
 #include <iostream>
 #include <iterator>
 #include <string>
+#include "../math/Basic.h"
+#include "Processor.h"
 
 using namespace yazz::math;
 
 namespace yazz {
 namespace model {
 
-Processor::Processor(Storage& storage) {
+Processor::Processor(Storage* storage) {
 	this->storage = storage;
 }
 
@@ -19,31 +19,34 @@ Processor::~Processor() {
 }
 
 void Processor::trainModel(HmModel* model, vector<MfccEntry*>* data) {
-	vector<observation_t>* observations = this->mfccToLabels(data);
+	const vector<observation_t>* observations = this->mfccToLabels(data);
 
 	// TODO Implement Baum-Welch algorithm for "model" and "data"
+	UNUSED(model);
+	UNUSED(data);
 
 	delete observations;
 }
 
-HmModel* Processor::findBestModel(const vector<MfccEntry*>* data) {
+HmModel* Processor::findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data) {
 
 	HmModel* bestModel = NULL;
 	double minDistance = 0.;
 
-	const map<uint32_t, HmModel*>* models = this->storage.getModels();
-	for (map<uint32_t, HmModel*>::const_iterator iter = models->begin();
+	for (vector<HmModel*>::const_iterator iter = models->begin();
 			iter != models->end(); ++iter) {
 
-		HmModel* model = *iter->second;
+		HmModel* model = *iter;
 		double probability = 0.;
+
 		// TODO Implement EM algorithm for "model" and "data"
+		UNUSED(data);
 
 		cout << "Probability for model \"" << model->getText().c_str() << "\" is " << probability << endl;
 
 		if (NULL == bestModel || probability < minDistance) {
 			minDistance = probability;
-			bestModel = *model;
+			bestModel = model;
 		}
 	}
 
@@ -56,26 +59,28 @@ HmModel* Processor::findBestModel(const vector<MfccEntry*>* data) {
 }
 
 const vector<observation_t>* Processor::mfccToLabels(const vector<MfccEntry*>* mfcc) {
-	vector<observation_t>* labels = new vector<observation_t>*();
-	const CodeBook* codeBook = this->storage.getCodeBook();
+	vector<observation_t>* labels = new vector<observation_t>();
+	const CodeBook* codeBook = this->storage->getCodeBook();
 
-	cout << "Labels:" << endl;
+	if (DEBUG_ENABLED) {
+		cout << "Labels:" << endl;
+	}
 
 	vector<MfccEntry*>::const_iterator iter;
-	for (iter = mfcc->begin(); iter != mfcc->end(); ++model) {
+	for (iter = mfcc->begin(); iter != mfcc->end(); ++iter) {
 		MfccEntry* entry = *iter;
 		observation_t label = codeBook->findLabelBySample(entry);
 
 		labels->push_back(label);
 
-		cout << label << ": ";
-		for (size_t i = 0; i < entry->getSize(); i++) {
-			cout << entry->getData()[i] << ", ";
+		if (DEBUG_ENABLED) {
+			cout << label << ": ";
+			for (size_t i = 0; i < entry->getSize(); i++) {
+				cout << entry->getData()[i] << ", ";
+			}
+			cout << endl;
 		}
-		cout << endl;
 	}
-
-	cout << endl;
 
 	return NULL;
 }

@@ -1,4 +1,5 @@
 #include <MfccEntry.h>
+#include <HmModel.h>
 
 namespace yazz {
 namespace model {
@@ -23,7 +24,7 @@ ostream& operator<<(ostream& fs, const MfccEntry& obj) {
 
 	fs.write((char*)(&obj.size), sizeof(size_t));
 	fs.write(reinterpret_cast<char*>(obj.data),
-			streamsize(obj.size * sizeof(state_t)));
+			streamsize(obj.size * sizeof(double)));
 
 	return fs;
 }
@@ -31,14 +32,16 @@ ostream& operator<<(ostream& fs, const MfccEntry& obj) {
 istream& operator>>(istream& fs, MfccEntry& obj) {
 
 	fs.read((char*)(&obj.size), sizeof(size_t));
-	obj.data = new state_t[obj.size];
+	obj.data = new double[obj.size];
 	fs.read(reinterpret_cast<char*>(obj.data),
-			streamsize(obj.size * sizeof(state_t)));
+			streamsize(obj.size * sizeof(double)));
 
 	return fs;
 }
 
 void MfccEntry::print() {
+	cout << "[";
+
 	for (size_t i = 0; i < this->size; i++) {
 		cout << this->data[i];
 

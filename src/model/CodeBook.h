@@ -1,7 +1,9 @@
 #ifndef CODEBOOK_H_
 #define CODEBOOK_H_
 
+#include <map>
 #include <MfccEntry.h>
+#include <HmModel.h>
 
 using namespace std;
 
@@ -36,10 +38,13 @@ public:
 
 	observation_t findLabelBySample(MfccEntry* mfccEntry) const;
 
+	friend std::ostream& operator<<(std::ostream& fs, const CodeBook& obj);
+	friend std::istream& operator>>(std::istream& fs, CodeBook& obj);
+
 	/**
 	 * Default value for unrecognised MFCC samples
 	 */
-	static char UNKNOWN_VALUE = '?';
+	static const char UNKNOWN_VALUE;
 
 private:
 	map<observation_t, CodeBookEntry*>* book;

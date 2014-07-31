@@ -24,9 +24,9 @@ Storage::Storage() {
 Storage::~Storage() {
 
 	if (NULL != this->models) {
-		map<string&, HmModel*>::const_iterator iter;
+		map<uint32_t, HmModel*>::const_iterator iter;
 		for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
-			delete *iter->second;
+			delete iter->second;
 		}
 
 		delete this->models;
@@ -51,7 +51,7 @@ bool Storage::init() {
 		cout << "Loading models from the storage... " << endl;
 
 		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::in | std::ios::binary);
+		fs.open(STORAGE_FILE, std::ios::in /*| std::ios::binary*/);
 
 		if (!fs.good()) {
 			cerr << "Can't access the model's storage :(" << endl;
@@ -83,7 +83,7 @@ bool Storage::init() {
 		cout << "Storage not found, creating an empty one... " << endl;
 
 		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
+		fs.open(STORAGE_FILE, std::ios::out /*| std::ios::binary*/);
 
 		fs.write(STORAGE_HEADER, sizeof(char) * 4);
 		fs.write((char*) &this->maxId, sizeof(uint32_t));
@@ -123,7 +123,7 @@ void Storage::deleteLabel(observation_t label) {
 bool Storage::persist() {
 
 	std::fstream fs;
-	fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
+	fs.open(STORAGE_FILE, std::ios::out /*| std::ios::binary*/);
 
 	if (!fs.good()) {
 		cerr << "Can't access model's storage :(" << endl;
@@ -133,9 +133,9 @@ bool Storage::persist() {
 	fs.write(STORAGE_HEADER, sizeof(char) * 4);
 	fs.write((char*) &this->maxId, sizeof(uint32_t));
 
-	map<string&, HmModel*>::const_iterator iter;
+	map<uint32_t, HmModel*>::const_iterator iter;
 	for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
-		HmModel& model = *(*iter->second);
+		HmModel& model = *iter->second;
 		fs << model;
 	}
 

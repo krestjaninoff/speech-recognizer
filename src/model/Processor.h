@@ -3,11 +3,11 @@
 
 #include <HmModel.h>
 #include <Codebook.h>
+#include <Storage.h>
 #include <Word.h>
 #include <vector>
 
 using namespace std;
-using namespace yazz::audio;
 
 namespace yazz {
 namespace model {
@@ -19,14 +19,14 @@ namespace model {
  */
 class Processor {
 public:
-	Processor(Storage& storage);
+	Processor(Storage* storage);
 	~Processor();
 
 	void trainModel(HmModel* model, vector<MfccEntry*>* data);
-	HmModel* findBestModel(const vector<MfccEntry*>* data);
+	HmModel* findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data);
 
 private:
-	Storage& storage;
+	Storage* storage;
 
 	const vector<observation_t>* mfccToLabels(const vector<MfccEntry*>* mfcc);
 };

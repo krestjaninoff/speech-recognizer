@@ -1,7 +1,10 @@
 TODO:
 
-* Introduce HmmModel
-* Introduce CodeBook and related Cmd stuff
+* Cmd arguments refactoring
+* Save data in string format
+* Implement the algorithms
+* Smoke tests
+* Create codebook and models
 
 Shelved tasks
 

@@ -1,7 +1,12 @@
+#include "../config.h"
 #include <CodeBook.h>
+#include "../math/Basic.h"
+#include <math.h>
 
 namespace yazz {
 namespace model {
+
+const char CodeBook::UNKNOWN_VALUE = '?';
 
 CodeBook::CodeBook() {
 	this->book = new std::map<observation_t, CodeBookEntry*>();
@@ -25,16 +30,16 @@ void CodeBook::addLabel(observation_t label, MfccEntry* mfccEntry) {
 	CodeBookEntry* entry;
 
 	// It's the first label
-	if (NULL == this->book[label]) {
+	if (NULL == (*this->book)[label]) {
 		entry = new CodeBookEntry();
 		entry->samplesCnt = 1;
 		entry->avgVector = mfccEntry;
 
-		this->book[label] = entry;
+		(*this->book)[label] = entry;
 
 	// Not the first label
 	} else {
-		entry = this->book[label];
+		entry = (*this->book)[label];
 		double* avgVector = entry->avgVector->getData();
 		double* currentVector = mfccEntry->getData();
 
@@ -102,10 +107,10 @@ istream& operator>>(istream& fs, CodeBook& obj) {
 		fs.read((char*) &bookEntry->samplesCnt, sizeof(uint16_t));
 
 		MfccEntry* mfccEntry = new MfccEntry();
-		fs >> mfccEntry;
+		fs >> *mfccEntry;
 
 		bookEntry->avgVector = mfccEntry;
-		obj.book[label] = bookEntry;
+		(*obj.book)[label] = bookEntry;
 	}
 
 	return fs;

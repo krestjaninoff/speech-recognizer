@@ -35,7 +35,7 @@ bool AudioDataCommand::readData(Context& context, const char* inputFile) {
 	audio::WavData* wavData = WavData::readFromFile(inputFile);
 
 	if (NULL != wavData) {
-		context.wavData = wavData;
+		context.setWavData(wavData);
 	}
 
 	return NULL != wavData;
@@ -46,7 +46,7 @@ bool AudioDataCommand::splitIntoFiles(Context& context, const char* outputFolder
 	cout << "Splitting data into separate words..." << endl;
 
 	// Check pre-requirements
-	if (NULL == context.wavData) {
+	if (NULL == context.getWavData()) {
 		cout << "Input data is not specified :(" << endl;
 		return false;
 	}
@@ -65,9 +65,9 @@ bool AudioDataCommand::splitIntoFiles(Context& context, const char* outputFolder
 	}
 
 	// Create the Processor
-	audio::Processor* processor = new Processor(context.wavData);
+	audio::Processor* processor = new audio::Processor(context.getWavData());
 	processor->init();
-	context.processor = processor;
+	context.setAudioProcessor(processor);
 
 	// Split wav data into words
 	processor->divideIntoWords();

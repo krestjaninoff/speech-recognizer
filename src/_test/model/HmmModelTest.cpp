@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gtest/gtest-message.h>
 #include <gtest/internal/gtest-internal.h>
-#include <HmmModel.h>
+#include <HmModel.h>
 
 using namespace yazz::model;
 
@@ -27,12 +27,12 @@ TEST(HMM_MODEL, READ_WRITE) {
 
 	double* initialDst = new double[3] {0., 1., 0.};
 
-	HmmModel* modelOriginal = new HmmModel();
+	HmModel* modelOriginal = new HmModel();
 	modelOriginal->init(states, stateCnt, observations, observationCnt,
 			transitions, emissions, initialDst, text);
 
 	stringstream stream;
-	HmmModel* modelDecoded = new HmmModel();
+	HmModel* modelDecoded = new HmModel();
 
 	stream << *modelOriginal;
 	stream >> *modelDecoded;

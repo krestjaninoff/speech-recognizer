@@ -16,19 +16,24 @@ class ModelCommand {
 public:
 
 	/**
-	 * Display the list of available models (print CodeBook)
+	 * Display the list of available observations (print CodeBook)
 	 */
-	static void listLabels(Context& context);
+	static void listObservations(Context& context);
 
 	/**
-	 * Add a new label (or update existing one)
+	 * Display the MFCC data by for the observation
 	 */
-	static void addLabel(Context& context, const char* label);
+	static void printObservation(Context& context, const char* observation);
 
 	/**
-	 * Remove the label
+	 * Add a new observation (or update existing one)
 	 */
-	static void removeLabel(Context& context, const char* label);
+	static void addObservation(Context& context, const char* observation);
+
+	/**
+	 * Remove the observation
+	 */
+	static void deleteObservation(Context& context, const char* observation);
 
 
 	/**
@@ -37,9 +42,9 @@ public:
 	static void listModels(Context& context);
 
 	/**
-	 * Display the model by its is
+	 * Display the model by its id
 	 */
-	static void displayModel(Context& context, const char* modelId);
+	static void printModel(Context& context, const char* modelIdStr);
 
 	/**
 	 * Create a new model
@@ -49,7 +54,7 @@ public:
 	/**
 	 * Train the model
 	 */
-	static void trainModel(Context& context, const char* modelId);
+	static void trainModel(Context& context, const char* modelIdStr);
 
 	/**
 	 * Delete the model
@@ -69,7 +74,7 @@ public:
 
 private:
 
-	static Word* getWord(Context& context);
+	static vector<MfccEntry*>* getMfccData(Context& context);
 
 	static vector<string> parseString(const string& source, char delimeter);
 };

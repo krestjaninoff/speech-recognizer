@@ -47,7 +47,7 @@ HmModel::~HmModel() {
 }
 
 void HmModel::init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
-			double** transitions, double** emissions, double* initialDst, string& text) {
+			double** transitions, double** emissions, double* initialDst, string text) {
 	this->id = 0;
 
 	this->states = states;

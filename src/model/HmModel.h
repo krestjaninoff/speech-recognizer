@@ -1,5 +1,5 @@
-#ifndef HMMMODEL_H_
-#define HMMMODEL_H_
+#ifndef HMMODEL_H_
+#define HMMODEL_H_
 
 #include <iostream>
 #include <string>
@@ -24,7 +24,7 @@ public:
 	~HmModel();
 
 	void init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
-			double** transitions, double** emissions, double* initialDst, string& text);
+			double** transitions, double** emissions, double* initialDst, string text);
 
 	uint32_t getId() const { return this->id; }
 	void setId(uint32_t id) { this->id = id; }
@@ -65,4 +65,4 @@ private:
 } /* namespace model */
 } /* namespace yazz */
 
-#endif /* HMMMODEL_H_ */
+#endif /* HMMODEL_H_ */

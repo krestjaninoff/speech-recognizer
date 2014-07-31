@@ -32,9 +32,9 @@ Processor::Processor(WavData* wavData) {
 
 Processor::~Processor() {
 	if (NULL != this->words) {
-		vector<Frame*>::const_iterator iter;
+		vector<Word*>::const_iterator iter;
 
-		for (iter = this->words->begin(); model != this->words->end(); ++model) {
+		for (iter = this->words->begin(); iter != this->words->end(); ++iter) {
 			delete *iter;
 		}
 
@@ -48,7 +48,7 @@ Processor::~Processor() {
 	if (NULL != this->frames) {
 		vector<Frame*>::const_iterator iter;
 
-		for (iter = this->frames->begin(); model != this->frames->end(); ++model) {
+		for (iter = this->frames->begin(); iter != this->frames->end(); ++iter) {
 			delete *iter;
 		}
 
@@ -227,6 +227,7 @@ void Processor::cleanUpWords() {
 	}
 }
 
+// @unused
 void Processor::useAllSamplesAsOneWord() {
 	this->words->clear();
 	this->wordToFrames->clear();
@@ -270,6 +271,7 @@ bool Processor::findSilenceThreshold() {
 	return hasSilence;
 }
 
+// @unused
 void Processor::initMfcc(Word& word) {
 
 	uint32_t firstId = (*this->wordToFrames)[word.getId()].first;
