@@ -192,12 +192,34 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Create and save the model
 	HmModel* model = new HmModel();
-	model->init(states, statesCnt, observations, observationCnt, transitions, emissions, initialDist, modelName);
+	model->init(states, statesCnt, observations, observationCnt, transitions,
+	        emissions, initialDist, modelName);
 	context.getStorage()->addModel(model);
 
 	cout << "The new sample has been successfully added!" << endl;
 }
 
+void ModelCommand::displayObservations(Context& context) {
+
+    // Read MFCC data
+    const vector<MfccEntry*>* data = getMfccData(context);
+
+    // Transform MFCC to observations
+    const vector<observation_t>* observations =
+            context.getModelProcessor()->mfccToObservations(data);
+
+    // Print results
+    cout << endl << "Observation: ";
+    for(vector<observation_t>::const_iterator iter = observations->begin();
+            iter != observations->end(); iter++) {
+        cout << *iter << " ";
+    }
+    cout << endl;
+
+    // Clean up
+    delete observations;
+    delete data;
+}
 
 void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 	cout << "Training the model with Id " << modelIdStr;
@@ -209,7 +231,7 @@ void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 	if (NULL != model) {
 
 		// Preparing training data
-		vector<MfccEntry*>* data = getMfccData(context);
+		const vector<MfccEntry*>* data = getMfccData(context);
 
 		// Training
 		cout << "Model before training:" << endl;
@@ -220,6 +242,9 @@ void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 
 		cout << "Model after training:" << endl;
 		model->print();
+
+		// Clean up
+		delete data;
 
 	} else {
 		cout << "Model not found!" << endl;
@@ -249,7 +274,7 @@ string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
 	cout << "Word recognition... " << endl;
 
 	// Get a word to recognize
-	vector<MfccEntry*>* data = getMfccData(context);
+	const vector<MfccEntry*>* data = getMfccData(context);
 
 	// Get available models
 	vector<HmModel*>* modelsFiltered = new vector<HmModel*>();
@@ -273,13 +298,16 @@ string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
 
 	// Recognition process
 	model::Processor* processor = context.getModelProcessor();
-	HmModel* model = processor->findBestModel(modelsToApply, data);
+	const HmModel* model = processor->findBestModel(modelsToApply, data);
 
 	// Get the word
 	string theWord = "";
 	if (NULL != model) {
 		theWord =  model->getText();
 	}
+
+	// Clean up
+	delete data;
 
 	return theWord;
 }
@@ -298,7 +326,7 @@ void ModelCommand::recognize(Context& context, const char* modelNamesChar) {
 	}
 }
 
-vector<MfccEntry*>* ModelCommand::getMfccData(Context& context) {
+const vector<MfccEntry*>* ModelCommand::getMfccData(Context& context) {
 
 	// Check pre-requirements
 	if (NULL == context.getWavData()) {

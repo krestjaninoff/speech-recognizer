@@ -2,7 +2,7 @@
 #define RECOGNIZER_H_
 
 #include <HmModel.h>
-#include <Codebook.h>
+#include <CodeBook.h>
 #include <Storage.h>
 #include <Word.h>
 #include <vector>
@@ -22,13 +22,13 @@ public:
 	Processor(Storage* storage);
 	~Processor();
 
-	void trainModel(HmModel* model, vector<MfccEntry*>* data);
-	HmModel* findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data);
+    const vector<observation_t>* mfccToObservations(const vector<MfccEntry*>* mfcc);
+
+	void trainModel(HmModel* model, const vector<MfccEntry*>* data);
+	const HmModel* findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data);
 
 private:
 	Storage* storage;
-
-	const vector<observation_t>* mfccToLabels(const vector<MfccEntry*>* mfcc);
 };
 
 } /* namespace model */

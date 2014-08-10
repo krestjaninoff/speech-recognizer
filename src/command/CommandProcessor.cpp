@@ -29,6 +29,7 @@ static struct option longOptions[] = {
 	{ "delete-model", optional_argument, 0, 'd' },
 	{ "delete-observation", optional_argument, 0, 'D' },
 
+	{ "observations", optional_argument, 0, 'o' },
 	{ "train-model", optional_argument, 0, 't' },
 	{ "recognize", optional_argument, 0, 'r' },
 
@@ -37,7 +38,7 @@ static struct option longOptions[] = {
 
 	{0, 0, 0, 0}
 };
-static const char* const shortOptions = "vhi:lLp:P:a:A:d:D:t:r:g::s::";
+static const char* const shortOptions = "vhi:lLp:P:a:A:d:D:ot:r:g::s::";
 
 /**
  * Help info
@@ -67,7 +68,8 @@ static const char* const helpInfo =	EOL
 
 	EOL
 
-	"-t<m>, --train-model<m>			\t\t Train the specific model with the input data" EOL
+	"-o,		--observations			\t\t Display observations retrieved from the input data" EOL
+	"-t<m>, 	--train-model<m>		\t\t Train the specific model with the input data" EOL
 	"-r<m1,m2>, --recognize=<m1,m2>		\t\t Recognize the input data using specified (csv) list of models (by default all models are used)" EOL
 
 	EOL
@@ -135,6 +137,8 @@ bool CommandProcessor::process() {
 					ModelCommand::deleteObservation(*this->context, optarg);
 					break;
 
+				case 'o':
+					ModelCommand::displayObservations(*this->context);
 				case 't':
 					ModelCommand::trainModel(*this->context, optarg);
 					break;

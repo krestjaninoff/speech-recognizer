@@ -18,8 +18,8 @@ Processor::~Processor() {
 	// Note, Storage is an independent object, Processor doesn't own it.
 }
 
-void Processor::trainModel(HmModel* model, vector<MfccEntry*>* data) {
-	const vector<observation_t>* observations = this->mfccToLabels(data);
+void Processor::trainModel(HmModel* model, const vector<MfccEntry*>* data) {
+	const vector<observation_t>* observations = this->mfccToObservations(data);
 
 	// TODO Implement Baum-Welch algorithm for "model" and "data"
 	UNUSED(model);
@@ -28,7 +28,7 @@ void Processor::trainModel(HmModel* model, vector<MfccEntry*>* data) {
 	delete observations;
 }
 
-HmModel* Processor::findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data) {
+const HmModel* Processor::findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data) {
 
 	HmModel* bestModel = NULL;
 	double minDistance = 0.;
@@ -58,8 +58,8 @@ HmModel* Processor::findBestModel(const vector<HmModel*>* models, const vector<M
 	return NULL;
 }
 
-const vector<observation_t>* Processor::mfccToLabels(const vector<MfccEntry*>* mfcc) {
-	vector<observation_t>* labels = new vector<observation_t>();
+const vector<observation_t>* Processor::mfccToObservations(const vector<MfccEntry*>* mfcc) {
+	vector<observation_t>* observations = new vector<observation_t>();
 	const CodeBook* codeBook = this->storage->getCodeBook();
 
 	if (DEBUG_ENABLED) {
@@ -71,7 +71,7 @@ const vector<observation_t>* Processor::mfccToLabels(const vector<MfccEntry*>* m
 		MfccEntry* entry = *iter;
 		observation_t label = codeBook->findLabelBySample(entry);
 
-		labels->push_back(label);
+		observations->push_back(label);
 
 		if (DEBUG_ENABLED) {
 			cout << label << ": ";
@@ -82,7 +82,7 @@ const vector<observation_t>* Processor::mfccToLabels(const vector<MfccEntry*>* m
 		}
 	}
 
-	return NULL;
+	return observations;
 }
 
 } /* namespace model */

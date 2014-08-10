@@ -51,6 +51,12 @@ public:
 	 */
 	static void addModel(Context& context, const char* modelName);
 
+
+	/**
+	 * Display observations retrieved from the input data
+	 */
+	static void displayObservations(Context& context);
+
 	/**
 	 * Train the model
 	 */
@@ -72,9 +78,10 @@ public:
 	 */
 	static string doRecognize(Context& context, const char* modelNames);
 
+
 private:
 
-	static vector<MfccEntry*>* getMfccData(Context& context);
+	static const vector<MfccEntry*>* getMfccData(Context& context);
 
 	static vector<string> parseString(const string& source, char delimeter);
 };
