@@ -13,7 +13,7 @@ static string recognizeSample(string file) {
 	Context* ctx = new Context();
 
 	WavData* wavData = WavData::readFromFile(file);
-	ctx->wavData = wavData;
+	ctx->setWavData(wavData);
 
 	string theWord = ModelCommand::doRecognize(*ctx, NULL);
 	delete ctx;
@@ -45,8 +45,3 @@ TEST(AUDIO_RECOGNIZER, DISABLED_RECOGNIZE) {
 	// testSetOfSamples("samples/male3");
 	// testSetOfSamples("samples/female1");
 }
-
-
-
-
-

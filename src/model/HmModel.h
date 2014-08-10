@@ -60,6 +60,8 @@ private:
 	double* initialDst;		// stateCnt
 
 	string text;
+
+	void check();
 };
 
 } /* namespace model */

@@ -239,6 +239,7 @@ void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 
 		model::Processor* processor = context.getModelProcessor();
 		processor->trainModel(model, data);
+		context.getStorage()->persist();
 
 		cout << "Model after training:" << endl;
 		model->print();

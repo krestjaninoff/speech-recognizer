@@ -52,11 +52,13 @@ option(test "Build all tests" OFF)
 	
 	# Unit Tests
 	add_executable(unit_tests
-#		_test/math/BasicTest.cpp
-#		_test/math/DTWTest.cpp
-#		_test/math/MFCCTest.cpp
-#		_test/audio/ProcessorTest.cpp
-#		_test/model/RecognizerTest.cpp
+		_test/math/BasicTest.cpp
+		_test/math/DTWTest.cpp
+		_test/math/MFCCTest.cpp
+		_test/math/BaumWelchTest.cpp
+		_test/math/ForwardBackwardTest.cpp
+		_test/audio/ProcessorTest.cpp
+		_test/model/RecognizerTest.cpp
 		_test/model/HmmModelTest.cpp
 	)
 	

@@ -5,6 +5,8 @@ set(SOURCE
 	Basic.cpp
 	MFCC.cpp
 	DTW.cpp
+	BaumWelch.cpp
+	ForwardBackward.cpp
 )
 
 add_library(math STATIC ${SOURCE})

@@ -31,6 +31,3 @@ TEST(MATH_DTW, CALC_DISTANCE) {
 	double distance = DTW::calcDistance(seq1, seq1size, seq2, seq2size);
 	EXPECT_NEAR(34.2222, distance, EPS_TEST);
 }
-
-
-

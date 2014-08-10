@@ -3,6 +3,8 @@
 #include <iterator>
 #include <string>
 #include "../math/Basic.h"
+#include "../math/ForwardBackward.h"
+#include "../math/BaumWelch.h"
 #include "Processor.h"
 
 using namespace yazz::math;
@@ -21,41 +23,38 @@ Processor::~Processor() {
 void Processor::trainModel(HmModel* model, const vector<MfccEntry*>* data) {
 	const vector<observation_t>* observations = this->mfccToObservations(data);
 
-	// TODO Implement Baum-Welch algorithm for "model" and "data"
-	UNUSED(model);
-	UNUSED(data);
+	BaumWelch::perform(model, observations);
 
 	delete observations;
 }
 
-const HmModel* Processor::findBestModel(const vector<HmModel*>* models, const vector<MfccEntry*>* data) {
+const HmModel* Processor::findBestModel(const vector<HmModel*>* models,
+		const vector<MfccEntry*>* data) {
+	const vector<observation_t>* observations = this->mfccToObservations(data);
 
-	HmModel* bestModel = NULL;
+	const HmModel* bestModel = NULL;
 	double minDistance = 0.;
 
-	for (vector<HmModel*>::const_iterator iter = models->begin();
-			iter != models->end(); ++iter) {
+	//for (vector<HmModel*>::const_iterator iter = models->begin();
+	//		iter != models->end(); ++iter) {
 
-		HmModel* model = *iter;
-		double probability = 0.;
+	//	HmModel* model = *iter;
+	//	double probability = 0.;
 
-		// TODO Implement EM algorithm for "model" and "data"
-		UNUSED(data);
+		bestModel = ForwardBackward::perform(models, observations);
 
-		cout << "Probability for model \"" << model->getText().c_str() << "\" is " << probability << endl;
+	//	cout << "Probability for model \"" << model->getText().c_str() << "\" is " << probability << endl;
 
-		if (NULL == bestModel || probability < minDistance) {
-			minDistance = probability;
-			bestModel = model;
-		}
-	}
+	//	if (NULL == bestModel || probability < minDistance) {
+	//		minDistance = probability;
+	//		bestModel = model;
+	//	}
+	//}
 
 	cout << "The best model is \"" << bestModel->getText().c_str() << "\" with " <<
 			minDistance << " distance" << endl;
 
 	return bestModel;
-
-	return NULL;
 }
 
 const vector<observation_t>* Processor::mfccToObservations(const vector<MfccEntry*>* mfcc) {

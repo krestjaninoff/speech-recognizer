@@ -1,3 +1,6 @@
+#include <assert.h>
+#include <math.h>
+#include <limits>
 #include <HmModel.h>
 
 namespace yazz {
@@ -61,6 +64,8 @@ void HmModel::init(state_t* states, size_t stateCnt, observation_t* observations
 	this->initialDst = initialDst;
 
 	this->text = text;
+
+	this->check();
 }
 
 ostream& operator<<(ostream& fs, const HmModel& obj) {
@@ -205,6 +210,39 @@ void HmModel::print() {
 		}
 	}
 	cout << endl;
+}
+
+void HmModel::check() {
+	double sum;
+
+	// Check transition matrix
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		sum = 0;
+
+		for (size_t j = 0; j < this->observationCnt; j++) {
+			sum += this->transitions[i][j];
+		}
+
+		assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
+	}
+
+	// Check emission matrix
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		sum = 0;
+
+		for (size_t j = 0; j < this->observationCnt; j++) {
+			sum += this->emissions[i][j];
+		}
+
+		assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
+	}
+
+	// Check initial state
+	sum = 0;
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		sum += this->initialDst[i];
+	}
+	assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
 }
 
 } /* namespace model */
