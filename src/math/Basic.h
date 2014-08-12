@@ -10,7 +10,7 @@ namespace yazz {
 namespace math {
 
 /**
- * Statistics related calculations
+ * Common math
  */
 class Basic {
 public:
@@ -29,6 +29,12 @@ public:
 			uint8_t binsCount, double minRaw, double maxRaw);
 
 	static double euclideanDistance(double* a, double* b, size_t size);
+
+	// Print helpers
+	static void printVector(char* vector, size_t size);
+	static void printVector(double* vector, size_t size);
+	static void printMatrix(double** matrix, size_t sizeX, size_t sizeY);
+	static void printMatrix3D(double*** matrix, size_t sizeX, size_t sizeY, size_t sizeZ);
 };
 
 } /* namespace math */

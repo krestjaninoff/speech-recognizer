@@ -1,7 +1,10 @@
 #include <assert.h>
 #include <math.h>
 #include <limits>
+#include <../math/Basic.h>
 #include <HmModel.h>
+
+using namespace yazz::math;
 
 namespace yazz {
 namespace model {
@@ -153,62 +156,23 @@ void HmModel::print() {
 	cout << endl << endl;
 
 	cout << "States: ";
-	for (size_t i = 0; i < this->stateCnt; i++) {
-		cout << "'" << this->states[i] << "'";
-
-		if (i < this->stateCnt - 1) {
-			cout << ", ";
-		}
-	}
+	Basic::printVector(this->states, this->stateCnt);
 	cout << endl << endl;
 
 	cout << "Observations: ";
-	for (size_t i = 0; i < this->observationCnt; i++) {
-		cout << "'" << this->observations[i] << "'";
-
-		if (i < this->observationCnt - 1) {
-			cout << ", ";
-		}
-	}
+	Basic::printVector(this->observations, this->observationCnt);
 	cout << endl << endl;
 
 	cout << "Transitions:" << endl;
-	for (size_t i = 0; i < this->stateCnt; i++) {
-		for (size_t j = 0; j < this->stateCnt; j++) {
-
-			cout << this->transitions[i][j];
-
-			if (i < this->stateCnt - 1) {
-				cout << ",\t";
-			}
-		}
-		cout << endl;
-	}
+	Basic::printMatrix(this->transitions, this->stateCnt, this->stateCnt);
 	cout << endl;
 
 	cout << "Emissions:" << endl;
-	for (size_t i = 0; i < this->stateCnt; i++) {
-		for (size_t j = 0; j < this->observationCnt; j++) {
-
-			cout << this->emissions[i][j];
-
-			if (i < this->observationCnt - 1) {
-				cout << ",\t";
-			}
-		}
-		cout << endl;
-	}
+	Basic::printMatrix(this->emissions, this->stateCnt, this->observationCnt);
 	cout << endl;
 
 	cout << "Initial distribution:" << endl;
-	for (size_t i = 0; i < this->stateCnt; i++) {
-
-		cout << this->initialDst[i];
-
-		if (i < this->stateCnt - 1) {
-			cout << ", ";
-		}
-	}
+	Basic::printVector(this->initialDst, this->stateCnt);
 	cout << endl;
 }
 
