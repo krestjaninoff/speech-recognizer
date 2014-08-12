@@ -33,26 +33,26 @@ const HmModel* Processor::findBestModel(const vector<HmModel*>* models,
 	const vector<observation_t>* observations = this->mfccToObservations(data);
 
 	const HmModel* bestModel = NULL;
-	double minDistance = 0.;
+	double minProbability = 0.;
 
-	//for (vector<HmModel*>::const_iterator iter = models->begin();
-	//		iter != models->end(); ++iter) {
+	for (vector<HmModel*>::const_iterator iter = models->begin();
+			iter != models->end(); ++iter) {
 
-	//	HmModel* model = *iter;
-	//	double probability = 0.;
+		const HmModel& model = **iter;
+		double probability = 0.;
 
-		bestModel = ForwardBackward::perform(models, observations);
+		probability = ForwardBackward::forward(model, observations);
 
-	//	cout << "Probability for model \"" << model->getText().c_str() << "\" is " << probability << endl;
+		cout << "Probability for model \"" << model.getText().c_str() << "\" is " << probability << endl;
 
-	//	if (NULL == bestModel || probability < minDistance) {
-	//		minDistance = probability;
-	//		bestModel = model;
-	//	}
-	//}
+		if (NULL == bestModel || probability < minProbability) {
+			minProbability = probability;
+			bestModel = &model;
+		}
+	}
 
 	cout << "The best model is \"" << bestModel->getText().c_str() << "\" with " <<
-			minDistance << " distance" << endl;
+			minProbability << " distance" << endl;
 
 	return bestModel;
 }

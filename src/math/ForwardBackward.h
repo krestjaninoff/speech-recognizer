@@ -1,8 +1,7 @@
 #ifndef FORWARDBACKWARD_H_
 #define FORWARDBACKWARD_H_
 
-#include <vector>
-#include "../model/HmModel.h"
+#include <Algorithm.h>
 
 using namespace std;
 using namespace yazz::model;
@@ -12,12 +11,16 @@ namespace math {
 
 /**
  * ForwardBackward algorithm implementation
+ *
+ * @see docs/hmm_pdmi.pdf
  */
-class ForwardBackward {
+class ForwardBackward : public Algorithm {
 public:
 
-	static const HmModel* perform(const vector<HmModel*>* models,
-			const vector<observation_t>* observations);
+	/**
+	 * Calculate probability of model with given observations
+	 */
+	static double forward(const HmModel& model,	const vector<observation_t>* observations);
 };
 
 } /* namespace math */

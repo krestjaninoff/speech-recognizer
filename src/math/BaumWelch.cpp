@@ -28,20 +28,7 @@ void BaumWelch::perform(HmModel* model, const vector<observation_t>* data) {
 
 	// Observations map
 	map<observation_t, uint32_t> observMap;
-	for (vector<observation_t>::const_iterator iter = data->begin();
-			iter != data->end(); iter++) {
-		observation_t value = *iter;
-
-		int32_t index = -1;
-		for (uint32_t i = 0; i < observationsCnt; i++) {
-			if (value == observations[i]) {
-				index = i;
-				break;
-			}
-		}
-
-		observMap[value] = index;
-	}
+	initObservationsMap(observMap, data, observations, observationsCnt);
 
 	// Allocate memory
 	double** a = new double*[stateCnt];
@@ -314,18 +301,6 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 	} while (convergence > CONVERGENCE_EPSILON && iter < ITER_LIMIT);
 
 	assert(iter < ITER_LIMIT);
-}
-
-double BaumWelch::getObservProb(observation_t observation, size_t stateId,
-		double** emissions, map<observation_t, uint32_t>& observMap) {
-	double probability = 0;
-
-	int32_t index = observMap[observation];
-	if (index > 0) {
-		probability = emissions[stateId][index];
-	}
-
-	return probability;
 }
 
 } /* namespace math */
