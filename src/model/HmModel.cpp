@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <limits>
-#include <../math/Basic.h>
+#include <../math/Printer.h>
 #include <HmModel.h>
 
 using namespace yazz::math;
@@ -156,23 +156,23 @@ void HmModel::print() {
 	cout << endl << endl;
 
 	cout << "States: ";
-	Basic::printVector(this->states, this->stateCnt);
+	Printer::printVector(this->states, this->stateCnt);
 	cout << endl << endl;
 
 	cout << "Observations: ";
-	Basic::printVector(this->observations, this->observationCnt);
+	Printer::printVector(this->observations, this->observationCnt);
 	cout << endl << endl;
 
 	cout << "Transitions:" << endl;
-	Basic::printMatrix(this->transitions, this->stateCnt, this->stateCnt);
+	Printer::printMatrix(this->transitions, this->stateCnt, this->stateCnt);
 	cout << endl;
 
 	cout << "Emissions:" << endl;
-	Basic::printMatrix(this->emissions, this->stateCnt, this->observationCnt);
+	Printer::printMatrix(this->emissions, this->stateCnt, this->observationCnt);
 	cout << endl;
 
 	cout << "Initial distribution:" << endl;
-	Basic::printVector(this->initialDst, this->stateCnt);
+	Printer::printVector(this->initialDst, this->stateCnt);
 	cout << endl;
 }
 

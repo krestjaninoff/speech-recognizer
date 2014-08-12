@@ -7,6 +7,7 @@ set(SOURCE
 	DTW.cpp
 	BaumWelch.cpp
 	ForwardBackward.cpp
+	Printer.cpp
 )
 
 add_library(math STATIC ${SOURCE})

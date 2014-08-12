@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <../config.h>
-#include <Basic.h>
+#include <Printer.h>
 #include <BaumWelch.h>
 
 using namespace std;
@@ -138,7 +138,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "A matrix is:" << endl;
-				Basic::printMatrix(a, stateCnt, data->size());
+				Printer::printMatrix(a, stateCnt, data->size());
 				cout << endl;
 			}
 		}
@@ -169,7 +169,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "B matrix is:" << endl;
-				Basic::printMatrix(b, stateCnt, data->size());
+				Printer::printMatrix(b, stateCnt, data->size());
 				cout << endl;
 			}
 		}
@@ -190,7 +190,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "Y matrix is:" << endl;
-				Basic::printMatrix(y, stateCnt, data->size());
+				Printer::printMatrix(y, stateCnt, data->size());
 				cout << endl;
 			}
 
@@ -218,7 +218,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "E matrix is:" << endl;
-				Basic::printMatrix3D(e, stateCnt, stateCnt, data->size());
+				Printer::printMatrix3D(e, stateCnt, stateCnt, data->size());
 				cout << endl;
 			}
 		}
@@ -238,7 +238,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "Initial distributions is:" << endl;
-				Basic::printVector(initialDst, stateCnt);
+				Printer::printVector(initialDst, stateCnt);
 				cout << endl << "Convergence of initial distribution is: " << convergenceInitialDst;
 				cout << endl;
 			}
@@ -264,7 +264,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "Transition matrix is:" << endl;
-				Basic::printMatrix(transitions, stateCnt, stateCnt);
+				Printer::printMatrix(transitions, stateCnt, stateCnt);
 				cout << endl << "Convergence of transition matrix is: " << convergenceTransitions;
 				cout << endl;
 			}
@@ -296,7 +296,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "Emission matrix is:" << endl;
-				Basic::printMatrix(emissions, stateCnt, observationsCnt);
+				Printer::printMatrix(emissions, stateCnt, observationsCnt);
 				cout << endl << "Convergence of emission matrix is: " << convergenceEmissions;
 				cout << endl;
 			}
