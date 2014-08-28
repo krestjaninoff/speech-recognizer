@@ -36,10 +36,7 @@ void Printer::printMatrix(double** matrix, size_t sizeX, size_t sizeY) {
 		for (size_t j = 0; j < sizeY; j++) {
 
 			cout << matrix[i][j];
-
-			if (i < sizeY - 1) {
-				cout << ",\t";
-			}
+			cout << "\t";
 		}
 		cout << endl;
 	}

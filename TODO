@@ -1,10 +1,7 @@
 TODO:
 
-* Cmd arguments refactoring
-* Save data in string format
-* Implement the algorithms
-* Smoke tests
-* Create codebook and models
+* Create codebook and models (stubs)
+* Check algorithms
 
 Shelved tasks
 

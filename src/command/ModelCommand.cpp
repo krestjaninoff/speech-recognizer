@@ -22,20 +22,28 @@ void ModelCommand::listObservations(Context& context) {
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 	map<observation_t, CodeBookEntry*>::const_iterator iter;
 
-	cout << endl << "CodeBook:" << endl;
-	for (iter = book->begin(); iter != book->end(); ++iter) {
-		cout << "'" << iter->first << "' (" << iter->second->samplesCnt << "): [";
+	if (book->size() > 0) {
+		cout << "CodeBook:" << endl;
 
-		MfccEntry* mfcc = iter->second->avgVector;
-		mfcc->print();
+		for (iter = book->begin(); iter != book->end(); ++iter) {
+			cout << "'" << iter->first << "' (" << iter->second->samplesCnt << "): ";
+
+			MfccEntry* mfcc = iter->second->avgVector;
+			mfcc->print();
+		}
+
+	} else {
+		cout << "There are no any observations in the storage :( See help to get know how to add one!" << endl;
 	}
 }
 
 void ModelCommand::printObservation(Context& context, const char* observation) {
 
-	CodeBookEntry* entry = context.getStorage()->getCodeBook()->getBook()->at(*observation);
+	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
-	if (NULL != entry) {
+	if (book->count(*observation) > 0) {
+		CodeBookEntry* entry = book->at(*observation);
+
 		cout << "Observation '" << observation << "' is based on " << entry->samplesCnt << " samples: ";
 		entry->avgVector->print();
 		cout << endl;
@@ -47,17 +55,22 @@ void ModelCommand::printObservation(Context& context, const char* observation) {
 
 void ModelCommand::addObservation(Context& context, const char* observation) {
 
+	// Notice, that by adding an observation with the name which already exists in the Codebook
+	// we just average its value. Hence, we don't need to check uniqueness of the observation.
 	cout << "Adding label '" << observation << "' into the CodeBook..." << endl;
 	cout << endl;
 
 	// Read the observation data
-	cout << "Enter MFCC vector elements (" << MFCC_SIZE << "): ";
+	cout << "Enter MFCC vector elements (" << MFCC_SIZE << "): " << endl;
 
 	double* data = new double[MFCC_SIZE];
 	double value;
 
 	for (unsigned short i = 0; i < MFCC_SIZE; i++) {
+
+		cout << "[" << i + 1 << "]: ";
 		cin >> value;
+
 		data[i] = value;
 	}
 	cout << endl;
@@ -65,17 +78,24 @@ void ModelCommand::addObservation(Context& context, const char* observation) {
 	// Add or update the observation
 	MfccEntry* mfcc = new MfccEntry(data, MFCC_SIZE);
 	context.getStorage()->addLabel(*observation, mfcc);
+	context.getStorage()->persist();
 
 	cout << "The observation was successfully added!" << endl;
 }
 
 void ModelCommand::deleteObservation(Context& context, const char* observation) {
 
-	cout << "Deleting label '" << observation << "' from the CodeBook...";
+	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
-	context.getStorage()->deleteLabel(*observation);
+	if (book->count(*observation) > 0) {
+		context.getStorage()->deleteLabel(*observation);
+		context.getStorage()->persist();
 
-	cout << " done!" << endl;
+		cout << "Observation '" << observation << "' was deleted from the CodeBook" << endl;
+
+	} else {
+		cout << "Observation '" << observation << "' isn't in the CodeBook" << endl;
+	}
 }
 
 
@@ -93,7 +113,7 @@ void ModelCommand::listModels(Context& context) {
 		}
 
 	} else {
-		cout << "There are no any models in the storage :( Use -a option add one!" << endl;
+		cout << "There are no any models in the storage :( See help to get know how to add one!" << endl;
 	}
 
 	cout << endl;
@@ -102,11 +122,12 @@ void ModelCommand::listModels(Context& context) {
 void ModelCommand::printModel(Context& context, const char* modelIdStr) {
 
 	uint32_t modelId = atoi(modelIdStr);
-
 	const map<uint32_t, HmModel*>* models = context.getStorage()->getModels();
-	HmModel* model = models->at(modelId);
 
-	if (NULL != model) {
+	if (models->count(modelId) > 0) {
+		HmModel* model = models->at(modelId);
+
+		cout << endl;
 		model->print();
 
 	} else {
@@ -115,6 +136,9 @@ void ModelCommand::printModel(Context& context, const char* modelIdStr) {
 }
 
 void ModelCommand::addModel(Context& context, const char* modelNameChar) {
+
+	// Notice, that we can have a lot of models for the same value.
+	// Hence, we don't need to check uniqueness of model's name
 	cout << "Adding a new model... " << endl;
 
 	// Check the model's name
@@ -129,10 +153,10 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	cout << "Enter amount of model's states: ";
 	cin >> statesCnt;
 
-	cout << "Enter model's states: ";
+	cout << "Enter model's states: " << endl;
 	state_t* states = new state_t[statesCnt];
 	for (size_t i = 0; i < statesCnt; i++) {
-		cout << "(" << i << "): ";
+		cout << "[" << i << "]: ";
 		cin >> states[i];
 	}
 
@@ -143,10 +167,10 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	cout << "Enter amount of model's observations: ";
 	cin >> observationCnt;
 
-	cout << "Enter model's observations: ";
+	cout << "Enter model's observations: " << endl;
 	observation_t* observations = new observation_t[observationCnt];
 	for (size_t i = 0; i < observationCnt; i++) {
-		cout << "(" << i << "): ";
+		cout << "[" << i << "]: ";
 		cin >> observations[i];
 	}
 
@@ -154,13 +178,13 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Read model's transitions
 	double** transitions = new double*[statesCnt];
-	cout << "Enter amount of model's transitions: ";
+	cout << "Enter model's transitions: " << endl;
 
 	for (size_t i = 0; i < statesCnt; i++) {
 		transitions[i] = new double[statesCnt];
 
 		for (size_t j = 0; j < statesCnt; j++) {
-			cout << "(" << i << "," << j << "): ";
+			cout << "[" << i << "] " << states[i] << " -> " << "[" << j << "] " << states[j] << ": ";
 			cin >> transitions[i][j];
 		}
 
@@ -169,13 +193,13 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Read model's emissions
 	double** emissions = new double*[statesCnt];
-	cout << "Enter amount of model's emissions: ";
+	cout << "Enter model's emissions: " << endl;
 
 	for (size_t i = 0; i < statesCnt; i++) {
 		emissions[i] = new double[observationCnt];
 
 		for (size_t j = 0; j < observationCnt; j++) {
-			cout << "(" << i << "," << j << "): ";
+			cout << "[" << i << "] " << observations[i] << " -> " << "[" << j << "] " << observations[j] << ": ";
 			cin >> emissions[i][j];
 		}
 
@@ -183,10 +207,10 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	}
 
 	// Read model's initial distribution
-	cout << "Enter model's initial distribution: ";
+	cout << "Enter model's initial distribution: " << endl;
 	double* initialDist = new double[statesCnt];
 	for (size_t i = 0; i < statesCnt; i++) {
-		cout << "(" << i << "): ";
+		cout << "[" << i << "] " << states[i] << ": ";
 		cin >> initialDist[i];
 	}
 
@@ -194,9 +218,28 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	HmModel* model = new HmModel();
 	model->init(states, statesCnt, observations, observationCnt, transitions,
 	        emissions, initialDist, modelName);
+
 	context.getStorage()->addModel(model);
+	context.getStorage()->persist();
 
 	cout << "The new sample has been successfully added!" << endl;
+}
+
+void ModelCommand::deleteModel(Context& context, const char* modelIdStr) {
+
+	uint32_t modelId = atoi(modelIdStr);
+	const map<uint32_t, HmModel*>* models = context.getStorage()->getModels();
+
+	if (models->count(modelId) > 0) {
+
+		context.getStorage()->deleteModel(modelId);
+		context.getStorage()->persist();
+
+		cout << "Model " << modelIdStr << " was successfully deleted" << endl;
+
+	} else {
+		cout << "Model " << modelIdStr << " doesn't exists" << endl;
+	}
 }
 
 void ModelCommand::displayObservations(Context& context) {
@@ -251,17 +294,6 @@ void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 		cout << "Model not found!" << endl;
 	}
 }
-
-
-void ModelCommand::deleteModel(Context& context, const char* modelIdStr) {
-	cout << "Deleting model with Id " << modelIdStr << "...";
-
-	uint32_t modelId = atoi(modelIdStr);
-	context.getStorage()->deleteModel(modelId);
-
-	cout << " done!" << endl;
-}
-
 
 string ModelCommand::doRecognize(Context& context, const char* modelNamesChar) {
 

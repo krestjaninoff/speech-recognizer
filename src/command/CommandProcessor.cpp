@@ -48,34 +48,34 @@ static const char* const helpInfo =	EOL
 	EOL
 
 	"Options:" EOL
-	"-v, --version \t\t Display version information" EOL
-	"-h, --help    \t\t Display help information (this manual)" EOL
-	"-i, --input   \t\t Read WAV data for post-processing" EOL
+	"-v, --version    Display version information" EOL
+	"-h, --help       Display help information (this manual)" EOL
+	"-i, --input      Read WAV data for post-processing" EOL
 
 	EOL
 
-	"-l,    --list-models				\t\t Show the list of the available models" EOL
-	"-L,    --list-observations			\t\t Show the list of the available observations (CodeBook)" EOL
-	"-p<m>, --print-model=<m>			\t\t Print the specific model by given Id" EOL
-	"-P<o>, --print-observation=<o>		\t\t Print the specific observation by given Label" EOL
+	"-l,    --list-models               Show the list of the available models" EOL
+	"-L,    --list-observations         Show the list of the available observations (CodeBook)" EOL
+	"-p<m>, --print-model=<m>           Print the specific model by given Id" EOL
+	"-P<o>, --print-observation=<o>     Print the specific observation by given Label" EOL
 
 	EOL
 
-	"-a<m>, --add-model=<m>				\t\t Add the model with given name" EOL
-	"-A<o>, --add-observation=<o>		\t\t Add the observation with given label" EOL
-	"-d<m>, --delete-model=<m>			\t\t Delete the model with given Id" EOL
-	"-D<o>, --delete-observation=<o>	\t\t Delete the observation with given label" EOL
+	"-a<m>, --add-model=<m>             Add the model with given name" EOL
+	"-A<o>, --add-observation=<o>       Add the observation with given label" EOL
+	"-d<m>, --delete-model=<m>          Delete the model with given Id" EOL
+	"-D<o>, --delete-observation=<o>    Delete the observation with given label" EOL
 
 	EOL
 
-	"-o,		--observations			\t\t Display observations retrieved from the input data" EOL
-	"-t<m>, 	--train-model<m>		\t\t Train the specific model with the input data" EOL
-	"-r<m1,m2>, --recognize=<m1,m2>		\t\t Recognize the input data using specified (csv) list of models (by default all models are used)" EOL
+	"-o,        --observations          Display observations retrieved from the input data" EOL
+	"-t<m>,     --train-model<m>        Train the specific model with the input data" EOL
+	"-r<m1,m2>, --recognize=<m1,m2>     Recognize the input data using specified (csv) list of models (by default all models are used)" EOL
 
 	EOL
 
-	"-g<filename>, --graph=<filename>	\t Create the RMS diagram based on the WAV data (requires -i) and store into the specified file (file name is optional)" EOL
-	"-s<filename>, --split=<dirname>	\t Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
+	"-g<filename>, --graph=<filename>   Create the RMS diagram based on the WAV data (requires -i) and store into the specified file (file name is optional)" EOL
+	"-s<filename>, --split=<dirname>    Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
 	EOL
 
 	"Notice, because of GetOpt restriction you must set optional parameters in the same way which you see in this manual."

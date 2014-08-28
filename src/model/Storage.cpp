@@ -12,7 +12,7 @@
 namespace yazz {
 namespace model {
 
-const char* Storage::STORAGE_FILE = "models.dat";
+const char* Storage::STORAGE_FILE = "hmm.dat";
 const char* Storage::STORAGE_HEADER = "YAZZ";
 
 Storage::Storage() {
@@ -39,7 +39,7 @@ Storage::~Storage() {
 
 bool Storage::init() {
 
-	// Check if already initialized
+	// Check if already initialised
 	if (NULL != this->models && NULL != this->codeBook) {
 		return true;
 	}
@@ -48,13 +48,13 @@ bool Storage::init() {
 	this->codeBook = new CodeBook();
 
 	if (access(STORAGE_FILE, F_OK) != -1) {
-		cout << "Loading models from the storage... " << endl;
+		cout << "...loading data from the storage..." << endl;
 
 		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::in /*| std::ios::binary*/);
+		fs.open(STORAGE_FILE, std::ios::in | std::ios::binary);
 
 		if (!fs.good()) {
-			cerr << "Can't access the model's storage :(" << endl;
+			cerr << "Can't access the data storage :(" << endl;
 			return false;
 		}
 
@@ -67,7 +67,10 @@ bool Storage::init() {
 
 		fs.read((char*) &this->maxId, sizeof(uint32_t));
 
-		for (uint32_t i = 0; i < this->maxId; i++) {
+		size_t modelsCnt;
+		fs.read((char*) &modelsCnt, sizeof(uint32_t));
+
+		for (uint32_t i = 0; i < modelsCnt; i++) {
 			HmModel* model = new HmModel();
 			fs >> *model;
 
@@ -83,10 +86,13 @@ bool Storage::init() {
 		cout << "Storage not found, creating an empty one... " << endl;
 
 		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::out /*| std::ios::binary*/);
+		fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
 
 		fs.write(STORAGE_HEADER, sizeof(char) * 4);
 		fs.write((char*) &this->maxId, sizeof(uint32_t));
+
+		size_t modelsCnt = 0;
+		fs.write((char*) &modelsCnt, sizeof(uint32_t));
 
 		fs.close();
 	}
@@ -123,15 +129,18 @@ void Storage::deleteLabel(observation_t label) {
 bool Storage::persist() {
 
 	std::fstream fs;
-	fs.open(STORAGE_FILE, std::ios::out /*| std::ios::binary*/);
+	fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
 
 	if (!fs.good()) {
-		cerr << "Can't access model's storage :(" << endl;
+		cerr << "Can't access the data storage :(" << endl;
 		return false;
 	}
 
 	fs.write(STORAGE_HEADER, sizeof(char) * 4);
 	fs.write((char*) &this->maxId, sizeof(uint32_t));
+
+	size_t modelsCnt = this->models->size();
+	fs.write((char*) &modelsCnt, sizeof(uint32_t));
 
 	map<uint32_t, HmModel*>::const_iterator iter;
 	for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
@@ -142,7 +151,7 @@ bool Storage::persist() {
 	fs << *(this->codeBook);
 
 	fs.close();
-	cout << "done!" << endl;
+	cout << "...storage data successfully updated..." << endl;
 
 	return true;
 }

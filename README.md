@@ -36,8 +36,8 @@ I have samples of voices of 4 people (3 man and 1 women).
 
 Milestone
 ---------
-At the moment I'm working (sometimes) on implementing the basis (framework) of the application. It is supposed to be
-a lightweight console application which can recognize the limited dictionary by MFCC / DTW.
+~~At the moment I'm working (sometimes) on implementing the basis (framework) of the application. It is supposed to be
+a lightweight console application which can recognize the limited dictionary by MFCC / DTW.~~
 
 The second step is integration the C++ library into the Java/Android application. Just because I do believe that mobile
 technologies need this stuff more than console computers.
@@ -48,9 +48,4 @@ and make this project... finished? :)
 
 Command line
 ------------
-* Help:                             yazz -h
-* Listing all the available models: yazz -l
-* Splitting a source into samples:  yazz -i samples/female1.wav -s_split
-* Adding a sample into a model:     yazz -i samples/female1/1.wav -a odin
-* Recognition of a sample:          yazz -i samples/female1/1.wav -r
-* Unit tests:                       unit_tests --gtest_filter=MATH_MFCC*
+See help for details (yazz -h).

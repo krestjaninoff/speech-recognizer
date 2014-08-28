@@ -152,12 +152,12 @@ istream& operator>>(istream& fs, HmModel& obj) {
 
 void HmModel::print() {
 
-	cout << "Model '" << this->text << "' (id: " << this->id << ")";
+	cout << "[ID " << this->id << "] Model '" << this->text << "':";
 	cout << endl << endl;
 
 	cout << "States: ";
 	Printer::printVector(this->states, this->stateCnt);
-	cout << endl << endl;
+	cout << endl;
 
 	cout << "Observations: ";
 	Printer::printVector(this->observations, this->observationCnt);
@@ -183,11 +183,11 @@ void HmModel::check() {
 	for (size_t i = 0; i < this->stateCnt; i++) {
 		sum = 0;
 
-		for (size_t j = 0; j < this->observationCnt; j++) {
+		for (size_t j = 0; j < this->stateCnt; j++) {
 			sum += this->transitions[i][j];
 		}
 
-		assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
+		assert("Invalid transitions matrix: " && fabs(1 - sum) < numeric_limits<double>::epsilon());
 	}
 
 	// Check emission matrix
@@ -198,7 +198,7 @@ void HmModel::check() {
 			sum += this->emissions[i][j];
 		}
 
-		assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
+		assert("Invalid emissions matrix: " && fabs(1 - sum) < numeric_limits<double>::epsilon());
 	}
 
 	// Check initial state
@@ -206,7 +206,7 @@ void HmModel::check() {
 	for (size_t i = 0; i < this->stateCnt; i++) {
 		sum += this->initialDst[i];
 	}
-	assert(fabs(1 - sum) > numeric_limits<double>::epsilon());
+	assert("Invalid initial distribution" && fabs(1 - sum) < numeric_limits<double>::epsilon());
 }
 
 } /* namespace model */

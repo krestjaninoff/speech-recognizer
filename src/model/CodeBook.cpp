@@ -44,8 +44,8 @@ void CodeBook::addLabel(observation_t label, MfccEntry* mfccEntry) {
 		double* currentVector = mfccEntry->getData();
 
 		for (size_t i = 0; i < entry->avgVector->getSize(); i++) {
-			double diff = (avgVector[i] - currentVector[i]) / static_cast<double>(entry->samplesCnt);
-			avgVector[i] += diff;
+			double correctedValue = (avgVector[i] * entry->samplesCnt + currentVector[i]) / (entry->samplesCnt + 1);
+			avgVector[i] = correctedValue;
 		}
 
 		entry->samplesCnt++;
@@ -87,7 +87,7 @@ ostream& operator<<(ostream& fs, const CodeBook& obj) {
 	for (iterator = obj.book->begin(); iterator != obj.book->end(); iterator++) {
 		fs.write((char*)(&iterator->first), sizeof(observation_t));
 		fs.write((char*)(&iterator->second->samplesCnt), sizeof(uint16_t));
-		fs << iterator->second->avgVector;
+		fs << *iterator->second->avgVector;
 	}
 
 	return fs;
