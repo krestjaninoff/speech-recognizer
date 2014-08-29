@@ -46,7 +46,7 @@ double ForwardBackward::forward(const HmModel& model, const vector<observation_t
 	}
 
 	vector<observation_t>::const_iterator iter = data->begin();
-	for (; iter != data->end(); ++t, ++iter) {
+	for (++t, ++iter; iter != data->end(); t++, iter++) {
 		for (size_t j = 1; j < stateCnt; j++) {
 
 			double transitionSum = 0;

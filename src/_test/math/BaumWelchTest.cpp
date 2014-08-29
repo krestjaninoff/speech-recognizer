@@ -15,7 +15,7 @@ TEST(BAUM_WELCH, SIMPLE) {
 	HmModel* model = getModelOdin();
 
 	vector<observation_t> observations;
-	observations.push_back('a');
+	observations.push_back('o');
 	observations.push_back('d');
 	observations.push_back('i');
 	observations.push_back('n');
@@ -23,7 +23,7 @@ TEST(BAUM_WELCH, SIMPLE) {
 	// Model's attributes to check with
 	double** transitions = new double*[4] {
 		new double[4] {0.6, 0.4, 0.0, 0.0},
-		new double[4] {0.0, 0.5, 5.0, 0.0},
+		new double[4] {0.0, 0.5, 0.5, 0.0},
 		new double[4] {0.0, 0.0, 0.7, 0.3},
 		new double[4] {0.0, 0.0, 0.0, 1.0}
 	};

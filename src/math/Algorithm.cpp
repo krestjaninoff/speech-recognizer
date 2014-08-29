@@ -35,7 +35,7 @@ void Algorithm::initObservationsMap(map<observation_t, uint32_t>& observMap,
 
 double Algorithm::getObservProb(observation_t observation, size_t stateId,
 		double** emissions, map<observation_t, uint32_t>& observMap) {
-	double probability = 0;
+	double probability = 0.0;
 
 	int32_t index = observMap[observation];
 	if (index > 0) {
