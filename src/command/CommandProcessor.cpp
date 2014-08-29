@@ -139,6 +139,7 @@ bool CommandProcessor::process() {
 
 				case 'o':
 					ModelCommand::displayObservations(*this->context);
+					break;
 				case 't':
 					ModelCommand::trainModel(*this->context, optarg);
 					break;

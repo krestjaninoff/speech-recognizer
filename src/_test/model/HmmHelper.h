@@ -17,13 +17,13 @@ static HmModel* getModelOdin() {
 
 	double** transitions = new double*[4] {
 		new double[4] {0.6, 0.4, 0.0, 0.0},
-		new double[4] {0.0, 0.5, 5.0, 0.0},
+		new double[4] {0.0, 0.5, 0.5, 0.0},
 		new double[4] {0.0, 0.0, 0.7, 0.3},
 		new double[4] {0.0, 0.0, 0.0, 1.0}
 	};
 	double** emissions = new double*[4] {
 		new double[6] {0.5, 0.5, 0.0, 0.0, 0.0, 0.0},
-		new double[6] {0.0, 0.0, 0.1, 0.0, 0.0, 0.0},
+		new double[6] {0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
 		new double[6] {0.0, 0.0, 0.0, 0.5, 0.5, 0.0},
 		new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0}
 	};

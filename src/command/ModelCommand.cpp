@@ -252,7 +252,7 @@ void ModelCommand::displayObservations(Context& context) {
             context.getModelProcessor()->mfccToObservations(data);
 
     // Print results
-    cout << endl << "Observation: ";
+    cout << endl << "Observations: ";
     for(vector<observation_t>::const_iterator iter = observations->begin();
             iter != observations->end(); iter++) {
         cout << *iter << " ";
@@ -261,6 +261,9 @@ void ModelCommand::displayObservations(Context& context) {
 
     // Clean up
     delete observations;
+    for (vector<MfccEntry*>::const_iterator iter = data->begin(); iter != data->end(); ++iter) {
+		delete *iter;
+	}
     delete data;
 }
 
