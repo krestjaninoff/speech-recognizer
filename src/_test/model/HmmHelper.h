@@ -57,7 +57,7 @@ static HmModel* getModelDva() {
 		new double[6] {0.0, 0.0, 0.0, 0.0, 0.8, 0.2}
 	};
 
-	double* initialDst = new double[3] {1.0, 0.0, 0.0};
+	double* initialDst = new double[3] {0.9, 0.1, 0.0};
 
 	HmModel* model = new HmModel();
 	model->init(states, stateCnt, observations, observationCnt,

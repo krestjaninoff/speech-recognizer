@@ -8,7 +8,7 @@ using namespace std;
 using namespace yazz::model;
 using namespace yazz::math;
 
-TEST(FORWARD_BACKWARD, SIMPLE) {
+TEST(FORWARD_BACKWARD, FORWARD) {
 
 	const HmModel& modelOdin = *getModelOdin();
 	const HmModel& modelDva = *getModelDva();
@@ -24,9 +24,9 @@ TEST(FORWARD_BACKWARD, SIMPLE) {
 	double probabilityDva = ForwardBackward::forward(modelDva, observationsConst);
 	double probabilityTri = ForwardBackward::forward(modelTri, observationsConst);
 
-	double probabilityMin = min(min(probabilityOdin, probabilityDva), probabilityTri);
+	double probabilityMax = max(max(probabilityOdin, probabilityDva), probabilityTri);
 
-	EXPECT_EQ(probabilityDva, probabilityMin);
+	EXPECT_EQ(probabilityDva, probabilityMax);
 
 	delete &modelOdin;
 	delete &modelDva;

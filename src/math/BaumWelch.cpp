@@ -110,7 +110,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			vector<observation_t>::const_iterator iter = data->begin();
 			for (; iter != data->end(); ++t, ++iter) {
-				for (size_t j = 0; j < stateCnt; j++) {
+				for (size_t j = 1; j < stateCnt; j++) {
 
 					double transitionSum = 0;
 					for (size_t k = 0; k < stateCnt; k++) {

@@ -1,3 +1,4 @@
+#include "../config.h"
 #include <Algorithm.h>
 
 namespace yazz {
@@ -21,6 +22,14 @@ void Algorithm::initObservationsMap(map<observation_t, uint32_t>& observMap,
 		}
 
 		observMap[value] = index;
+	}
+
+	if (DEBUG_ENABLED) {
+		cout << "Observation map is: ";
+		for (map<observation_t, uint32_t>::iterator iter = observMap.begin(); iter != observMap.end(); ++iter) {
+			cout << (*iter).first << "->" << (*iter).second << " ";
+		}
+		cout << endl << endl;
 	}
 }
 

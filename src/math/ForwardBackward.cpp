@@ -1,4 +1,6 @@
+#include "../config.h"
 #include <assert.h>
+#include <Printer.h>
 #include <ForwardBackward.h>
 
 using namespace std;
@@ -37,9 +39,15 @@ double ForwardBackward::forward(const HmModel& model, const vector<observation_t
 				* getObservProb(observation, i, emissions, observMap);
 	}
 
+	if (DEBUG_ENABLED) {
+		cout << "Iteration " << t << ":" << endl;
+		Printer::printMatrix(a, stateCnt, data->size());
+		cout << endl;
+	}
+
 	vector<observation_t>::const_iterator iter = data->begin();
 	for (; iter != data->end(); ++t, ++iter) {
-		for (size_t j = 0; j < stateCnt; j++) {
+		for (size_t j = 1; j < stateCnt; j++) {
 
 			double transitionSum = 0;
 			for (size_t k = 0; k < stateCnt; k++) {
@@ -50,12 +58,23 @@ double ForwardBackward::forward(const HmModel& model, const vector<observation_t
 			a[j][t] = getObservProb(observation, j, emissions, observMap)
 					* transitionSum;
 		}
+
+		if (DEBUG_ENABLED) {
+			cout << "Iteration " << t << ":" << endl;
+			cout << endl;
+			Printer::printMatrix(a, stateCnt, data->size());
+			cout << endl;
+		}
 	}
 
 	double probability = 0.;
 	size_t tMax = data->size() - 1;
 	for (size_t i = 0; i < stateCnt; i++) {
 		probability += a[i][tMax];
+	}
+
+	if (DEBUG_ENABLED) {
+		cout << "Probability is: " << probability << endl;
 	}
 
 	// Clean up
