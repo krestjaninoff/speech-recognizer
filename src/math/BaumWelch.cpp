@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <math.h>
+#include <limits>
 #include <../config.h>
 #include <Printer.h>
 #include <BaumWelch.h>
@@ -171,7 +172,12 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 						sum += a[j][t] * b[j][t];
 					}
 
-					y[i][t] = a[i][t] * b[i][t] / sum;
+					if (sum > numeric_limits<double>::epsilon()) {
+						y[i][t] = a[i][t] * b[i][t] / sum;
+
+					} else {
+						y[i][t] = 0.;
+					}
 				}
 			}
 
@@ -196,9 +202,13 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 							}
 						}
 
-						e[i][j][t] = a[i][t] * transitions[i][j] * b[j][t + 1]
-								* getObservProb(value, j, emissions, observMap)
-								/ sum;
+						if (sum > numeric_limits<double>::epsilon()) {
+							e[i][j][t] = a[i][t] * transitions[i][j] * b[j][t + 1]
+									* getObservProb(value, j, emissions, observMap)
+									/ sum;
+						} else {
+							e[i][j][t] = 0.;
+						}
 					}
 				}
 			}
@@ -242,7 +252,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 						sumE += e[i][j][t];
 					}
 
-					double transitionNewValue = sumE / sumY;
+					double transitionNewValue = (sumY > numeric_limits<double>::epsilon()) ? sumE / sumY : 0.;
 					convergenceTransitions += fabs(	transitionNewValue - transitions[i][j]);
 					transitions[i][j] = transitionNewValue;
 				}
@@ -274,7 +284,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 						}
 					}
 
-					double emissionNewValue = sumYO / sumY;
+					double emissionNewValue = (sumY > numeric_limits<double>::epsilon()) ? sumYO / sumY : 0.;
 					convergenceEmissions += fabs(emissionNewValue - emissions[i][j]);
 					emissions[i][j] += emissionNewValue;
 				}

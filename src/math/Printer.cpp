@@ -45,16 +45,15 @@ void Printer::printMatrix(double** matrix, size_t sizeX, size_t sizeY) {
 void Printer::printMatrix3D(double*** matrix, size_t sizeX, size_t sizeY, size_t sizeZ) {
 	for (size_t i = 0; i < sizeX; i++) {
 		for (size_t j = 0; j < sizeY; j++) {
-			cout << "\t";
 
 			for (size_t l = 0; l < sizeZ; l++) {
 				cout << matrix[i][j][l];
 
 				if (l < sizeZ - 1) {
-					cout << ",\t";
+					cout << ", ";
 				}
-				cout << endl;
 			}
+			cout << endl;
 		}
 		cout << endl;
 	}

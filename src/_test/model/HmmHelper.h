@@ -95,4 +95,40 @@ static HmModel* getModelTri() {
 	return model;
 }
 
+/**
+ * @see http://www.learninglover.com/examples.php?id=48
+ */
+static HmModel* getModelCasino() {
+	string text = "casino";
+
+	size_t stateCnt = 5;
+	state_t* states = new state_t[5] {'a', 'b', 'c', 'd', 'e'};
+
+	size_t observationCnt = 12;
+	observation_t* observations = new observation_t[12] {
+		'1', '2', '3', '4', '5', '6'};
+
+	double** transitions = new double*[5] {
+		new double[5] {0.9, 0.025, 0.025, 0.025, 0.025},
+		new double[5] {0.025, 0.9, 0.025, 0.025, 0.025},
+		new double[5] {0.025, 0.025, 0.9, 0.025, 0.025},
+		new double[5] {0.025, 0.025, 0.025, 0.09, 0.025},
+		new double[5] {0.025, 0.025, 0.025, 0.025, 0.9}
+	};
+	double** emissions = new double*[5] {
+		new double[6] {0.1667, 0.1667, 0.1667, 0.1667, 0.1667, 0.1667},
+		new double[6] {0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.2857},
+		new double[6] {0.1250, 0.1250, 0.1250, 0.1250, 0.2500, 0.2500},
+		new double[6] {0.1111, 0.1111, 0.1111, 0.2222, 0.2222, 0.2222},
+		new double[6] {0.1000, 0.1000, 0.2000, 0.2000, 0.2000, 0.2000}
+	};
+	double* initialDst = new double[5] {0.2, 0.2, 0.2, 0.2, 0.2};
+
+	HmModel* model = new HmModel();
+	model->init(states, stateCnt, observations, observationCnt,
+			transitions, emissions, initialDst, text);
+
+	return model;
+}
+
 #endif /* HMMHELPER_H_ */
