@@ -1,6 +1,7 @@
 TODO:
 
 * Check algorithms (BaumWelch)
+- Fix SIMPLE_REVERSE test (add "normalization" for matrixes with zeros)
 - Refactor Baum-Welch: extract Forward/Backward logic
 - Add more BW test
 
