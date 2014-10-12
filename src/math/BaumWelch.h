@@ -22,11 +22,11 @@ public:
 
 private:
 
-	static void algorithm(size_t stateCnt, size_t observationsCnt, double* initialDst,
-			double** transitions, double** emissions,
-			const vector<observation_t>* data, observation_t* observations,
-			map<observation_t, uint32_t> observMap, double** a, double** b,
-			double** y, double*** e);
+	static void algorithm(size_t stateCnt, size_t observationsCnt,
+			double* initialDst, 	double** transitions, double** emissions,
+			const vector<observation_t>* sequence,
+			observation_t* observations, map<observation_t, uint32_t> observMap,
+			double** a, double** b, double** y, double*** e);
 
 	static uint32_t ITER_LIMIT;
 	static double CONVERGENCE_EPSILON;

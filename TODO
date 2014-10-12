@@ -1,7 +1,14 @@
 TODO:
 
 * Check algorithms (BaumWelch)
-* Create codebook and models (stubs)
+- Refactor Baum-Welch: extract Forward/Backward logic
+- Add more BW test
+
+* Change state/observation type to string
+
+* Create static states (alphabet) and observations (sounds)
+
+* Create codebook
                               
 
 Shelved tasks

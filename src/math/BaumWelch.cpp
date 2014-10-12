@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include <limits>
 #include <../config.h>
 #include <Printer.h>
@@ -15,12 +17,12 @@ namespace math {
  * Max iteration count
  */
 uint32_t BaumWelch::ITER_LIMIT = 50;
-double BaumWelch::CONVERGENCE_EPSILON = 1e-4;
+double BaumWelch::CONVERGENCE_EPSILON = 1e-2;
 
-void BaumWelch::perform(HmModel* model, const vector<observation_t>* data) {
+void BaumWelch::perform(HmModel* model, const vector<observation_t>* sequence) {
 
 	// Check
-	assert(data->size() > 0);
+	assert(sequence->size() > 0);
 
 	// Model data
 	size_t stateCnt = model->getStateCnt();
@@ -29,22 +31,25 @@ void BaumWelch::perform(HmModel* model, const vector<observation_t>* data) {
 
 	// Observations map
 	map<observation_t, uint32_t> observMap;
-	initObservationsMap(observMap, data, observations, observationsCnt);
+	initObservationsMap(observMap, sequence, observations, observationsCnt);
 
 	// Allocate memory
 	double** a = new double*[stateCnt];
 	for (size_t i = 0; i < stateCnt; i++) {
-		a[i] = new double[data->size()];
+		a[i] = new double[sequence->size()];
+		memset(a[i], 0, sequence->size());
 	}
 
 	double** b = new double*[stateCnt];
 	for (size_t i = 0; i < stateCnt; i++) {
-		b[i] = new double[data->size()];
+		b[i] = new double[sequence->size()];
+		memset(b[i], 0, sequence->size());
 	}
 
 	double** y = new double*[stateCnt];
 	for (size_t i = 0; i < stateCnt; i++) {
-		y[i] = new double[data->size()];
+		y[i] = new double[sequence->size()];
+		memset(y[i], 0, sequence->size());
 	}
 
 	double*** e = new double**[stateCnt];
@@ -52,14 +57,15 @@ void BaumWelch::perform(HmModel* model, const vector<observation_t>* data) {
 		e[i] = new double*[stateCnt];
 
 		for (size_t j = 0; j < stateCnt; j++) {
-			e[i][j] = new double[data->size()];
+			e[i][j] = new double[sequence->size()];
+			memset(e[i][j], 0, sequence->size());
 		}
 	}
 
 	// Perform the algorithm
 	algorithm(stateCnt, observationsCnt,
 			model->getInitialDst(), model->getTransitions(), model->getEmissions(),
-			data, observations, observMap, a, b, y, e);
+			sequence, observations, observMap, a, b, y, e);
 
 
 	// Clean up
@@ -89,8 +95,8 @@ void BaumWelch::perform(HmModel* model, const vector<observation_t>* data) {
 
 void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 		double* initialDst, double** transitions, double** emissions,
-		const vector<observation_t>* data, observation_t* observations,
-		map<observation_t, uint32_t> observMap,
+		const vector<observation_t>* sequence,
+		observation_t* observations, map<observation_t, uint32_t> observMap,
 		double** a, double** b, double** y, double*** e) {
 
 	double convergence = 0;
@@ -104,14 +110,14 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 		{
 			uint32_t t = 0;
 			for (size_t i = 0; i < stateCnt; i++) {
-				observation_t observation = (*data)[0];
+				observation_t observation = (*sequence)[0];
 				a[i][t] = initialDst[i]
 						* getObservProb(observation, i, emissions, observMap);
 			}
 
-			vector<observation_t>::const_iterator iter = data->begin();
-			for (t++, iter++; iter != data->end(); t++, iter++) {
-				for (size_t j = 1; j < stateCnt; j++) {
+			vector<observation_t>::const_iterator iter = sequence->begin();
+			for (t++, iter++; iter != sequence->end(); t++, iter++) {
+				for (size_t j = 0; j < stateCnt; j++) {
 
 					double transitionSum = 0;
 					for (size_t k = 0; k < stateCnt; k++) {
@@ -119,26 +125,26 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 					}
 
 					observation_t observation = *iter;
-					a[j][t] = getObservProb(observation, j, emissions, observMap)
-							* transitionSum;
+					double probability = getObservProb(observation, j, emissions, observMap);
+					a[j][t] = probability * transitionSum;
 				}
 			}
 
 			if (DEBUG_ENABLED) {
 				cout << "A matrix is:" << endl;
-				Printer::printMatrix(a, stateCnt, data->size());
+				Printer::printMatrix(a, stateCnt, sequence->size());
 				cout << endl;
 			}
 		}
 
 		// Backward part (define "b")
 		{
-			int32_t t = data->size() - 1;
+			int32_t t = sequence->size() - 1;
 			for (size_t i = 0; i < stateCnt; i++) {
 				b[i][t] = 1;
 			}
 
-			vector<observation_t>::const_iterator iter = data->end();
+			vector<observation_t>::const_iterator iter = sequence->end();
 			for (t--, iter--; t >= 0; t--, iter--) {
 				observation_t observation = *iter;
 
@@ -147,8 +153,8 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 					double transitionSum = 0;
 					for (size_t k = 0; k < stateCnt; k++) {
 
-						transitionSum += b[k][t + 1] * transitions[j][k]
-								* getObservProb(observation, j, emissions, observMap);
+						double probability = getObservProb(observation, k, emissions, observMap);
+						transitionSum += b[k][t + 1] * transitions[j][k] * probability;
 					}
 
 					b[j][t] = transitionSum;
@@ -157,7 +163,7 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 			if (DEBUG_ENABLED) {
 				cout << "B matrix is:" << endl;
-				Printer::printMatrix(b, stateCnt, data->size());
+				Printer::printMatrix(b, stateCnt, sequence->size());
 				cout << endl;
 			}
 		}
@@ -165,64 +171,54 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 		// Calculate interim parameters: y and e
 		{
 			for (size_t i = 0; i < stateCnt; i++) {
-				for (size_t t = 0; t < data->size(); t++) {
+				for (size_t t = 0; t < sequence->size(); t++) {
 					double sum = 0;
 
 					for (size_t j = 0; j < stateCnt; j++) {
 						sum += a[j][t] * b[j][t];
 					}
 
-					if (sum > numeric_limits<double>::epsilon()) {
-						y[i][t] = a[i][t] * b[i][t] / sum;
-
-					} else {
-						y[i][t] = 0.;
-					}
+					y[i][t] = a[i][t] * b[i][t] / sum;
 				}
 			}
 
 			if (DEBUG_ENABLED) {
 				cout << "Y matrix is:" << endl;
-				Printer::printMatrix(y, stateCnt, data->size());
+				Printer::printMatrix(y, stateCnt, sequence->size());
 				cout << endl;
 			}
 
 			for (size_t i = 0; i < stateCnt; i++) {
 				for (size_t j = 0; j < stateCnt; j++) {
 
-					for (size_t t = 0; t < data->size() - 1; t++) {
+					for (size_t t = 0; t < sequence->size() - 1; t++) {
 						double sum = 0;
 
-						observation_t value = (*data)[t + 1];
+						observation_t value = (*sequence)[t + 1];
 						for (size_t k = 0; k < stateCnt; k++) {
 							for (size_t l = 0; l < stateCnt; l++) {
 
-								sum += a[k][t] * transitions[k][l] * b[l][t + 1]
-										* getObservProb(value, l, emissions, observMap);
+								double probability = getObservProb(value, l, emissions, observMap);
+								sum += a[k][t] * transitions[k][l] * b[l][t + 1] * probability;
 							}
 						}
 
-						if (sum > numeric_limits<double>::epsilon()) {
-							e[i][j][t] = a[i][t] * transitions[i][j] * b[j][t + 1]
-									* getObservProb(value, j, emissions, observMap)
-									/ sum;
-						} else {
-							e[i][j][t] = 0.;
-						}
+						double probability = getObservProb(value, j, emissions, observMap);
+						e[i][j][t] = a[i][t] * transitions[i][j] * b[j][t + 1] * probability / sum;
 					}
 				}
 			}
 
 			if (DEBUG_ENABLED) {
 				cout << "E matrix is:" << endl;
-				Printer::printMatrix3D(e, stateCnt, stateCnt, data->size());
+				Printer::printMatrix3D(e, stateCnt, stateCnt, sequence->size());
 				cout << endl;
 			}
 		}
 
 		// Update the model
 		{
-			convergence = 0;
+			convergence = 0.;
 
 			// Initial distribution
 			double convergenceInitialDst = 0;
@@ -247,12 +243,12 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 
 					double sumY = 0;
 					double sumE = 0;
-					for (size_t t = 0; t < data->size() - 1; t++) {
+					for (size_t t = 0; t < sequence->size() - 1; t++) {
 						sumY += y[i][t];
 						sumE += e[i][j][t];
 					}
 
-					double transitionNewValue = (sumY > numeric_limits<double>::epsilon()) ? sumE / sumY : 0.;
+					double transitionNewValue = sumE / sumY;
 					convergenceTransitions += fabs(	transitionNewValue - transitions[i][j]);
 					transitions[i][j] = transitionNewValue;
 				}
@@ -271,22 +267,22 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 			for (size_t i = 0; i < stateCnt; i++) {
 
 				double sumY = 0;
-				for (size_t t = 0; t < data->size(); t++) {
+				for (size_t t = 0; t < sequence->size(); t++) {
 					sumY += y[i][t];
 				}
 
 				for (size_t j = 0; j < observationsCnt; j++) {
-					double sumYO = 0;
 
-					for (size_t t = 0; t < data->size(); t++) {
-						if (observations[j] == (*data)[t]) {
-							sumYO = y[i][t];
+					double sumYO = 0;
+					for (size_t t = 0; t < sequence->size(); t++) {
+						if (observations[j] == (*sequence)[t]) {
+							sumYO += y[i][t];
 						}
 					}
 
-					double emissionNewValue = (sumY > numeric_limits<double>::epsilon()) ? sumYO / sumY : 0.;
+					double emissionNewValue = sumYO / sumY;
 					convergenceEmissions += fabs(emissionNewValue - emissions[i][j]);
-					emissions[i][j] += emissionNewValue;
+					emissions[i][j] = emissionNewValue;
 				}
 			}
 			convergenceEmissions /= stateCnt * observationsCnt;
@@ -307,6 +303,9 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 			cout << "Iteration: " << iter << ", convergence: " << convergence << endl;
 		}
 		iter++;
+
+		//cout << "Next iteration?";
+		//char y; cin >> y;
 
 	} while (convergence > CONVERGENCE_EPSILON && iter < ITER_LIMIT);
 

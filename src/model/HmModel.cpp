@@ -9,6 +9,8 @@ using namespace yazz::math;
 namespace yazz {
 namespace model {
 
+const double MODEL_EPSILON = 1e-3; //numeric_limits<double>::epsilon()
+
 HmModel::HmModel() {
 	this->id = 0;
 
@@ -187,7 +189,7 @@ void HmModel::check() {
 			sum += this->transitions[i][j];
 		}
 
-		assert("Invalid transitions matrix: " && fabs(1 - sum) < numeric_limits<double>::epsilon());
+		assert("Invalid transitions matrix: " && fabs(1 - sum) < MODEL_EPSILON);
 	}
 
 	// Check emission matrix
@@ -198,7 +200,7 @@ void HmModel::check() {
 			sum += this->emissions[i][j];
 		}
 
-		assert("Invalid emissions matrix: " && fabs(1 - sum) < numeric_limits<double>::epsilon());
+		assert("Invalid emissions matrix: " && fabs(1 - sum) < MODEL_EPSILON);
 	}
 
 	// Check initial state
@@ -206,7 +208,7 @@ void HmModel::check() {
 	for (size_t i = 0; i < this->stateCnt; i++) {
 		sum += this->initialDst[i];
 	}
-	assert("Invalid initial distribution" && fabs(1 - sum) < numeric_limits<double>::epsilon());
+	assert("Invalid initial distribution" && fabs(1 - sum) < MODEL_EPSILON);
 }
 
 } /* namespace model */

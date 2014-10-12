@@ -4,65 +4,84 @@
 #include "../../config.h"
 #include "../../math/BaumWelch.h"
 #include "../model/HmmHelper.h"
+#include <vector>
 
 using namespace yazz;
 using namespace yazz::model;
 using namespace yazz::math;
+using namespace std;
 
+const double HMM_TEST_EPSILON = 1e-2;
+
+static void checkModel(HmModel* model, double** transitionsX, double** emissionsX,
+		double* initialDstX);
+
+/**
+ * The simplest test
+ */
 TEST(BAUM_WELCH, SIMPLE) {
+	string text = "test";
 
-	// Source model
-	HmModel* model = getModelOdin();
+	size_t stateCnt = 2;
+	state_t* states = new state_t[2] {'s', 't'};
 
-	vector<observation_t> observations;
-	observations.push_back('6');
-	observations.push_back('3');
-	observations.push_back('2');
-	observations.push_back('3');
-	observations.push_back('3');
-	observations.push_back('4');
-	observations.push_back('4');
-	observations.push_back('6');
-	observations.push_back('6');
-	observations.push_back('4');
-	observations.push_back('3');
-	observations.push_back('5');
+	size_t observationCnt = 2;
+	observation_t* observations = new observation_t[2] {'A', 'B'};
+
+	double** transitions = new double*[2] {
+		new double[2] {0.3, 0.7},
+		new double[2] {0.1, 0.9}
+	};
+	double** emissions = new double*[2] {
+		new double[2] {0.4, 0.6},
+		new double[2] {0.5, 0.5}
+	};
+	double* initialDst = new double[2] {0.85, 0.15};
+
+	HmModel* model = new HmModel();
+	model->init(states, stateCnt, observations, observationCnt,
+			transitions, emissions, initialDst, text);
+
+	vector<observation_t> sequence;
+	sequence.push_back('A');
+	sequence.push_back('B');
+	sequence.push_back('B');
+	sequence.push_back('A');
 
 	// Model's attributes to check with
-	double** transitions = new double*[5] {
-		new double[5] {0.8718, 0.0252, 0.0219, 0.0336, 0.0475},
-		new double[5] {0.0258, 0.8728, 0.0217, 0.0314, 0.0483},
-		new double[5] {0.0306, 0.0280, 0.8489, 0.0349, 0.0576},
-		new double[5] {0.0214, 0.0203, 0.0194, 0.9008, 0.0381},
-		new double[5] {0.0143, 0.0147, 0.0141, 0.0195, 0.9374}
+	double** transitionsX = new double*[2] {
+		new double[2] {0.0, 1.0},
+		new double[2] {0.47, 0.53}
 	};
-	double** emissions = new double*[5] {
-		new double[6] {0.0000, 0.1043, 0.3663, 0.2274, 0.0741, 0.2280},
-		new double[6] {0.0000, 0.0942, 0.3376, 0.2308, 0.0680, 0.2694},
-		new double[6] {0.0000, 0.0796, 0.3201, 0.2168, 0.1156, 0.2680},
-		new double[6] {0.0000, 0.0594, 0.2889, 0.2845, 0.1027, 0.2645},
-		new double[6] {0.0000, 0.0810, 0.3397, 0.2616, 0.0779, 0.2399}
+	double** emissionsX = new double*[2] {
+		new double[2] {1.0, 0.0},
+		new double[2] {0.02, 0.97}
 	};
-	double* initialDst = new double[5] {0.1789,	0.2195,	0.1230,	0.1262,	0.3524};
+	double* initialDstX = new double[2] {1.0, 0.0};
 
 	// Run the algorithm
-	const vector<observation_t>* observationsConst = &observations;
+	const vector<observation_t>* observationsConst = &sequence;
 	BaumWelch::perform(model, observationsConst);
 
-	// Check results
+	// Check the results
+	checkModel(model, transitionsX, emissionsX, initialDstX);
+}
+
+static void checkModel(HmModel* model, double** transitionsX, double** emissionsX,
+		double* initialDstX) {
 	for (size_t i = 0; i < model->getStateCnt(); i++) {
 		for (size_t j = 0; j < model->getStateCnt(); j++) {
-			EXPECT_NEAR(model->getTransitions()[i][j], transitions[i][j], EPS_TEST);
+			EXPECT_NEAR(model->getTransitions()[i][j], transitionsX[i][j], HMM_TEST_EPSILON);
 		}
 	}
 
 	for (size_t i = 0; i < model->getStateCnt(); i++) {
 		for (size_t j = 0; j < model->getObservationCnt(); j++) {
-			EXPECT_NEAR(model->getEmissions()[i][j], emissions[i][j], EPS_TEST);
+			EXPECT_NEAR(model->getEmissions()[i][j], emissionsX[i][j], HMM_TEST_EPSILON);
 		}
 	}
 
 	for (size_t i = 0; i < model->getStateCnt(); i++) {
-		EXPECT_NEAR(model->getInitialDst()[i], initialDst[i], EPS_TEST);
+		EXPECT_NEAR(model->getInitialDst()[i], initialDstX[i], HMM_TEST_EPSILON);
 	}
 }
