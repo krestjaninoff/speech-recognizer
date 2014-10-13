@@ -15,9 +15,9 @@ TEST(FORWARD_BACKWARD, FORWARD) {
 	const HmModel& modelTri = *getModelTri();
 
 	vector<observation_t> observations;
-	observations.push_back('t');
-	observations.push_back('w');
-	observations.push_back('a');
+	observations.push_back("т");
+	observations.push_back("в");
+	observations.push_back("а");
 	const vector<observation_t>* observationsConst = &observations;
 
 	double probabilityOdin = ForwardBackward::calcPossibility(modelOdin, observationsConst);

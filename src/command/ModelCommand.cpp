@@ -1,11 +1,12 @@
 #include <HmModel.h>
 #include <ModelCommand.h>
-#include "../audio/Processor.h"
-#include "../model/Processor.h"
-#include <string.h>
 #include <Storage.h>
 #include <WavData.h>
 #include <Word.h>
+#include <Alphabet.h>
+#include "../audio/Processor.h"
+#include "../model/Processor.h"
+#include <string.h>
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
@@ -41,8 +42,8 @@ void ModelCommand::printObservation(Context& context, const char* observation) {
 
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
-	if (book->count(*observation) > 0) {
-		CodeBookEntry* entry = book->at(*observation);
+	if (book->count(observation) > 0) {
+		CodeBookEntry* entry = book->at(observation);
 
 		cout << "Observation '" << observation << "' is based on " << entry->samplesCnt << " samples: ";
 		entry->avgVector->print();
@@ -54,6 +55,7 @@ void ModelCommand::printObservation(Context& context, const char* observation) {
 }
 
 void ModelCommand::addObservation(Context& context, const char* observation) {
+	string observationStr(observation);
 
 	// Notice, that by adding an observation with the name which already exists in the Codebook
 	// we just average its value. Hence, we don't need to check uniqueness of the observation.
@@ -77,7 +79,7 @@ void ModelCommand::addObservation(Context& context, const char* observation) {
 
 	// Add or update the observation
 	MfccEntry* mfcc = new MfccEntry(data, MFCC_SIZE);
-	context.getStorage()->addLabel(*observation, mfcc);
+	context.getStorage()->addLabel(observationStr, mfcc);
 	context.getStorage()->persist();
 
 	cout << "The observation was successfully added!" << endl;
@@ -87,8 +89,8 @@ void ModelCommand::deleteObservation(Context& context, const char* observation) 
 
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
-	if (book->count(*observation) > 0) {
-		context.getStorage()->deleteLabel(*observation);
+	if (book->count(observation) > 0) {
+		context.getStorage()->deleteLabel(observation);
 		context.getStorage()->persist();
 
 		cout << "Observation '" << observation << "' was deleted from the CodeBook" << endl;
@@ -135,6 +137,7 @@ void ModelCommand::printModel(Context& context, const char* modelIdStr) {
 	}
 }
 
+// TODO Refactor states/observation + model input strategy
 void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Notice, that we can have a lot of models for the same value.
@@ -216,8 +219,7 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Create and save the model
 	HmModel* model = new HmModel();
-	model->init(states, statesCnt, observations, observationCnt, transitions,
-	        emissions, initialDist, modelName);
+	model->init(LETTERS, SOUNDS, transitions, emissions, initialDist, modelName);
 
 	context.getStorage()->addModel(model);
 	context.getStorage()->persist();

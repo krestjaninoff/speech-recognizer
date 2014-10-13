@@ -29,10 +29,10 @@ HmModel::HmModel() {
 
 HmModel::~HmModel() {
 	if (NULL != this->states) {
-		delete [] this->states;
+		delete this->states;
 	}
 	if (NULL != this->observations) {
-		delete [] this->observations;
+		delete this->observations;
 	}
 
 	if (NULL != this->transitions) {
@@ -54,15 +54,15 @@ HmModel::~HmModel() {
 	}
 }
 
-void HmModel::init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
+void HmModel::init(vector<state_t> states, const vector<observation_t> observations,
 			double** transitions, double** emissions, double* initialDst, string text) {
 	this->id = 0;
 
-	this->states = states;
-	this->stateCnt = stateCnt;
+	this->states = new vector<state_t>(states);
+	this->stateCnt = states.size();
 
-	this->observations = observations;
-	this->observationCnt = observationCnt;
+	this->observations = new vector<observation_t>(observations);
+	this->observationCnt = observations.size();
 
 	this->transitions = transitions;
 	this->emissions = emissions;
@@ -83,12 +83,14 @@ ostream& operator<<(ostream& fs, const HmModel& obj) {
 	fs.write(&obj.text[0], sizeof(char) * textSize);
 
 	fs.write((char*)(&obj.stateCnt), sizeof(size_t));
-	fs.write(reinterpret_cast<char*>(obj.states),
-			streamsize(obj.stateCnt * sizeof(state_t)));
+	for (size_t i = 0; i < obj.stateCnt; i++) {
+		fs << (*obj.states)[i];
+	}
 
 	fs.write((char*)(&obj.observationCnt), sizeof(size_t));
-	fs.write(reinterpret_cast<char*>(obj.observations),
-			streamsize(obj.observationCnt * sizeof(observation_t)));
+	for (size_t i = 0; i < obj.observationCnt; i++) {
+		fs << (*obj.observations)[i];
+	}
 
 	for (size_t i = 0; i < obj.stateCnt; i++) {
 		fs.write(reinterpret_cast<char*>(obj.transitions[i]),
@@ -107,6 +109,7 @@ ostream& operator<<(ostream& fs, const HmModel& obj) {
 }
 
 istream& operator>>(istream& fs, HmModel& obj) {
+	string tmp;
 
 	fs.read((char*)(&obj.id), sizeof(uint32_t));
 
@@ -121,14 +124,20 @@ istream& operator>>(istream& fs, HmModel& obj) {
 	obj.text = textString;
 
 	fs.read((char*)(&obj.stateCnt), sizeof(size_t));
-	obj.states = new state_t[obj.stateCnt];
-	fs.read(reinterpret_cast<char*>(obj.states),
-			streamsize(obj.stateCnt * sizeof(state_t)));
+	vector<string>* statesTmp = new vector<string>(obj.stateCnt);
+	for (size_t i = 0; i < obj.stateCnt; i++) {
+		fs >> tmp;
+		statesTmp->push_back(tmp);
+	}
+	obj.states = statesTmp;
 
 	fs.read((char*)(&obj.observationCnt), sizeof(size_t));
-	obj.observations = new observation_t[obj.observationCnt];
-	fs.read(reinterpret_cast<char*>(obj.observations),
-			streamsize(obj.observationCnt * sizeof(observation_t)));
+	vector<string>* observationsTmp = new vector<string>(obj.observationCnt);
+	for (size_t i = 0; i < obj.observationCnt; i++) {
+		fs >> tmp;
+		observationsTmp->push_back(tmp);
+	}
+	obj.observations = observationsTmp;
 
 	obj.transitions = new double*[obj.stateCnt];
 	for (size_t i = 0; i < obj.stateCnt; i++) {
@@ -159,11 +168,11 @@ void HmModel::print() {
 	cout << endl << endl;
 
 	cout << "States: ";
-	Printer::printVector(this->states, this->stateCnt);
+	Printer::printVector(*this->states, this->stateCnt);
 	cout << endl;
 
 	cout << "Observations: ";
-	Printer::printVector(this->observations, this->observationCnt);
+	Printer::printVector(*this->observations, this->observationCnt);
 	cout << endl << endl;
 
 	cout << "Transitions:" << endl;

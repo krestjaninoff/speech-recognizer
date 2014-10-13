@@ -1,18 +1,16 @@
 #ifndef HMMHELPER_H_
 #define HMMHELPER_H_
 
+#include <Alphabet.h>
 #include <HmModel.h>
 
 using namespace yazz::model;
 
 static HmModel* getModelOdin() {
-	string text = "odin";
+	string text = "один";
 
-	size_t stateCnt = 4;
-	state_t* states = new state_t[4] {'o', 'd', 'i', 'n'};
-
-	size_t observationCnt = 6;
-	observation_t* observations = new observation_t[6] {'a', 'o', 'd', 'i', 'y', 'n'};
+	const vector<string> states = {"о", "д", "и", "н"};
+	const vector<string> observations = {"а", "о", "д", "и", "ы", "н"};
 
 	double** transitions = new double*[4] {
 		new double[4] {0.6, 0.4, 0.0, 0.0},
@@ -30,20 +28,17 @@ static HmModel* getModelOdin() {
 	double* initialDst = new double[4] {1.0, 0.0, 0.0, 0.0};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	return model;
 }
 
 static HmModel* getModelDva() {
-	string text = "dva";
+	string text = "два";
 
-	size_t stateCnt = 3;
-	state_t* states = new state_t[3] {'d', 'v', 'a'};
-
-	size_t observationCnt = 6;
-	observation_t* observations = new observation_t[6] {'d', 't', 'v', 'w', 'a', 'r'};
+	const vector<string> states = {"д", "в", "а"};
+	const vector<string> observations = {"д", "т", "в", "ф", "а", "о"};
 
 	double** transitions = new double*[3] {
 		new double[3] {0.5, 0.5, 0.0},
@@ -59,20 +54,17 @@ static HmModel* getModelDva() {
 	double* initialDst = new double[3] {0.9, 0.1, 0.0};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	return model;
 }
 
 static HmModel* getModelTri() {
-	string text = "tri";
+	string text = "три";
 
-	size_t stateCnt = 3;
-	state_t* states = new state_t[3] {'t', 'r', 'i'};
-
-	size_t observationCnt = 4;
-	observation_t* observations = new observation_t[4] {'t', 'r', 'i', 'y'};
+	const vector<string> states = {"т", "р", "и"};
+	const vector<string> observations = {"т", "р", "и", "ы"};
 
 	double** transitions = new double*[3] {
 		new double[3] {0.2, 0.8, 0.0},
@@ -88,7 +80,7 @@ static HmModel* getModelTri() {
 	double* initialDst = new double[3] {1.0, 0.0, 0.0};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	return model;

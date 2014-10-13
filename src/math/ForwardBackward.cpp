@@ -91,7 +91,7 @@ double ForwardBackward::calcPossibility(const HmModel& model, const vector<obser
 	// Model data
 	size_t stateCnt = model.getStateCnt();
 	size_t observationsCnt = model.getObservationCnt();
-	observation_t* observations = model.getObservations();
+	const vector<observation_t>* observations = model.getObservations();
 	double* initialDst = model.getInitialDst();
 	double** transitions = model.getTransitions();
 	double** emissions = model.getEmissions();

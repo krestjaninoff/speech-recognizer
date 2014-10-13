@@ -24,11 +24,8 @@ static void cleanUp(HmModel* model, double** transitionsX, double** emissionsX,
 TEST(BAUM_WELCH, SIMPLE) {
 	string text = "test";
 
-	size_t stateCnt = 2;
-	state_t* states = new state_t[2] {'s', 't'};
-
-	size_t observationCnt = 2;
-	observation_t* observations = new observation_t[2] {'A', 'B'};
+	const vector<string> states = {"s", "t"};
+	const vector<string> observations = {"A", "B"};
 
 	double** transitions = new double*[2] {
 		new double[2] {0.3, 0.7},
@@ -41,14 +38,14 @@ TEST(BAUM_WELCH, SIMPLE) {
 	double* initialDst = new double[2] {0.85, 0.15};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	vector<observation_t> sequence;
-	sequence.push_back('A');
-	sequence.push_back('B');
-	sequence.push_back('B');
-	sequence.push_back('A');
+	sequence.push_back("A");
+	sequence.push_back("B");
+	sequence.push_back("B");
+	sequence.push_back("A");
 
 	// Model's attributes to check with
 	double** transitionsX = new double*[2] {
@@ -76,11 +73,8 @@ TEST(BAUM_WELCH, SIMPLE) {
 TEST(BAUM_WELCH, SIMPLE_EQUALS) {
 	string text = "test";
 
-	size_t stateCnt = 2;
-	state_t* states = new state_t[2] {'s', 't'};
-
-	size_t observationCnt = 2;
-	observation_t* observations = new observation_t[2] {'A', 'B'};
+	const vector<string> states = {"s", "t"};
+	const vector<string> observations = {"A", "B"};
 
 	double** transitions = new double*[2] {
 		new double[2] {0.0, 1.0},
@@ -93,14 +87,14 @@ TEST(BAUM_WELCH, SIMPLE_EQUALS) {
 	double* initialDst = new double[2] {1.0, 0.0};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	vector<observation_t> sequence;
-	sequence.push_back('A');
-	sequence.push_back('B');
-	sequence.push_back('B');
-	sequence.push_back('A');
+	sequence.push_back("A");
+	sequence.push_back("B");
+	sequence.push_back("B");
+	sequence.push_back("A");
 
 	// Model's attributes to check with
 	double** transitionsX = new double*[2] {
@@ -132,11 +126,8 @@ TEST(BAUM_WELCH, SIMPLE_EQUALS) {
 TEST(BAUM_WELCH, SIMPLE_REVERSE) {
 	string text = "test";
 
-	size_t stateCnt = 2;
-	state_t* states = new state_t[2] {'s', 't'};
-
-	size_t observationCnt = 2;
-	observation_t* observations = new observation_t[2] {'A', 'B'};
+	const vector<string> states = {"s", "t"};
+	const vector<string> observations = {"A", "B"};
 
 	double** transitions = new double*[2] {
 		new double[2] {0.4, 0.6},
@@ -149,14 +140,14 @@ TEST(BAUM_WELCH, SIMPLE_REVERSE) {
 	double* initialDst = new double[2] {0.6, 0.4};
 
 	HmModel* model = new HmModel();
-	model->init(states, stateCnt, observations, observationCnt,
+	model->init(states, observations,
 			transitions, emissions, initialDst, text);
 
 	vector<observation_t> sequence;
-	sequence.push_back('A');
-	sequence.push_back('B');
-	sequence.push_back('B');
-	sequence.push_back('A');
+	sequence.push_back("A");
+	sequence.push_back("B");
+	sequence.push_back("B");
+	sequence.push_back("A");
 
 	// Model's attributes to check with
 	double** transitionsX = new double*[2] {

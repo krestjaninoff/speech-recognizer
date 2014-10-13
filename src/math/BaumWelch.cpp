@@ -28,7 +28,7 @@ void BaumWelch::perform(HmModel* model, const vector<observation_t>* sequence) {
 	// Model data
 	size_t stateCnt = model->getStateCnt();
 	size_t observationsCnt = model->getObservationCnt();
-	observation_t* observations = model->getObservations();
+	const vector<observation_t>* observations = model->getObservations();
 
 	// Observations map
 	map<observation_t, uint32_t> observMap;
@@ -154,8 +154,8 @@ void BaumWelch::calculateXi(size_t stateCnt, double** transitions,
 double BaumWelch::updateModel(size_t stateCnt, size_t observationsCnt,
 		double* initialDst, double** transitions, double** emissions,
 		const vector<observation_t>* sequence,
-		observation_t* observations, map<observation_t, uint32_t>& observMap,
-		double** a, double** b,	double** y, double*** e) {
+		const vector<observation_t>* observations,
+		double** y, double*** e) {
 	double convergence = 0.;
 
 	// Initial distribution
@@ -213,7 +213,7 @@ double BaumWelch::updateModel(size_t stateCnt, size_t observationsCnt,
 
 			double sumYO = 0;
 			for (size_t t = 0; t < sequence->size(); t++) {
-				if (observations[j] == (*sequence)[t]) {
+				if ((*observations)[j] == (*sequence)[t]) {
 					sumYO += y[i][t];
 				}
 			}
@@ -242,7 +242,7 @@ double BaumWelch::updateModel(size_t stateCnt, size_t observationsCnt,
 void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 		double* initialDst, double** transitions, double** emissions,
 		const vector<observation_t>* sequence,
-		observation_t* observations, map<observation_t, uint32_t> observMap,
+		const vector<observation_t>* observations, map<observation_t, uint32_t> observMap,
 		double** a, double** b, double** y, double*** e) {
 
 	double convergence = 0;
@@ -276,8 +276,8 @@ void BaumWelch::algorithm(size_t stateCnt, size_t observationsCnt,
 		convergence = updateModel(stateCnt, observationsCnt,
 				initialDst, transitions, emissions,
 				sequence,
-				observations, observMap,
-				a, b, y, e);
+				observations,
+				y, e);
 
 		if (DEBUG_ENABLED) {
 			cout << "Total convergence: " << convergence << endl << endl;

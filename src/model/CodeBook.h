@@ -44,7 +44,7 @@ public:
 	/**
 	 * Default value for unrecognised MFCC samples
 	 */
-	static const char UNKNOWN_VALUE;
+	static const string UNKNOWN_VALUE;
 
 private:
 	map<observation_t, CodeBookEntry*>* book;

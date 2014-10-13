@@ -1,5 +1,6 @@
 #include "../config.h"
 #include <assert.h>
+#include <string>
 #include <Algorithm.h>
 
 namespace yazz {
@@ -8,17 +9,17 @@ namespace math {
 const int32_t INVALID_INDEX = -1;
 
 void Algorithm::initObservationsMap(map<observation_t, uint32_t>& observMap,
-		const vector<observation_t>* data,
-		observation_t* observations, size_t observationsCnt) {
+		const vector<observation_t>* sequence,
+		const vector<observation_t>* observations, size_t observationsCnt) {
 
-	for (vector<observation_t>::const_iterator iter = data->begin();
-			iter != data->end(); iter++) {
+	for (vector<observation_t>::const_iterator iter = sequence->begin();
+			iter != sequence->end(); iter++) {
 
 		observation_t value = *iter;
 		int32_t index = INVALID_INDEX;
 
 		for (uint32_t i = 0; i < observationsCnt; i++) {
-			if (value == observations[i]) {
+			if (0 == value.compare((*observations)[i])) {
 				index = i;
 				break;
 			}

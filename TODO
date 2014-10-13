@@ -1,8 +1,8 @@
 TODO:
 
-* Change state/observation type to string
-
 * Create static states (alphabet) and observations (sounds)
+** Add an alphabet test
+** Change model input strategy
 
 * Create codebook
                               

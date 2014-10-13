@@ -19,8 +19,8 @@ class Algorithm {
 protected:
 
 	static void initObservationsMap(map<observation_t, uint32_t>& observMap,
-			const vector<observation_t>* data,
-			observation_t* observations, size_t observationsCnt);
+			const vector<observation_t>* sequence,
+			const vector<observation_t>* observations, size_t observationsCnt);
 
 	static double getObservProb(observation_t observation, uint32_t stateId,
 			double** emissions, map<observation_t, uint32_t>& observMap);

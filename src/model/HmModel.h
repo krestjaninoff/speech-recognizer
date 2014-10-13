@@ -2,6 +2,7 @@
 #define HMMODEL_H_
 
 #include <iostream>
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -10,8 +11,8 @@ namespace yazz {
 namespace model {
 
 // Define special types for HMM states and observations
-typedef char state_t;
-typedef char observation_t;
+typedef string state_t;
+typedef string observation_t;
 
 /**
  * Hidden Markov Model
@@ -23,16 +24,17 @@ public:
 	HmModel();
 	~HmModel();
 
-	void init(state_t* states, size_t stateCnt, observation_t* observations, size_t observationCnt,
-			double** transitions, double** emissions, double* initialDst, string text);
+	void init(vector<state_t> states, vector<observation_t>,
+			double** transitions, double** emissions, double* initialDst,
+			string text);
 
 	uint32_t getId() const { return this->id; }
 	void setId(uint32_t id) { this->id = id; }
 
-	state_t* getStates() const { return this->states; }
+	const vector<state_t>* getStates() const { return this->states; }
 	size_t getStateCnt() const { return this->stateCnt; }
 
-	observation_t* getObservations() const { return this->observations; }
+	const vector<observation_t>* getObservations() const { return this->observations; }
 	size_t getObservationCnt() const { return this->observationCnt; }
 
 	double** getTransitions() const { return this->transitions; }
@@ -49,10 +51,10 @@ public:
 private:
 	uint32_t id;
 
-	state_t* states;
+	const vector<state_t>* states;
 	size_t stateCnt;
 
-	observation_t* observations;
+	const vector<observation_t>* observations;
 	size_t observationCnt;
 
 	double** transitions;	// stateCnt * stateCnt

@@ -2,11 +2,12 @@
 #include <CodeBook.h>
 #include "../math/Basic.h"
 #include <math.h>
+#include <string.h>
 
 namespace yazz {
 namespace model {
 
-const char CodeBook::UNKNOWN_VALUE = '?';
+const string CodeBook::UNKNOWN_VALUE = "?";
 
 CodeBook::CodeBook() {
 	this->book = new std::map<observation_t, CodeBookEntry*>();
@@ -68,7 +69,7 @@ observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 				currentMfccEntry->getData(), MFCC_SIZE);
 
 		if (fabs(distance) < CODEBOOK_THRESHOLD) {
-			if ('\0' == label || minDistance > distance) {
+			if (0 == UNKNOWN_VALUE.compare(label) || minDistance > distance) {
 				minDistance = distance;
 				label = iterator->first;
 			}
