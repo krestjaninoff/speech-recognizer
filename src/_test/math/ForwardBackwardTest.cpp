@@ -20,9 +20,9 @@ TEST(FORWARD_BACKWARD, FORWARD) {
 	observations.push_back('a');
 	const vector<observation_t>* observationsConst = &observations;
 
-	double probabilityOdin = ForwardBackward::forward(modelOdin, observationsConst);
-	double probabilityDva = ForwardBackward::forward(modelDva, observationsConst);
-	double probabilityTri = ForwardBackward::forward(modelTri, observationsConst);
+	double probabilityOdin = ForwardBackward::calcPossibility(modelOdin, observationsConst);
+	double probabilityDva = ForwardBackward::calcPossibility(modelDva, observationsConst);
+	double probabilityTri = ForwardBackward::calcPossibility(modelTri, observationsConst);
 
 	double probabilityMax = max(max(probabilityOdin, probabilityDva), probabilityTri);
 

@@ -9,7 +9,7 @@ using namespace yazz::math;
 namespace yazz {
 namespace model {
 
-const double MODEL_EPSILON = 1e-3; //numeric_limits<double>::epsilon()
+const double MODEL_EPSILON = 1e-4; //numeric_limits<double>::epsilon()
 
 HmModel::HmModel() {
 	this->id = 0;
@@ -71,6 +71,7 @@ void HmModel::init(state_t* states, size_t stateCnt, observation_t* observations
 	this->text = text;
 
 	this->check();
+	this->normalize();
 }
 
 ostream& operator<<(ostream& fs, const HmModel& obj) {
@@ -209,6 +210,39 @@ void HmModel::check() {
 		sum += this->initialDst[i];
 	}
 	assert("Invalid initial distribution" && fabs(1 - sum) < MODEL_EPSILON);
+}
+
+void HmModel::normalize() {
+
+	normalizeVector(this->initialDst, this->stateCnt);
+
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		normalizeVector(this->transitions[i], this->stateCnt);
+	}
+	for (size_t i = 0; i < this->stateCnt; i++) {
+		normalizeVector(this->emissions[i], this->observationCnt);
+	}
+}
+
+void HmModel::normalizeVector(double* vector, size_t size) {
+
+	size_t zeroCnt = 0;
+	for (size_t i = 0; i < size; i++) {
+
+		if (vector[i] < MODEL_EPSILON) {
+			zeroCnt++;
+		}
+	}
+
+	double decreaseVal = zeroCnt * MODEL_EPSILON / (size - zeroCnt);
+	for (size_t i = 0; i < size; i++) {
+
+		if (vector[i] < MODEL_EPSILON) {
+			vector[i] = MODEL_EPSILON;
+		} else {
+			vector[i] -= decreaseVal;
+		}
+	}
 }
 
 } /* namespace model */

@@ -28,6 +28,20 @@ private:
 			observation_t* observations, map<observation_t, uint32_t> observMap,
 			double** a, double** b, double** y, double*** e);
 
+	static void calculateGamma(size_t stateCnt, const vector<observation_t>* sequence,
+			double** a, double** b, double** y);
+
+	static void calculateXi(size_t stateCnt, double** transitions, double** emissions,
+			const vector<observation_t>* sequence,
+			map<observation_t, uint32_t>& observMap, double** a, double** b,
+			double*** e);
+
+	static double updateModel(size_t stateCnt, size_t observationsCnt,
+			double* initialDst, double** transitions, double** emissions,
+			const vector<observation_t>* sequence,
+			observation_t* observations, map<observation_t, uint32_t>& observMap,
+			double** a, double** b,	double** y, double*** e);
+
 	static uint32_t ITER_LIMIT;
 	static double CONVERGENCE_EPSILON;
 };

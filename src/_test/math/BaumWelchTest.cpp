@@ -53,11 +53,11 @@ TEST(BAUM_WELCH, SIMPLE) {
 	// Model's attributes to check with
 	double** transitionsX = new double*[2] {
 		new double[2] {0.0, 1.0},
-		new double[2] {0.47, 0.53}
+		new double[2] {0.49, 0.51}
 	};
 	double** emissionsX = new double*[2] {
 		new double[2] {1.0, 0.0},
-		new double[2] {0.02, 0.97}
+		new double[2] {0.01, 0.99}
 	};
 	double* initialDstX = new double[2] {1.0, 0.0};
 
@@ -124,6 +124,10 @@ TEST(BAUM_WELCH, SIMPLE_EQUALS) {
 
 /**
  * The simplest test (initial data is opposite to actual values)
+ * <p>
+ * Notice, Baum-Welch algorithm searches for LOCAL maximums. That means
+ * optimal solution can't be found if the original model is quite for from
+ * the optimal one. So, we can test only 'close' solutions.
  */
 TEST(BAUM_WELCH, SIMPLE_REVERSE) {
 	string text = "test";
@@ -135,14 +139,14 @@ TEST(BAUM_WELCH, SIMPLE_REVERSE) {
 	observation_t* observations = new observation_t[2] {'A', 'B'};
 
 	double** transitions = new double*[2] {
-		new double[2] {1.0, 0.0},
-		new double[2] {0.9, 0.1}
+		new double[2] {0.4, 0.6},
+		new double[2] {0.5, 0.5}
 	};
 	double** emissions = new double*[2] {
-		new double[2] {0.0, 1.0},
-		new double[2] {1.0, 0.0}
+		new double[2] {0.6, 0.4},
+		new double[2] {0.4, 0.6}
 	};
-	double* initialDst = new double[2] {0.0, 1.0};
+	double* initialDst = new double[2] {0.6, 0.4};
 
 	HmModel* model = new HmModel();
 	model->init(states, stateCnt, observations, observationCnt,
@@ -207,5 +211,5 @@ static void cleanUp(HmModel* model, double** transitionsX, double** emissionsX,
 	}
 	delete [] emissionsX;
 
-	delete [] model;
+	delete model;
 }

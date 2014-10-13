@@ -41,7 +41,7 @@ const HmModel* Processor::findBestModel(const vector<HmModel*>* models,
 		const HmModel& model = **iter;
 		double probability = 0.;
 
-		probability = ForwardBackward::forward(model, observations);
+		probability = ForwardBackward::calcPossibility(model, observations);
 
 		cout << "Probability for model \"" << model.getText().c_str() << "\" is " << probability << endl;
 

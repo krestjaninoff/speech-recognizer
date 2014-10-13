@@ -62,6 +62,9 @@ private:
 	string text;
 
 	void check();
+
+	void normalize();
+	static void normalizeVector(double* vector, size_t size);
 };
 
 } /* namespace model */

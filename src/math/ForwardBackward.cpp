@@ -9,10 +9,84 @@ using namespace yazz::model;
 namespace yazz {
 namespace math {
 
-double ForwardBackward::forward(const HmModel& model, const vector<observation_t>* data) {
+/**
+ * Forward part (define "a")
+ */
+void ForwardBackward::forwardAlgorithm(size_t stateCnt, double* initialDst,
+		double** transitions, double** emissions,
+		const vector<observation_t>* sequence, double** a,
+		map<observation_t, uint32_t>& observMap) {
+
+	uint32_t t = 0;
+	for (size_t i = 0; i < stateCnt; i++) {
+		observation_t observation = (*sequence)[0];
+		a[i][t] = initialDst[i]
+				* getObservProb(observation, i, emissions, observMap);
+	}
+
+	vector<observation_t>::const_iterator iter = sequence->begin();
+	for (t++, iter++; iter != sequence->end(); t++, iter++) {
+		for (size_t j = 0; j < stateCnt; j++) {
+
+			double transitionSum = 0;
+			for (size_t k = 0; k < stateCnt; k++) {
+				transitionSum += a[k][t - 1] * transitions[k][j];
+			}
+
+			observation_t observation = *iter;
+			double probability = getObservProb(observation, j, emissions, observMap);
+
+			a[j][t] = probability * transitionSum;
+		}
+	}
+
+	if (DEBUG_ENABLED) {
+		cout << "A matrix is:" << endl;
+		Printer::printMatrix(a, stateCnt, sequence->size());
+		cout << endl;
+	}
+}
+
+/**
+ * Backward part (define "b")
+ */
+void ForwardBackward::backwardAlgorithm(size_t stateCnt, double** transitions,
+		double** emissions, const vector<observation_t>* sequence, double** b,
+		map<observation_t, uint32_t>& observMap) {
+
+	int32_t t = sequence->size() - 1;
+	for (size_t i = 0; i < stateCnt; i++) {
+		b[i][t] = 1;
+	}
+
+	vector<observation_t>::const_iterator iter = sequence->end();
+	for (t--, iter--; t >= 0; t--, iter--) {
+
+		observation_t observation = *iter;
+		for (size_t j = 0; j < stateCnt; j++) {
+
+			double transitionSum = 0;
+			for (size_t k = 0; k < stateCnt; k++) {
+
+				double probability = getObservProb(observation, k, emissions, observMap);
+				transitionSum += b[k][t + 1] * transitions[j][k] * probability;
+			}
+
+			b[j][t] = transitionSum;
+		}
+	}
+
+	if (DEBUG_ENABLED) {
+		cout << "B matrix is:" << endl;
+		Printer::printMatrix(b, stateCnt, sequence->size());
+		cout << endl;
+	}
+}
+
+double ForwardBackward::calcPossibility(const HmModel& model, const vector<observation_t>* sequence) {
 
 	// Check
-	assert(data->size() > 0);
+	assert(sequence->size() > 0);
 
 	// Model data
 	size_t stateCnt = model.getStateCnt();
@@ -25,56 +99,27 @@ double ForwardBackward::forward(const HmModel& model, const vector<observation_t
 	// Memory allocation
 	double** a = new double*[stateCnt];
 	for (size_t i = 0; i < stateCnt; i++) {
-		a[i] = new double[data->size()];
+		a[i] = new double[sequence->size()];
 	}
 
 	// Observations map
 	map<observation_t, uint32_t> observMap;
-	initObservationsMap(observMap, data, observations, observationsCnt);
+	initObservationsMap(observMap, sequence, observations, observationsCnt);
 
-	uint32_t t = 0;
-	for (size_t i = 0; i < stateCnt; i++) {
-		observation_t observation = (*data)[0];
-		a[i][t] = initialDst[i]
-				* getObservProb(observation, i, emissions, observMap);
-	}
+	// Forward algorithm
+	forwardAlgorithm(stateCnt,
+		initialDst, transitions, emissions, sequence,
+		a, observMap);
 
-	if (DEBUG_ENABLED) {
-		cout << "Iteration " << t << ":" << endl;
-		Printer::printMatrix(a, stateCnt, data->size());
-		cout << endl;
-	}
-
-	vector<observation_t>::const_iterator iter = data->begin();
-	for (++t, ++iter; iter != data->end(); t++, iter++) {
-		for (size_t j = 1; j < stateCnt; j++) {
-
-			double transitionSum = 0;
-			for (size_t k = 0; k < stateCnt; k++) {
-				transitionSum += a[k][t - 1] * transitions[k][j];
-			}
-
-			observation_t observation = *iter;
-			a[j][t] = getObservProb(observation, j, emissions, observMap)
-					* transitionSum;
-		}
-
-		if (DEBUG_ENABLED) {
-			cout << "Iteration " << t << ":" << endl;
-			cout << endl;
-			Printer::printMatrix(a, stateCnt, data->size());
-			cout << endl;
-		}
-	}
-
+	// Calc probability
 	double probability = 0.;
-	size_t tMax = data->size() - 1;
+	size_t tMax = sequence->size() - 1;
 	for (size_t i = 0; i < stateCnt; i++) {
 		probability += a[i][tMax];
 	}
 
 	if (DEBUG_ENABLED) {
-		cout << "Probability is: " << probability << endl;
+		cout << "Probability is: " << probability << endl << endl;
 	}
 
 	// Clean up
