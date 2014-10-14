@@ -2,6 +2,7 @@
 #include <Storage.h>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 #include <utility>
 
@@ -9,11 +10,22 @@
 #include <io.h>
 #endif
 
+using namespace std;
+
 namespace yazz {
 namespace model {
 
-const char* Storage::STORAGE_FILE = "hmm.dat";
-const char* Storage::STORAGE_HEADER = "YAZZ";
+const char* STORAGE_FILE = "models.dat";
+
+const string STORAGE_HEADER = "YAZZ";
+const string MAX_ID = "MAX_ID";
+const string MODELS = "MODELS";
+
+// Common attributes
+const string Storage::SPACE = " ";
+const string Storage::TAB = "\t";
+const int Storage::PRECISION = 5;
+const int Storage::INVALID_CODE = 1;
 
 Storage::Storage() {
 	this->maxId = 0;
@@ -50,33 +62,32 @@ bool Storage::init() {
 	if (access(STORAGE_FILE, F_OK) != -1) {
 		cout << "...loading data from the storage..." << endl;
 
-		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::in | std::ios::binary);
+		std::ifstream fs;
+		fs.open(STORAGE_FILE, std::ios::in);
 
 		if (!fs.good()) {
 			cerr << "Can't access the data storage :(" << endl;
-			return false;
+			exit(INVALID_CODE);
 		}
 
-		char header[4];
-		fs.read(header, sizeof(char) * 4);
-		if (strncmp(header, STORAGE_HEADER, 4)) {
-			cerr << "Invalid storage :(" << endl;
-			return false;
-		}
+		// Read the header
+		readHeader(fs, STORAGE_HEADER);
 
-		fs.read((char*) &this->maxId, sizeof(uint32_t));
+		// Read MAX_ID section
+		this->maxId = readNamedInt(fs, MAX_ID, true);
 
-		size_t modelsCnt;
-		fs.read((char*) &modelsCnt, sizeof(uint32_t));
+		// Read MODEL section
+		int32_t modelsCnt = readNamedInt(fs, MODELS, true);
 
-		for (uint32_t i = 0; i < modelsCnt; i++) {
+		// Read models
+		for (int32_t i = 0; i < modelsCnt; i++) {
 			HmModel* model = new HmModel();
 			fs >> *model;
 
 			this->models->insert(make_pair(model->getId(), model));
 		}
 
+		// Read the Codebook
 		fs >> *(this->codeBook);
 
 		fs.close();
@@ -84,17 +95,7 @@ bool Storage::init() {
 	// Storage not found, creating an empty one
 	} else {
 		cout << "Storage not found, creating an empty one... " << endl;
-
-		std::fstream fs;
-		fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
-
-		fs.write(STORAGE_HEADER, sizeof(char) * 4);
-		fs.write((char*) &this->maxId, sizeof(uint32_t));
-
-		size_t modelsCnt = 0;
-		fs.write((char*) &modelsCnt, sizeof(uint32_t));
-
-		fs.close();
+		persist();
 	}
 
 	return true;
@@ -128,25 +129,27 @@ void Storage::deleteLabel(observation_t label) {
  */
 bool Storage::persist() {
 
-	std::fstream fs;
-	fs.open(STORAGE_FILE, std::ios::out | std::ios::binary);
+	std::ofstream fs;
+	fs.open(STORAGE_FILE, std::ios::out);
 
 	if (!fs.good()) {
 		cerr << "Can't access the data storage :(" << endl;
 		return false;
 	}
 
-	fs.write(STORAGE_HEADER, sizeof(char) * 4);
-	fs.write((char*) &this->maxId, sizeof(uint32_t));
+	fs << STORAGE_HEADER << endl;
+	fs << MAX_ID << SPACE << this->maxId << endl;
+	fs << endl << endl;
 
-	size_t modelsCnt = this->models->size();
-	fs.write((char*) &modelsCnt, sizeof(uint32_t));
+	fs << MODELS << SPACE << this->models->size() << endl;
+	fs << endl;
 
 	map<uint32_t, HmModel*>::const_iterator iter;
 	for (iter = this->models->begin(); iter != this->models->end(); ++iter) {
 		HmModel& model = *iter->second;
-		fs << model;
+		fs << model << endl;
 	}
+	fs << endl;
 
 	fs << *(this->codeBook);
 
@@ -154,6 +157,63 @@ bool Storage::persist() {
 	cout << "...storage data successfully updated..." << endl;
 
 	return true;
+}
+
+
+void Storage::readHeader(istream& fs, string name) {
+	string tmpStr;
+
+	bool isOk = (fs >> tmpStr);
+	processReadResults(isOk, name, tmpStr);
+}
+
+int Storage::readNamedInt(istream& fs, string name, bool isPositive) {
+	int32_t result = 0;
+	string tmpStr;
+
+	bool isOk = (fs >> tmpStr >> result);
+	processReadResults(isOk, name, tmpStr);
+
+	if (isPositive && result < 0) {
+		cerr << "Invalid storage: " << name << " should be a positive value" << endl;
+		exit(INVALID_CODE);
+	}
+
+	return result;
+}
+
+double Storage::readNamedDouble(istream& fs, string name) {
+	double result = 0;
+	string tmpStr;
+
+	bool isOk = (fs >> tmpStr >> result);
+	processReadResults(isOk, name, tmpStr);
+
+	return result;
+}
+
+string Storage::readNamedString(istream& fs, string name) {
+	string result;
+	string tmpStr;
+
+	bool isOk = (fs >> tmpStr >> result);
+	processReadResults(isOk, name, tmpStr);
+
+	return result;
+}
+
+void Storage::processReadResults(bool isOk, string name, string actualValue) {
+
+	if (isOk) {
+		if (0 != name.compare(actualValue)) {
+			cerr << "Invalid storage: " << name << " is missing" << endl;
+			exit(INVALID_CODE);
+		}
+
+	} else {
+		cerr << "Invalid storage: " << name << " is missing or corrupted" << endl;
+		exit(INVALID_CODE);
+	}
 }
 
 } /* namespace model */

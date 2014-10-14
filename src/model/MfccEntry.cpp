@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <Storage.h>
 #include <MfccEntry.h>
 #include <HmModel.h>
 
@@ -21,20 +23,33 @@ MfccEntry::~MfccEntry() {
 }
 
 ostream& operator<<(ostream& fs, const MfccEntry& obj) {
+	streamsize precisionOriginal = fs.precision(Storage::PRECISION);
 
-	fs.write((char*)(&obj.size), sizeof(size_t));
-	fs.write(reinterpret_cast<char*>(obj.data),
-			streamsize(obj.size * sizeof(double)));
+	fs << obj.size << Storage::SPACE;
+	for (size_t i = 0; i < obj.size; i++) {
+		fs << obj.data[i] << Storage::SPACE;
+	}
 
+	fs.precision(precisionOriginal);
 	return fs;
 }
 
 istream& operator>>(istream& fs, MfccEntry& obj) {
 
-	fs.read((char*)(&obj.size), sizeof(size_t));
-	obj.data = new double[obj.size];
-	fs.read(reinterpret_cast<char*>(obj.data),
-			streamsize(obj.size * sizeof(double)));
+	if (fs >> obj.size) {
+		obj.data = new double[obj.size];
+
+		for (size_t i = 0; i < obj.size; i++) {
+			if (!(fs >> obj.data[i])) {
+
+				cerr << "Invalid model: INITIAL data corrupted" << endl;
+				exit(Storage::INVALID_CODE);
+			}
+		}
+	} else {
+		cerr << "Invalid MFCC: size isn't specified" << endl;
+		exit(Storage::INVALID_CODE);
+	}
 
 	return fs;
 }

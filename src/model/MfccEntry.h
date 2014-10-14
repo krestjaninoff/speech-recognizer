@@ -1,7 +1,7 @@
 #ifndef MFCCENTRY_H_
 #define MFCCENTRY_H_
 
-#include <iostream>
+#include <fstream>
 
 using namespace std;
 

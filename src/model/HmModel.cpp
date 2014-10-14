@@ -1,7 +1,9 @@
+#include <stdlib.h>
 #include <assert.h>
 #include <math.h>
 #include <limits>
-#include <../math/Printer.h>
+#include <Storage.h>
+#include <Printer.h>
 #include <HmModel.h>
 
 using namespace yazz::math;
@@ -9,7 +11,16 @@ using namespace yazz::math;
 namespace yazz {
 namespace model {
 
+const string MODEL = "MODEL";
+const string TEXT =	"TEXT";
+const string STATES = "STATES";
+const string OBSERVATIONS = "OBSERVATIONS";
+const string INITIAL = "INITIAL";
+const string TRANSITION = "TRANSITION";
+const string EMISSION = "EMISSION";
+
 const double MODEL_EPSILON = 1e-4; //numeric_limits<double>::epsilon()
+
 
 HmModel::HmModel() {
 	this->id = 0;
@@ -24,7 +35,7 @@ HmModel::HmModel() {
 	this->emissions = NULL;
 	this->initialDst = NULL;
 
-	this->text = '\0';
+	this->text = "Undefined";
 }
 
 HmModel::~HmModel() {
@@ -75,89 +86,120 @@ void HmModel::init(vector<state_t> states, const vector<observation_t> observati
 }
 
 ostream& operator<<(ostream& fs, const HmModel& obj) {
+	streamsize precisionOriginal = fs.precision(Storage::PRECISION);
 
-	fs.write((char*) &obj.id, sizeof(uint32_t));
+	fs << MODEL << Storage::SPACE << obj.id << endl;
+	fs << TEXT << Storage::SPACE << obj.text << endl;
 
-	size_t textSize = obj.text.size();
-	fs.write((char*) &textSize, sizeof(size_t));
-	fs.write(&obj.text[0], sizeof(char) * textSize);
-
-	fs.write((char*)(&obj.stateCnt), sizeof(size_t));
+	fs << STATES << Storage::TAB << Storage::TAB << obj.stateCnt;
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		fs << (*obj.states)[i];
+		fs << Storage::SPACE << (*obj.states)[i];
 	}
+	fs << endl;
 
-	fs.write((char*)(&obj.observationCnt), sizeof(size_t));
+	fs << OBSERVATIONS << Storage::TAB << Storage::TAB << obj.observationCnt;
 	for (size_t i = 0; i < obj.observationCnt; i++) {
-		fs << (*obj.observations)[i];
+		fs << Storage::SPACE << (*obj.observations)[i];
 	}
+	fs << endl;
 
+	fs << INITIAL << endl;
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		fs.write(reinterpret_cast<char*>(obj.transitions[i]),
-				streamsize(obj.stateCnt * sizeof(double)));
+		fs << obj.initialDst[i] << Storage::TAB;
 	}
+	fs << endl;
 
+	fs << TRANSITION << endl;
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		fs.write(reinterpret_cast<char*>(obj.emissions[i]),
-				streamsize(obj.observationCnt * sizeof(double)));
+		for (size_t j = 0; j < obj.stateCnt; j++) {
+			fs << obj.transitions[i][j] << Storage::TAB;
+		}
+		fs << endl;
 	}
+	fs << endl;
 
-	fs.write(reinterpret_cast<char*>(obj.initialDst),
-			streamsize(obj.stateCnt * sizeof(double)));
+	fs << TRANSITION << endl;
+	for (size_t i = 0; i < obj.stateCnt; i++) {
+		for (size_t j = 0; j < obj.observationCnt; j++) {
+			fs << obj.transitions[i][j] << Storage::TAB;
+		}
+		fs << endl;
+	}
+	fs << endl;
 
+	fs.precision(precisionOriginal);
 	return fs;
 }
 
 istream& operator>>(istream& fs, HmModel& obj) {
-	string tmp;
+	string tmpStr;
 
-	fs.read((char*)(&obj.id), sizeof(uint32_t));
+	// Model
+	obj.id = Storage::readNamedInt(fs, MODEL, true);
 
-	size_t textSize;
-	fs.read((char*) &textSize, sizeof(size_t));
+	// Text
+	obj.text = Storage::readNamedString(fs, TEXT);
 
-	// Yes, it's really ugly. One day I'll refactor this mess.
-	char* text = new char[textSize + 1];
-	fs.read(text, sizeof(char) * textSize);
-	text[textSize] = '\0';
-	string textString(text);
-	obj.text = textString;
+	// States
+	obj.stateCnt = Storage::readNamedInt(fs, STATES, true);
 
-	fs.read((char*)(&obj.stateCnt), sizeof(size_t));
 	vector<string>* statesTmp = new vector<string>(obj.stateCnt);
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		fs >> tmp;
-		statesTmp->push_back(tmp);
+		fs >> tmpStr;
+		statesTmp->push_back(tmpStr);
 	}
 	obj.states = statesTmp;
 
-	fs.read((char*)(&obj.observationCnt), sizeof(size_t));
+	// Observations
+	obj.observationCnt = Storage::readNamedInt(fs, OBSERVATIONS, true);
+
 	vector<string>* observationsTmp = new vector<string>(obj.observationCnt);
 	for (size_t i = 0; i < obj.observationCnt; i++) {
-		fs >> tmp;
-		observationsTmp->push_back(tmp);
+		fs >> tmpStr;
+		observationsTmp->push_back(tmpStr);
 	}
 	obj.observations = observationsTmp;
 
+	// Initial
+	Storage::readHeader(fs, INITIAL);
+	obj.initialDst = new double[obj.stateCnt];
+
+	for (size_t i = 0; i < obj.stateCnt; i++) {
+		if (!(fs >> obj.initialDst[i])) {
+			cerr << "Invalid model: INITIAL data corrupted" << endl;
+			exit(Storage::INVALID_CODE);
+		}
+	}
+
+	// Transitions
+	Storage::readHeader(fs, TRANSITION);
 	obj.transitions = new double*[obj.stateCnt];
+
 	for (size_t i = 0; i < obj.stateCnt; i++) {
 		obj.transitions[i] = new double[obj.stateCnt];
 
-		fs.read(reinterpret_cast<char*>(obj.transitions[i]),
-			streamsize(obj.stateCnt * sizeof(double)));
+		for (size_t j = 0; j < obj.stateCnt; j++) {
+			if (!(fs >> obj.transitions[i][j])) {
+				cerr << "Invalid model: TRANSITION data corrupted" << endl;
+				exit(Storage::INVALID_CODE);
+			}
+		}
 	}
 
+	// Emissions
+	Storage::readHeader(fs, EMISSION);
 	obj.emissions = new double*[obj.stateCnt];
+
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		obj.emissions[i] = new double[obj.observationCnt];
+		obj.emissions[i] = new double[obj.stateCnt];
 
-		fs.read(reinterpret_cast<char*>(obj.emissions[i]),
-			streamsize(obj.observationCnt * sizeof(double)));
+		for (size_t j = 0; j < obj.observationCnt; j++) {
+			if (!(fs >> obj.emissions[i][j])) {
+				cerr << "Invalid model: EMISSION data corrupted" << endl;
+				exit(Storage::INVALID_CODE);
+			}
+		}
 	}
-
-	obj.initialDst = new double[obj.stateCnt];
-	fs.read(reinterpret_cast<char*>(obj.initialDst),
-			streamsize(obj.stateCnt * sizeof(double)));
 
 	return fs;
 }

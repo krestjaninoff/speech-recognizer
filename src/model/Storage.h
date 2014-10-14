@@ -69,6 +69,19 @@ public:
 	 */
 	bool persist();
 
+	// Read helpers
+	static void readHeader(istream& fs, string name);
+	static int readNamedInt(istream& fs, string name, bool isPositive);
+	static double readNamedDouble(istream& fs, string name);
+	static string readNamedString(istream& fs, string name);
+	static void processReadResults(bool isOk, string name, string actualValue);
+
+	// Common attributes
+	static const string SPACE;
+	static const string TAB;
+	static const int PRECISION;
+	static const int INVALID_CODE;
+
 private:
 
 	/**
@@ -85,18 +98,7 @@ private:
 	 * Code book
 	 */
 	CodeBook* codeBook;
-
-	/**
-	 * Models data base
-	 */
-	static const char* STORAGE_FILE;
-
-	/**
-	 * Storage-specific header
-	 */
-	static const char* STORAGE_HEADER;
 };
-
 
 } /* namespace model */
 } /* namespace yazz */

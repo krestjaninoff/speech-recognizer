@@ -1,13 +1,16 @@
 #include "../config.h"
-#include <CodeBook.h>
-#include "../math/Basic.h"
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <Storage.h>
+#include <CodeBook.h>
+#include <Basic.h>
 
 namespace yazz {
 namespace model {
 
 const string CodeBook::UNKNOWN_VALUE = "?";
+const string CODEBOOK = "CODEBOOK";
 
 CodeBook::CodeBook() {
 	this->book = new std::map<observation_t, CodeBookEntry*>();
@@ -80,32 +83,41 @@ observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 }
 
 ostream& operator<<(ostream& fs, const CodeBook& obj) {
+	streamsize precisionOriginal = fs.precision(Storage::PRECISION);
 
-	size_t bookSize = obj.book->size();
-	fs.write((char*)(&bookSize), sizeof(size_t));
+	fs << CODEBOOK << Storage::SPACE <<  obj.book->size();
 
 	std::map<observation_t, CodeBookEntry*>::iterator iterator;
 	for (iterator = obj.book->begin(); iterator != obj.book->end(); iterator++) {
-		fs.write((char*)(&iterator->first), sizeof(observation_t));
-		fs.write((char*)(&iterator->second->samplesCnt), sizeof(uint16_t));
+
+		fs << iterator->first << Storage::TAB << iterator->second->samplesCnt << Storage::TAB;
 		fs << *iterator->second->avgVector;
+
+		fs << endl;
 	}
 
+	fs.precision(precisionOriginal);
 	return fs;
 }
 
 istream& operator>>(istream& fs, CodeBook& obj) {
 	obj.book->clear();
 
-	size_t bookSize;
-	fs.read((char*) &bookSize, sizeof(size_t));
+	size_t bookSize = Storage::readNamedInt(fs, CODEBOOK, true);
 
 	for (size_t i = 0; i < bookSize; i++) {
 		CodeBookEntry* bookEntry = new CodeBookEntry();
 
 		observation_t label;
-		fs.read((char*) &label, sizeof(observation_t));
-		fs.read((char*) &bookEntry->samplesCnt, sizeof(uint16_t));
+		if (!(fs >> label)) {
+			cerr << "Invalid CodeBook: label should be a string" << endl;
+			exit(Storage::INVALID_CODE);
+		}
+
+		if (!(fs >> bookEntry->samplesCnt)) {
+			cerr << "Invalid CodeBook: samples count must be a positive string" << endl;
+			exit(Storage::INVALID_CODE);
+		}
 
 		MfccEntry* mfccEntry = new MfccEntry();
 		fs >> *mfccEntry;
