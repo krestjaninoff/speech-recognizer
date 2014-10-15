@@ -93,13 +93,13 @@ ostream& operator<<(ostream& fs, const HmModel& obj) {
 
 	fs << STATES << Storage::TAB << Storage::TAB << obj.stateCnt;
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		fs << Storage::SPACE << (*obj.states)[i];
+		fs << Storage::SPACE << obj.states->at(i);
 	}
 	fs << endl;
 
-	fs << OBSERVATIONS << Storage::TAB << Storage::TAB << obj.observationCnt;
+	fs << OBSERVATIONS << Storage::TAB << obj.observationCnt;
 	for (size_t i = 0; i < obj.observationCnt; i++) {
-		fs << Storage::SPACE << (*obj.observations)[i];
+		fs << Storage::SPACE << obj.observations->at(i);
 	}
 	fs << endl;
 
@@ -118,10 +118,10 @@ ostream& operator<<(ostream& fs, const HmModel& obj) {
 	}
 	fs << endl;
 
-	fs << TRANSITION << endl;
+	fs << EMISSION << endl;
 	for (size_t i = 0; i < obj.stateCnt; i++) {
 		for (size_t j = 0; j < obj.observationCnt; j++) {
-			fs << obj.transitions[i][j] << Storage::TAB;
+			fs << obj.emissions[i][j] << Storage::TAB;
 		}
 		fs << endl;
 	}
@@ -143,7 +143,7 @@ istream& operator>>(istream& fs, HmModel& obj) {
 	// States
 	obj.stateCnt = Storage::readNamedInt(fs, STATES, true);
 
-	vector<string>* statesTmp = new vector<string>(obj.stateCnt);
+	vector<string>* statesTmp = new vector<string>();
 	for (size_t i = 0; i < obj.stateCnt; i++) {
 		fs >> tmpStr;
 		statesTmp->push_back(tmpStr);
@@ -153,7 +153,7 @@ istream& operator>>(istream& fs, HmModel& obj) {
 	// Observations
 	obj.observationCnt = Storage::readNamedInt(fs, OBSERVATIONS, true);
 
-	vector<string>* observationsTmp = new vector<string>(obj.observationCnt);
+	vector<string>* observationsTmp = new vector<string>();
 	for (size_t i = 0; i < obj.observationCnt; i++) {
 		fs >> tmpStr;
 		observationsTmp->push_back(tmpStr);
@@ -191,7 +191,7 @@ istream& operator>>(istream& fs, HmModel& obj) {
 	obj.emissions = new double*[obj.stateCnt];
 
 	for (size_t i = 0; i < obj.stateCnt; i++) {
-		obj.emissions[i] = new double[obj.stateCnt];
+		obj.emissions[i] = new double[obj.observationCnt];
 
 		for (size_t j = 0; j < obj.observationCnt; j++) {
 			if (!(fs >> obj.emissions[i][j])) {

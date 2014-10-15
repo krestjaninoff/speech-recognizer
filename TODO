@@ -2,7 +2,6 @@ TODO:
 
 * Create static states (alphabet) and observations (sounds)
 ** Add an alphabet test
-** Change model input strategy
 
 * Create codebook
                               

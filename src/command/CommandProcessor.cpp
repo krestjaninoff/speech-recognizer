@@ -18,16 +18,16 @@ static struct option longOptions[] = {
 	{ "input", required_argument, 0, 'i' },
 
 	{ "list-models", optional_argument, 0, 'l' },
-	{ "list-observations", optional_argument, 0, 'L' },
+	{ "list-codebook", optional_argument, 0, 'L' },
 
 	{ "print-model", optional_argument, 0, 'p' },
-	{ "print-observation", optional_argument, 0, 'P' },
+	{ "print-codebook", optional_argument, 0, 'P' },
 
 	{ "add-model", optional_argument, 0, 'a' },
-	{ "add-observation", optional_argument, 0, 'A' },
+	{ "add-codebook", optional_argument, 0, 'A' },
 
 	{ "delete-model", optional_argument, 0, 'd' },
-	{ "delete-observation", optional_argument, 0, 'D' },
+	{ "delete-codebook", optional_argument, 0, 'D' },
 
 	{ "observations", optional_argument, 0, 'o' },
 	{ "train-model", optional_argument, 0, 't' },
@@ -55,16 +55,16 @@ static const char* const helpInfo =	EOL
 	EOL
 
 	"-l,    --list-models               Show the list of the available models" EOL
-	"-L,    --list-observations         Show the list of the available observations (CodeBook)" EOL
+	"-L,    --list-codebook             Show the list of the available observations (CodeBook)" EOL
 	"-p<m>, --print-model=<m>           Print the specific model by given Id" EOL
-	"-P<o>, --print-observation=<o>     Print the specific observation by given Label" EOL
+	"-P<o>, --print-codebook=<o>        Print the Codebook" EOL
 
 	EOL
 
 	"-a<m>, --add-model=<m>             Add the model with given name" EOL
-	"-A<o>, --add-observation=<o>       Add the observation with given label" EOL
+	"-A<o>, --add-codebook-entry=<o>    Add the Codebook entry" EOL
 	"-d<m>, --delete-model=<m>          Delete the model with given Id" EOL
-	"-D<o>, --delete-observation=<o>    Delete the observation with given label" EOL
+	"-D<o>, --delete-codebook-entry=<o> Delete the Codebook entry" EOL
 
 	EOL
 
@@ -114,27 +114,27 @@ bool CommandProcessor::process() {
 					ModelCommand::listModels(*this->context);
 					break;
 				case 'L':
-					ModelCommand::listObservations(*this->context);
+					ModelCommand::listCodebook(*this->context);
 					break;
 
 				case 'p':
 					ModelCommand::printModel(*this->context, optarg);
 					break;
 				case 'P':
-					ModelCommand::printObservation(*this->context, optarg);
+					ModelCommand::printCodebookEntry(*this->context, optarg);
 					break;
 
 				case 'a':
 					ModelCommand::addModel(*this->context, optarg);
 					break;
 				case 'A':
-					ModelCommand::addObservation(*this->context, optarg);
+					ModelCommand::addCodebookEntry(*this->context, optarg);
 					break;
 				case 'd':
 					ModelCommand::deleteModel(*this->context, optarg);
 					break;
 				case 'D':
-					ModelCommand::deleteObservation(*this->context, optarg);
+					ModelCommand::deleteCodebookEntry(*this->context, optarg);
 					break;
 
 				case 'o':

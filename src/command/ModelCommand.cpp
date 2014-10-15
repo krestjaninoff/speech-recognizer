@@ -19,7 +19,7 @@
 namespace yazz {
 namespace command {
 
-void ModelCommand::listObservations(Context& context) {
+void ModelCommand::listCodebook(Context& context) {
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 	map<observation_t, CodeBookEntry*>::const_iterator iter;
 
@@ -38,7 +38,7 @@ void ModelCommand::listObservations(Context& context) {
 	}
 }
 
-void ModelCommand::printObservation(Context& context, const char* observation) {
+void ModelCommand::printCodebookEntry(Context& context, const char* observation) {
 
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
@@ -54,7 +54,7 @@ void ModelCommand::printObservation(Context& context, const char* observation) {
 	}
 }
 
-void ModelCommand::addObservation(Context& context, const char* observation) {
+void ModelCommand::addCodebookEntry(Context& context, const char* observation) {
 	string observationStr(observation);
 
 	// Notice, that by adding an observation with the name which already exists in the Codebook
@@ -85,7 +85,7 @@ void ModelCommand::addObservation(Context& context, const char* observation) {
 	cout << "The observation was successfully added!" << endl;
 }
 
-void ModelCommand::deleteObservation(Context& context, const char* observation) {
+void ModelCommand::deleteCodebookEntry(Context& context, const char* observation) {
 
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 

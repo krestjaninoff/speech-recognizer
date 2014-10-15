@@ -3,7 +3,7 @@
 #include <gtest/internal/gtest-internal.h>
 #include "HmmHelper.h"
 
-TEST(HMM_MODEL, READ_WRITE) {
+TEST(HMM_MODEL, SERIALISATION) {
 
 	HmModel* modelOriginal = getModelOdin();
 	HmModel* modelDecoded = new HmModel();
@@ -13,5 +13,7 @@ TEST(HMM_MODEL, READ_WRITE) {
 	stream >> *modelDecoded;
 
 	EXPECT_EQ(modelOriginal->getStateCnt(), modelDecoded->getStateCnt());
+	EXPECT_EQ(modelOriginal->getStates()[0], modelDecoded->getStates()[0]);
 	EXPECT_EQ(modelOriginal->getObservationCnt(), modelDecoded->getObservationCnt());
+	EXPECT_EQ(modelOriginal->getObservations()[0], modelDecoded->getObservations()[0]);
 }

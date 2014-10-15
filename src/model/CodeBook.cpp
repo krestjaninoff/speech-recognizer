@@ -85,7 +85,7 @@ observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 ostream& operator<<(ostream& fs, const CodeBook& obj) {
 	streamsize precisionOriginal = fs.precision(Storage::PRECISION);
 
-	fs << CODEBOOK << Storage::SPACE <<  obj.book->size();
+	fs << CODEBOOK << Storage::SPACE <<  obj.book->size() << endl;
 
 	std::map<observation_t, CodeBookEntry*>::iterator iterator;
 	for (iterator = obj.book->begin(); iterator != obj.book->end(); iterator++) {

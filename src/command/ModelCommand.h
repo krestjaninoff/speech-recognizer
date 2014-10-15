@@ -18,22 +18,22 @@ public:
 	/**
 	 * Display the list of available observations (print CodeBook)
 	 */
-	static void listObservations(Context& context);
+	static void listCodebook(Context& context);
 
 	/**
 	 * Display the MFCC data by for the observation
 	 */
-	static void printObservation(Context& context, const char* observation);
+	static void printCodebookEntry(Context& context, const char* observation);
 
 	/**
 	 * Add a new observation (or update existing one)
 	 */
-	static void addObservation(Context& context, const char* observation);
+	static void addCodebookEntry(Context& context, const char* observation);
 
 	/**
 	 * Remove the observation
 	 */
-	static void deleteObservation(Context& context, const char* observation);
+	static void deleteCodebookEntry(Context& context, const char* observation);
 
 
 	/**
