@@ -1,7 +1,10 @@
 TODO:
 
 * Add the models
+
 * Fill the codebook
+-- Split missed sounds
+-- Store all samples in codebook 
 
 * Perform recognition
 * Perform learning
