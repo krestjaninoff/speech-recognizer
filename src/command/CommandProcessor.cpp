@@ -81,7 +81,7 @@ static const char* const helpInfo =	EOL
 	EOL
 
 	"-g<filename>, --graph=<filename>   Create the RMS diagram based on the WAV data (requires -i) and store into the specified file (file name is optional)" EOL
-	"-s<filename>, --split=<dirname>    Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
+	"-s<dirname>,  --split=<dirname>    Split the WAV data (requires -i) into words and store them into the specified directory (file name is optional)" EOL
 	EOL
 
 	"Notice, because of GetOpt restriction you must set optional parameters in the same way which you see in this manual."
