@@ -1,14 +1,9 @@
 TODO:
 
-* Create static states (alphabet) and observations (sounds)
-** Add an alphabet test
+* Add the models
+* Fill the codebook
 
-* Create codebook
+* Perform recognition
+* Perform learning
                               
-
-Shelved tasks
-
-* Imporove cmd interface
-** Sequence of arguments shouldn't be matter
-** Appropriate error messages
 

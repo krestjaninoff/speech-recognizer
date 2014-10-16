@@ -48,6 +48,9 @@ double Algorithm::getObservProb(observation_t observation, size_t stateId,
 	int32_t index = observMap[observation];
 	if (index >= 0) {
 		probability = emissions[stateId][index];
+
+	// Even in case of unknown sybmol we still return very small probability,
+	// that allows us to proceed the process when some sounds can't be recognised!
 	} else {
 		probability = DEFAULT_PROBABILITY;
 	}

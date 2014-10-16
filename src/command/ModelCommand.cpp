@@ -137,7 +137,6 @@ void ModelCommand::printModel(Context& context, const char* modelIdStr) {
 	}
 }
 
-// TODO Refactor states/observation + model input strategy
 void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Notice, that we can have a lot of models for the same value.
@@ -244,6 +243,22 @@ void ModelCommand::deleteModel(Context& context, const char* modelIdStr) {
 	}
 }
 
+void ModelCommand::displayMFCC(Context& context) {
+
+    // Read MFCC data
+    const vector<MfccEntry*>* data = getMfccData(context);
+
+    // Print MFCC
+	cout << endl << "MFCC coefficients: " << endl;
+	for(vector<MfccEntry*>::const_iterator iter = data->begin();
+			iter != data->end(); iter++) {
+		(*iter)->print();
+	}
+	cout << endl;
+
+	delete data;
+}
+
 void ModelCommand::displayObservations(Context& context) {
 
     // Read MFCC data
@@ -253,8 +268,8 @@ void ModelCommand::displayObservations(Context& context) {
     const vector<observation_t>* observations =
             context.getModelProcessor()->mfccToObservations(data);
 
-    // Print results
-    cout << endl << "Observations: ";
+    // Print observations
+    cout << endl << "Observations: " << endl;
     for(vector<observation_t>::const_iterator iter = observations->begin();
             iter != observations->end(); iter++) {
         cout << *iter << " ";
@@ -264,7 +279,7 @@ void ModelCommand::displayObservations(Context& context) {
     // Clean up
     delete observations;
     for (vector<MfccEntry*>::const_iterator iter = data->begin(); iter != data->end(); ++iter) {
-		delete *iter;
+		//delete *iter;
 	}
     delete data;
 }
@@ -387,6 +402,7 @@ const vector<MfccEntry*>* ModelCommand::getMfccData(Context& context) {
 
 	vector<Frame*>::const_iterator frame;
 	for (frame = frames->begin(); frame != frames->end(); ++frame) {
+		processor->initMfcc(*frame);
 
 		MfccEntry* entry = new MfccEntry((*frame)->getMFCC(), MFCC_SIZE);
 		mfccData->push_back(entry);

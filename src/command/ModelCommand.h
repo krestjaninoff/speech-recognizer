@@ -53,9 +53,15 @@ public:
 
 
 	/**
-	 * Display observations retrieved from the input data
+	 * Display the MFCC coefficients retrieved from the input data
+	 */
+	static void displayMFCC(Context& context);
+
+	/**
+	 * Display the observations retrieved from the input data
 	 */
 	static void displayObservations(Context& context);
+
 
 	/**
 	 * Train the model

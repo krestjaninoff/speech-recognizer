@@ -24,7 +24,8 @@ public:
 	~Processor();
 
 	void init();
-	void initMfcc(Word& word);
+	void initMfcc(Frame* frame);
+	void initMfcc(Word* word);
 
 	const WavData* getWavData() const { return this->wavData; }
 	const std::vector<Frame*>* getFrames() const { return this->frames; }

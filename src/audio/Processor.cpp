@@ -271,11 +271,20 @@ bool Processor::findSilenceThreshold() {
 	return hasSilence;
 }
 
-// @unused
-void Processor::initMfcc(Word& word) {
+void Processor::initMfcc(Frame* frame) {
 
-	uint32_t firstId = (*this->wordToFrames)[word.getId()].first;
-	uint32_t lastId = (*this->wordToFrames)[word.getId()].second;
+	uint32_t rawBegin = (*this->frameToRaw)[frame->getId()].first;
+	uint32_t rawFinsh = (*this->frameToRaw)[frame->getId()].second;
+
+	frame->initMFCC(getWavData()->getNormalizedData(), rawBegin, rawFinsh,
+			getWavData()->getHeader().samplesPerSec);
+}
+
+// @unused
+void Processor::initMfcc(Word* word) {
+
+	uint32_t firstId = (*this->wordToFrames)[word->getId()].first;
+	uint32_t lastId = (*this->wordToFrames)[word->getId()].second;
 
 	uint32_t framesCnt = lastId - firstId + 1;
 	double* mfcc = new double[MFCC_SIZE * framesCnt];
@@ -293,7 +302,7 @@ void Processor::initMfcc(Word& word) {
 		}
 	}
 
-	word.setMfcc(mfcc, MFCC_SIZE * framesCnt);
+	word->setMfcc(mfcc, MFCC_SIZE * framesCnt);
 }
 
 void Processor::saveWordAsAudio(const std::string& file, const Word& word) const {

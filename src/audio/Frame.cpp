@@ -8,11 +8,15 @@ namespace yazz {
 namespace audio {
 
 Frame::Frame(uint32_t id):
-	id(id), rms(0), entropy(0), mfcc(0) {
+	id(id), rms(0), entropy(0) {
+
+	this->mfcc = NULL;
 }
 
 Frame::~Frame() {
-	delete [] this->mfcc;
+	if (NULL != this->mfcc) {
+		delete [] this->mfcc;
+	}
 }
 
 void Frame::init(const raw_t* source, const double* sourceNormalized,
