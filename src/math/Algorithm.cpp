@@ -7,6 +7,7 @@ namespace yazz {
 namespace math {
 
 const int32_t INVALID_INDEX = -1;
+const double DEFAULT_PROBABILITY = 1e-4;
 
 void Algorithm::initObservationsMap(map<observation_t, uint32_t>& observMap,
 		const vector<observation_t>* sequence,
@@ -25,8 +26,7 @@ void Algorithm::initObservationsMap(map<observation_t, uint32_t>& observMap,
 			}
 		}
 
-		assert("Unknown observation" && (INVALID_INDEX != index));
-
+		//assert("Unknown observation" && (INVALID_INDEX != index));
 		observMap[value] = index;
 	}
 
@@ -48,6 +48,8 @@ double Algorithm::getObservProb(observation_t observation, size_t stateId,
 	int32_t index = observMap[observation];
 	if (index >= 0) {
 		probability = emissions[stateId][index];
+	} else {
+		probability = DEFAULT_PROBABILITY;
 	}
 
 	return probability;
