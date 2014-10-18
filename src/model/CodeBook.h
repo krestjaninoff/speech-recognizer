@@ -2,6 +2,7 @@
 #define CODEBOOK_H_
 
 #include <map>
+#include <vector>
 #include <MfccEntry.h>
 #include <HmModel.h>
 
@@ -11,11 +12,20 @@ namespace yazz {
 namespace model {
 
 /**
- * Vector template for a special label
+ * MFCC values for certain sound
  */
-struct CodeBookEntry {
-	MfccEntry*	avgVector;
-	uint16_t	samplesCnt;
+class CodeBookEntry {
+public:
+	CodeBookEntry(vector<MfccEntry*>*);
+	~CodeBookEntry();
+
+	void addValue(MfccEntry* entry) { this->values->push_back(entry); }
+	const vector<MfccEntry*>* getValues() const { return this->values; }
+	const size_t getSize() const { return this->values->size(); }
+	void print() const;
+
+private:
+	vector<MfccEntry*>* values;
 };
 
 /**

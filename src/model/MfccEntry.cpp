@@ -11,8 +11,8 @@ MfccEntry::MfccEntry() {
 	this->data = NULL;
 }
 
-MfccEntry::MfccEntry(double* data, size_t size) {
-	this->size = size;
+MfccEntry::MfccEntry(double* data) {
+	this->size = MFCC_SIZE;
 	this->data = data;
 }
 
@@ -25,7 +25,6 @@ MfccEntry::~MfccEntry() {
 ostream& operator<<(ostream& fs, const MfccEntry& obj) {
 	streamsize precisionOriginal = fs.precision(Storage::PRECISION);
 
-	fs << obj.size << Storage::SPACE;
 	for (size_t i = 0; i < obj.size; i++) {
 		fs << obj.data[i] << Storage::SPACE;
 	}
@@ -35,20 +34,14 @@ ostream& operator<<(ostream& fs, const MfccEntry& obj) {
 }
 
 istream& operator>>(istream& fs, MfccEntry& obj) {
+	obj.data = new double[MFCC_SIZE];
 
-	if (fs >> obj.size) {
-		obj.data = new double[obj.size];
+	for (size_t i = 0; i < obj.size; i++) {
+		if (!(fs >> obj.data[i])) {
 
-		for (size_t i = 0; i < obj.size; i++) {
-			if (!(fs >> obj.data[i])) {
-
-				cerr << "Invalid model: INITIAL data corrupted" << endl;
-				exit(Storage::INVALID_CODE);
-			}
+			cerr << "Invalid model: INITIAL data corrupted" << endl;
+			exit(Storage::INVALID_CODE);
 		}
-	} else {
-		cerr << "Invalid MFCC: size isn't specified" << endl;
-		exit(Storage::INVALID_CODE);
 	}
 
 	return fs;

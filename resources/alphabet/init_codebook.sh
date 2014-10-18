@@ -1,0 +1,1 @@
+date; result=alphabet.result; for letter in `find ../resources/alphabet/ -name *.*.wav`; do echo $letter >> $result; ./yazz.exe -i $letter -m >> $result; done; date

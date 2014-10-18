@@ -27,7 +27,7 @@ namespace yazz {
 	/**
 	 * Length of frame (ms)
 	 */
-	const uint32_t FRAME_LENGTH = 10;
+	const uint32_t FRAME_LENGTH = 50;
 
 	/**
 	 * Percentage of overlap for frames (0 <= x < 1)

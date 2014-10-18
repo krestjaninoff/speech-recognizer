@@ -27,10 +27,10 @@ void ModelCommand::listCodebook(Context& context) {
 		cout << "CodeBook:" << endl;
 
 		for (iter = book->begin(); iter != book->end(); ++iter) {
-			cout << "'" << iter->first << "' (" << iter->second->samplesCnt << "): ";
+			cout << "'" << iter->first << "' (" << iter->second->getSize() << "): " << endl;
 
-			MfccEntry* mfcc = iter->second->avgVector;
-			mfcc->print();
+			iter->second->print();
+			cout << endl;
 		}
 
 	} else {
@@ -45,8 +45,8 @@ void ModelCommand::printCodebookEntry(Context& context, const char* observation)
 	if (book->count(observation) > 0) {
 		CodeBookEntry* entry = book->at(observation);
 
-		cout << "Observation '" << observation << "' is based on " << entry->samplesCnt << " samples: ";
-		entry->avgVector->print();
+		cout << "Observation '" << observation << "' is based on " << entry->getSize() << " samples: " << endl;
+		entry->print();
 		cout << endl;
 
 	} else {
@@ -78,7 +78,7 @@ void ModelCommand::addCodebookEntry(Context& context, const char* observation) {
 	cout << endl;
 
 	// Add or update the observation
-	MfccEntry* mfcc = new MfccEntry(data, MFCC_SIZE);
+	MfccEntry* mfcc = new MfccEntry(data);
 	context.getStorage()->addLabel(observationStr, mfcc);
 	context.getStorage()->persist();
 
@@ -87,7 +87,7 @@ void ModelCommand::addCodebookEntry(Context& context, const char* observation) {
 
 void ModelCommand::deleteCodebookEntry(Context& context, const char* observation) {
 
-	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
+	const map<observation_t, vector<MfccEntry*>*>* book = context.getStorage()->getCodeBook()->getBook();
 
 	if (book->count(observation) > 0) {
 		context.getStorage()->deleteLabel(observation);
@@ -404,7 +404,7 @@ const vector<MfccEntry*>* ModelCommand::getMfccData(Context& context) {
 	for (frame = frames->begin(); frame != frames->end(); ++frame) {
 		processor->initMfcc(*frame);
 
-		MfccEntry* entry = new MfccEntry((*frame)->getMFCC(), MFCC_SIZE);
+		MfccEntry* entry = new MfccEntry((*frame)->getMFCC());
 		mfccData->push_back(entry);
 	}
 

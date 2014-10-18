@@ -66,11 +66,21 @@ double Basic::entropy(const double* source, uint32_t start, uint32_t finish,
 	return entropy;
 }
 
-double Basic::euclideanDistance(double* a, double* b, size_t size) {
+double Basic::euclideanDistance(const double* a, const double* b, size_t size) {
 	double distance = 0;
 
 	for (size_t i = 0; i < size; i++) {
 		distance += pow((a[i] - b[i]), 2);
+	}
+
+	return sqrt(distance);
+}
+
+double Basic::euclideanDistanceWithWeights(const double* a, const double* b, const double* weights, size_t size) {
+	double distance = 0;
+
+	for (size_t i = 0; i < size; i++) {
+		distance += pow((a[i] - b[i]), 2) * weights[i];
 	}
 
 	return sqrt(distance);

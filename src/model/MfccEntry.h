@@ -12,7 +12,7 @@ class MfccEntry {
 
 public:
 	MfccEntry();
-	MfccEntry(double* data, size_t size);
+	MfccEntry(double* data);
 	~MfccEntry();
 
 	inline size_t getSize() const { return this->size; }

@@ -28,7 +28,8 @@ public:
 	static double entropy(const double* source, uint32_t start, uint32_t finish,
 			uint8_t binsCount, double minRaw, double maxRaw);
 
-	static double euclideanDistance(double* a, double* b, size_t size);
+	static double euclideanDistance(const double* a, const double* b, size_t size);
+	static double euclideanDistanceWithWeights(const double* a, const double* b, const double* weights, size_t size);
 };
 
 } /* namespace math */
