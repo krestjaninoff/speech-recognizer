@@ -86,7 +86,7 @@ observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 	std::map<observation_t, CodeBookEntry*>::const_iterator observationIter;
 	for (observationIter = this->book->begin(); observationIter != this->book->end(); observationIter++) {
 
-		std::vector<MfccEntry*>::iterator mfccIter;
+		std::vector<MfccEntry*>::const_iterator mfccIter;
 		for (mfccIter = observationIter->second->getValues()->begin();
 				mfccIter != observationIter->second->getValues()->end(); mfccIter++) {
 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "../config.h"
 #include <Storage.h>
 #include <MfccEntry.h>
 #include <HmModel.h>

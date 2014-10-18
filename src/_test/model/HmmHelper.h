@@ -1,7 +1,6 @@
 #ifndef HMMHELPER_H_
 #define HMMHELPER_H_
 
-#include <Alphabet.h>
 #include <HmModel.h>
 
 using namespace yazz::model;

@@ -21,7 +21,7 @@ public:
 
 	void addValue(MfccEntry* entry) { this->values->push_back(entry); }
 	const vector<MfccEntry*>* getValues() const { return this->values; }
-	const size_t getSize() const { return this->values->size(); }
+	size_t getSize() const { return this->values->size(); }
 	void print() const;
 
 private:

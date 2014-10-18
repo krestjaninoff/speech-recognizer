@@ -3,7 +3,6 @@
 #include <Storage.h>
 #include <WavData.h>
 #include <Word.h>
-#include <Alphabet.h>
 #include "../audio/Processor.h"
 #include "../model/Processor.h"
 #include <string.h>
@@ -87,7 +86,7 @@ void ModelCommand::addCodebookEntry(Context& context, const char* observation) {
 
 void ModelCommand::deleteCodebookEntry(Context& context, const char* observation) {
 
-	const map<observation_t, vector<MfccEntry*>*>* book = context.getStorage()->getCodeBook()->getBook();
+	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
 	if (book->count(observation) > 0) {
 		context.getStorage()->deleteLabel(observation);
@@ -155,11 +154,14 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	cout << "Enter amount of model's states: ";
 	cin >> statesCnt;
 
+	state_t state;
 	cout << "Enter model's states: " << endl;
-	state_t* states = new state_t[statesCnt];
+	vector<state_t> states;
 	for (size_t i = 0; i < statesCnt; i++) {
 		cout << "[" << i << "]: ";
-		cin >> states[i];
+		cin >> state;
+
+		states.push_back(state);
 	}
 
 	cout << endl;
@@ -169,11 +171,14 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 	cout << "Enter amount of model's observations: ";
 	cin >> observationCnt;
 
+	observation_t observation;
 	cout << "Enter model's observations: " << endl;
-	observation_t* observations = new observation_t[observationCnt];
+	vector<observation_t> observations;
 	for (size_t i = 0; i < observationCnt; i++) {
 		cout << "[" << i << "]: ";
-		cin >> observations[i];
+		cin >> observation;
+
+		observations.push_back(observation);
 	}
 
 	cout << endl;
@@ -218,7 +223,7 @@ void ModelCommand::addModel(Context& context, const char* modelNameChar) {
 
 	// Create and save the model
 	HmModel* model = new HmModel();
-	model->init(LETTERS, SOUNDS, transitions, emissions, initialDist, modelName);
+	model->init(states, observations, transitions, emissions, initialDist, modelName);
 
 	context.getStorage()->addModel(model);
 	context.getStorage()->persist();
