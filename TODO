@@ -1,12 +1,8 @@
 TODO:
 
-* Add the models
+* Adapt the code for using real data
 
-* Fill the codebook
--- Split missed sounds
--- Store all samples in codebook 
+* Perform recognition / learning
 
-* Perform recognition
-* Perform learning
                               
 
