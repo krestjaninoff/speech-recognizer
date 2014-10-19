@@ -113,7 +113,6 @@ bool CommandProcessor::process() {
 
 				case 'i':
 					isLast = !AudioDataCommand::readData(*this->context, optarg);
-					isLast = false;
 					break;
 
 				case 'l':
@@ -158,10 +157,10 @@ bool CommandProcessor::process() {
 					break;
 
 				case 'g':
-					isLast = !VisualizationCommand::createDiagram(*this->context, optarg);
+					VisualizationCommand::createDiagram(*this->context, optarg);
 					break;
 				case 's':
-					isLast = !AudioDataCommand::splitIntoFiles(*this->context, optarg);
+					AudioDataCommand::splitIntoFiles(*this->context, optarg);
 					break;
 
 				default:
