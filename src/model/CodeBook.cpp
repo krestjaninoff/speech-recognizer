@@ -142,6 +142,9 @@ istream& operator>>(istream& fs, CodeBook& obj) {
 			cerr << "Invalid CodeBook: label should be a string" << endl;
 			exit(Storage::INVALID_CODE);
 		}
+		if (DEBUG_ENABLED) {
+			cout << ".. codebook entry " << label << endl;
+		}
 
 		size_t examplesCnt;
 		if (!(fs >> examplesCnt)) {

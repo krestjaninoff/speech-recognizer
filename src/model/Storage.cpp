@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <utility>
+#include <../config.h>
 
 #ifdef __MINGW32__
 #include <io.h>
@@ -85,6 +86,10 @@ bool Storage::init() {
 			fs >> *model;
 
 			this->models->insert(make_pair(model->getId(), model));
+
+			if (DEBUG_ENABLED) {
+				cout << ".. model " << model->getText() << endl;
+			}
 		}
 
 		// Read the Codebook
