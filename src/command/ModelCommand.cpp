@@ -22,11 +22,12 @@ void ModelCommand::listCodebook(Context& context) {
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 	map<observation_t, CodeBookEntry*>::const_iterator iter;
 
+	cout << endl;
 	if (book->size() > 0) {
 		cout << "CodeBook:" << endl;
 
 		for (iter = book->begin(); iter != book->end(); ++iter) {
-			cout << "'" << iter->first << "' (" << iter->second->getSize() << "): " << endl;
+			cout << "\"" << iter->first << "\" (" << iter->second->getSize() << "): " << endl;
 
 			iter->second->print();
 			cout << endl;
@@ -41,15 +42,16 @@ void ModelCommand::printCodebookEntry(Context& context, const char* observation)
 
 	const map<observation_t, CodeBookEntry*>* book = context.getStorage()->getCodeBook()->getBook();
 
+	cout << endl;
 	if (book->count(observation) > 0) {
 		CodeBookEntry* entry = book->at(observation);
 
-		cout << "Observation '" << observation << "' is based on " << entry->getSize() << " samples: " << endl;
+		cout << "Observation \"" << observation << "\" is based on " << entry->getSize() << " samples: " << endl;
 		entry->print();
 		cout << endl;
 
 	} else {
-		cout << "Observation with label '" << observation << "' not found :(" << endl;
+		cout << "Observation with label \"" << observation << "\" not found :(" << endl;
 	}
 }
 
@@ -58,7 +60,7 @@ void ModelCommand::addCodebookEntry(Context& context, const char* observation) {
 
 	// Notice, that by adding an observation with the name which already exists in the Codebook
 	// we just average its value. Hence, we don't need to check uniqueness of the observation.
-	cout << "Adding label '" << observation << "' into the CodeBook..." << endl;
+	cout << "Adding label \"" << observation << "\" into the CodeBook..." << endl;
 	cout << endl;
 
 	// Read the observation data
@@ -92,10 +94,10 @@ void ModelCommand::deleteCodebookEntry(Context& context, const char* observation
 		context.getStorage()->deleteLabel(observation);
 		context.getStorage()->persist();
 
-		cout << "Observation '" << observation << "' was deleted from the CodeBook" << endl;
+		cout << "Observation \"" << observation << "\" was deleted from the CodeBook" << endl;
 
 	} else {
-		cout << "Observation '" << observation << "' isn't in the CodeBook" << endl;
+		cout << "Observation \"" << observation << "\" isn't in the CodeBook" << endl;
 	}
 }
 
@@ -104,6 +106,7 @@ void ModelCommand::listModels(Context& context) {
 
 	const map<uint32_t, HmModel*>* models = context.getStorage()->getModels();
 
+	cout << endl;
 	if (models->size() > 0) {
 		cout << "Available models are:" << endl;
 
@@ -125,14 +128,14 @@ void ModelCommand::printModel(Context& context, const char* modelIdStr) {
 	uint32_t modelId = atoi(modelIdStr);
 	const map<uint32_t, HmModel*>* models = context.getStorage()->getModels();
 
+	cout << endl;
 	if (models->count(modelId) > 0) {
 		HmModel* model = models->at(modelId);
 
-		cout << endl;
 		model->print();
 
 	} else {
-		cout << "Model with id '" << modelIdStr << "' not found :(" << endl;
+		cout << "Model with id \"" << modelIdStr << "\" not found :(" << endl;
 	}
 }
 
@@ -236,6 +239,7 @@ void ModelCommand::deleteModel(Context& context, const char* modelIdStr) {
 	uint32_t modelId = atoi(modelIdStr);
 	const map<uint32_t, HmModel*>* models = context.getStorage()->getModels();
 
+	cout << endl;
 	if (models->count(modelId) > 0) {
 
 		context.getStorage()->deleteModel(modelId);
@@ -296,6 +300,7 @@ void ModelCommand::trainModel(Context& context, const char* modelIdStr) {
 	uint32_t modelId = atoi(modelIdStr);
 	HmModel* model = context.getStorage()->getModels()->at(modelId);
 
+	cout << endl;
 	if (NULL != model) {
 
 		// Preparing training data

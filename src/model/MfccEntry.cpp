@@ -35,6 +35,7 @@ ostream& operator<<(ostream& fs, const MfccEntry& obj) {
 }
 
 istream& operator>>(istream& fs, MfccEntry& obj) {
+	obj.size = MFCC_SIZE;
 	obj.data = new double[MFCC_SIZE];
 
 	for (size_t i = 0; i < obj.size; i++) {

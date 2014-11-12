@@ -206,7 +206,7 @@ istream& operator>>(istream& fs, HmModel& obj) {
 
 void HmModel::print() {
 
-	cout << "[ID " << this->id << "] Model '" << this->text << "':";
+	cout << "[Id " << this->id << "] Model \"" << this->text << "\":";
 	cout << endl << endl;
 
 	cout << "States: ";

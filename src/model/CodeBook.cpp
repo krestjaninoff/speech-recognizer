@@ -95,12 +95,12 @@ observation_t CodeBook::findLabelBySample(MfccEntry* mfccEntry) const {
 			double distance = math::Basic::euclideanDistanceWithWeights(mfccEntry->getData(),
 					currentMfccEntry->getData(), MFCC_WEIGHTS, MFCC_SIZE);
 
-			if (fabs(distance) < CODEBOOK_THRESHOLD) {
+			//if (fabs(distance) < CODEBOOK_THRESHOLD) {
 				if (0 == UNKNOWN_VALUE.compare(label) || minDistance > distance) {
 					minDistance = distance;
 					label = observationIter->first;
 				}
-			}
+			//}
 		}
 	}
 

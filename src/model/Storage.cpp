@@ -61,7 +61,7 @@ bool Storage::init() {
 	this->codeBook = new CodeBook();
 
 	if (access(STORAGE_FILE, F_OK) != -1) {
-		cout << "...loading data from the storage..." << endl;
+		cout << "Loading data from the storage..." << endl;
 
 		std::ifstream fs;
 		fs.open(STORAGE_FILE, std::ios::in);

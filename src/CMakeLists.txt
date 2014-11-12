@@ -60,6 +60,7 @@ option(test "Build all tests" OFF)
 		_test/audio/ProcessorTest.cpp
 		_test/model/RecognizerTest.cpp
 		_test/model/HmmModelTest.cpp
+		_test/model/ProcessorTest.cpp
 	)
 	
 	# Link test executable against gtest & gtest_main

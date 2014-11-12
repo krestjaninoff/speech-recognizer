@@ -69,7 +69,7 @@ namespace yazz {
 	/**
 	 * Codebook threshold
 	 */
-	const double CODEBOOK_THRESHOLD = 5;
+	const double CODEBOOK_THRESHOLD = 25;
 
 
 	// Helpers

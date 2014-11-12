@@ -1,7 +1,8 @@
 TODO:
 
-* Adapt the code for using real data
+* Accelerate MFCC computing
 
+* Adapt the code for using real data (invalid recognitions tolerance)
 * Perform recognition / learning
 
                               
