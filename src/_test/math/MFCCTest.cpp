@@ -29,7 +29,7 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 
 	const double fourierExpected[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357,
 		0.15109, 0.17987, 0.24049, 0.75985};
-	double* fourierResult = MFCC::fourierTransform(frame, 0, frameSize, false);
+	double* fourierResult = MFCC::fourierTransform(frame, frameSize, false);
 
 	for (uint32_t i = 0; i < frameSize; i++) {
 		EXPECT_NEAR(fourierExpected[i], fourierResult[i], EPS_TEST);
@@ -39,10 +39,40 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 
 	const double fourierHamExpected[] = {1.0830011, 0.7111400, 0.1586940, 0.0093373, 0.0068586,
 		0.0085555, 0.0068586, 0.0093373, 0.1586940, 0.7111400};
-	fourierResult = MFCC::fourierTransform(frame, 0, frameSize, true);
+	fourierResult = MFCC::fourierTransform(frame, frameSize, true);
 
 	for (uint32_t i = 0; i < frameSize; i++) {
 		EXPECT_NEAR(fourierHamExpected[i], fourierResult[i], EPS_TEST);
+	}
+
+	delete [] fourierResult;
+}
+
+TEST(MATH_MFCC, FOURIER_TRANSFORM_FST) {
+
+	const uint8_t frameSize = 10;
+	const double frame[] = {0.12165, -0.05362, -0.18302, -0.25706, -0.28193, -0.26713,
+		-0.22056, -0.15699,-0.10022, -0.07285};
+
+	const double fourierExpected[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357,
+		0.15109, 0.17987, 0.24049, 0.75985};
+	double* fourierResult = MFCC::fourierTransformFast(frame, frameSize, false);
+
+	for (uint32_t i = 0; i < frameSize; i++) {
+		cout << fourierExpected[i] << "\t" <<  fourierResult[i] << endl;
+		//EXPECT_NEAR(fourierExpected[i], fourierResult[i], EPS_TEST);
+	}
+	delete [] fourierResult;
+
+cout << endl << endl;
+
+	const double fourierHamExpected[] = {1.0830011, 0.7111400, 0.1586940, 0.0093373, 0.0068586,
+		0.0085555, 0.0068586, 0.0093373, 0.1586940, 0.7111400};
+	fourierResult = MFCC::fourierTransformFast(frame, frameSize, true);
+
+	for (uint32_t i = 0; i < frameSize; i++) {
+		cout << fourierHamExpected[i] << "\t" <<  fourierResult[i] << "\t" << (0.54 - 0.46 * cos(2 * 3.14 * i / (10 - 1))) << endl;
+		//EXPECT_NEAR(fourierHamExpected[i], fourierResult[i], EPS_TEST);
 	}
 
 	delete [] fourierResult;

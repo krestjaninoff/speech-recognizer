@@ -1,10 +1,11 @@
 #include <complex.h>
-#include <MFCC.h>
 #include <cmath>
 #include <cstring>
 #include <limits>
 #include <assert.h>
+#include <time.h>
 #include "../config.h"
+#include <MFCC.h>
 
 using namespace std;
 
@@ -16,7 +17,10 @@ double* MFCC::transform(const double* source, uint32_t start, uint32_t finish, u
 	uint32_t sampleLength = finish - start + 1;
 
 	// Calc
-	double* fourierRaw = fourierTransform(source, start, sampleLength, true);
+	time_t fourierStart = time(0);
+	double* fourierRaw = fourierTransform(source + start, sampleLength, true);
+	cout << "Fourier: " << time(0) - fourierStart << "sec for " << sampleLength << " elements" << endl;
+
 	double** melFilters = getMelFilters(mfccSize, sampleLength, frequency, freqMin, freqMax);
 	double* logPower = calcPower(fourierRaw, sampleLength, melFilters, mfccSize);
 	double* dctRaw = dctTransform(logPower, mfccSize);
@@ -49,8 +53,7 @@ double* MFCC::filter(const double* source, uint32_t start, uint32_t finish) {
 /**
  * Compute singnal's spectrum and its magnitudes (short-time Fourier transform with Hamming window)
  */
-double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t length,
-		bool useWindow) {
+double* MFCC::fourierTransform(const double* source, uint32_t length, bool useWindow) {
 
 	complex<double>* fourierCmplxRaw = new complex<double>[length];
 	double* fourierRaw = new double[length];
@@ -60,7 +63,7 @@ double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t le
 		fourierCmplxRaw[k] = complex<double>(0, 0);
 
 		for (uint32_t n = 0; n < length; n++) {
-			double sample = source[start + n];
+			double sample = source[n];
 
 			// According Euler's formula: e^(ix) = cos(x) + i*sin(x)
 			double x = -2. * M_PI * k * n / (double) length;
@@ -83,6 +86,118 @@ double* MFCC::fourierTransform(const double* source, uint32_t start, uint32_t le
 
 	return fourierRaw;
 }
+
+double* MFCC::fourierTransformFast(const double* source, uint32_t length, bool useWindow) {
+
+	// Extend source length to the power of 2
+	uint32_t p2length = length;
+
+	bool powerOfTwo = (length > 0) && !(length & (length - 1));
+	if (!powerOfTwo) {
+		p2length = 2 * ceil(log2(length));
+	}
+
+	// Prepare data (real + imagine)
+	uint32_t n = p2length * 2;
+
+	double* fourierRaw = new double[p2length];
+	double* fourierRawTmp = new double[n];
+
+	int index;
+	for (uint32_t i = 0; i < n; i += 2) {
+		fourierRawTmp[i] = 0;
+		index = i / 2;
+
+		if (index < length) {
+			fourierRawTmp[i + 1] = source[index];
+
+			if (useWindow) {
+				fourierRawTmp[i + 1] *= (0.54 - 0.46 * cos(2 * M_PI * index / (length - 1)));
+			}
+		} else {
+			fourierRawTmp[i + 1] = 0;
+		}
+	}
+
+	// Reverse-binary reindexing
+	uint32_t i = 1;
+	uint32_t j = 1;
+	uint32_t m;
+	double tmpReal, tmpImg;
+	while (i < n) {
+		if (j > i) {
+			tmpReal = fourierRawTmp[i];
+			fourierRawTmp[i] = fourierRawTmp[j];
+			fourierRawTmp[j] = tmpReal;
+
+			tmpReal = fourierRawTmp[i + 1];
+			fourierRawTmp[i + 1] = fourierRawTmp[j + 1];
+			fourierRawTmp[j + 1] = tmpReal;
+		}
+
+		i = i + 2;
+		m = p2length;
+		while ((m >= 2) && (j > m)) {
+			j = j - m;
+			m = m >> 1;
+		}
+		j = j + m;
+	}
+
+	// Danielson-Lanczos section
+	uint32_t mMax = 2;
+	uint32_t mMax2;
+	double sinTheta2Sq, sinTheta, wReal, wImagine, sinTheta2, theta;
+
+	while (n > mMax) {
+		theta = -2 * M_PI / mMax;
+		sinTheta = sin(theta);
+		sinTheta2 = sin(theta / 2);
+		sinTheta2Sq = sinTheta2 * sinTheta2 * 2;
+		mMax2 = mMax * 2;
+		wReal = 1;
+		wImagine = 0;
+		m = 1;
+
+		while (m < mMax) {
+			i = m;
+			m = m + 2;
+			tmpReal = wReal;
+			tmpImg = wImagine;
+			wReal = wReal - tmpReal * sinTheta2Sq - tmpImg * sinTheta;
+			wImagine = wImagine + tmpReal * sinTheta - tmpImg * sinTheta2Sq;
+
+			while (i < n) {
+				j = i + mMax;
+				tmpReal = wReal * fourierRawTmp[j] - wImagine * fourierRawTmp[j - 1];
+				tmpImg = wImagine * fourierRawTmp[j] + wReal * fourierRawTmp[j - 1];
+
+				fourierRawTmp[j] = fourierRawTmp[i] - tmpReal;
+				fourierRawTmp[j - 1] = fourierRawTmp[i - 1] - tmpImg;
+				fourierRawTmp[i] = fourierRawTmp[i] + tmpReal;
+				fourierRawTmp[i - 1] = fourierRawTmp[i - 1] + tmpImg;
+				i = i + mMax2;
+			}
+		}
+
+		mMax = mMax2;
+	}
+
+	// Calculate magnitude
+	double val;
+	int position;
+	for (i = 0; i < p2length; i++) {
+		j = i * 2;
+		position = p2length - i - 1;
+
+		fourierRaw[position] = sqrt(pow(fourierRawTmp[j], 2) + pow(fourierRawTmp[j + 1], 2));
+	}
+
+	delete[] fourierRawTmp;
+
+	return fourierRaw;
+}
+
 
 /**
  * Create triangular filters spaced on mel scale

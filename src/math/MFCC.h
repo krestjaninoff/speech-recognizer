@@ -45,9 +45,12 @@ public:
 	 *
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
+	 *
+	 * http://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
 	 */
-	static double* fourierTransform(const double* source, uint32_t start, uint32_t length,
-			bool useWindow);
+	static double* fourierTransform(const double* source, uint32_t length, bool useWindow);
+
+	static double* fourierTransformFast(const double *source, uint32_t length, bool useWindow);
 
 	/**
 	 * Create mel filters (for range of frequencies), using triangular overlapping windows
