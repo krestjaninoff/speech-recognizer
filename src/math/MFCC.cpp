@@ -1,5 +1,6 @@
-#include <complex.h>
 #include <cmath>
+#include <complex>
+#include <valarray>
 #include <cstring>
 #include <limits>
 #include <assert.h>
@@ -15,14 +16,15 @@ namespace math {
 double* MFCC::transform(const double* source, uint32_t start, uint32_t finish, uint8_t mfccSize,
 		uint32_t frequency, uint32_t freqMin, uint32_t freqMax) {
 	uint32_t sampleLength = finish - start + 1;
+	uint32_t p2length = pow(2, floor(log2(sampleLength)));
 
 	// Calc
-	time_t fourierStart = time(0);
-	double* fourierRaw = fourierTransform(source + start, sampleLength, true);
-	cout << "Fourier: " << time(0) - fourierStart << "sec for " << sampleLength << " elements" << endl;
+	//time_t fourierStart = time(0);
+	double* fourierRaw = fourierTransformFast(source + start, p2length, true);
+	//cout << "Fourier: " << time(0) - fourierStart << " sec for " << p2length << " (" << sampleLength << ") elements" << endl;
 
-	double** melFilters = getMelFilters(mfccSize, sampleLength, frequency, freqMin, freqMax);
-	double* logPower = calcPower(fourierRaw, sampleLength, melFilters, mfccSize);
+	double** melFilters = getMelFilters(mfccSize, p2length, frequency, freqMin, freqMax);
+	double* logPower = calcPower(fourierRaw, p2length, melFilters, mfccSize);
 	double* dctRaw = dctTransform(logPower, mfccSize);
 
 	// Clean up
@@ -58,7 +60,6 @@ double* MFCC::fourierTransform(const double* source, uint32_t length, bool useWi
 	complex<double>* fourierCmplxRaw = new complex<double>[length];
 	double* fourierRaw = new double[length];
 
-
 	for (uint32_t k = 0; k < length; k++) {
 		fourierCmplxRaw[k] = complex<double>(0, 0);
 
@@ -93,109 +94,61 @@ double* MFCC::fourierTransformFast(const double* source, uint32_t length, bool u
 	uint32_t p2length = length;
 
 	bool powerOfTwo = (length > 0) && !(length & (length - 1));
-	if (!powerOfTwo) {
-		p2length = 2 * ceil(log2(length));
-	}
+	assert("FFT input data size must have 2^n size" && powerOfTwo);
+	// p2length = pow(2, ceil(log2(length)));
 
-	// Prepare data (real + imagine)
-	uint32_t n = p2length * 2;
+	// Move to complex calculations
+	double* fourierRaw = new double[length];
+	valarray<complex<double>> fourierRawTmp(p2length);
 
-	double* fourierRaw = new double[p2length];
-	double* fourierRawTmp = new double[n];
+	for (uint32_t i = 0; i < p2length; i++) {
 
-	int index;
-	for (uint32_t i = 0; i < n; i += 2) {
-		fourierRawTmp[i] = 0;
-		index = i / 2;
-
-		if (index < length) {
-			fourierRawTmp[i + 1] = source[index];
+		// Even element is the real part of complex number
+		if (i < length) {
+			fourierRawTmp[i] = complex<double>(source[i], 0.);
 
 			if (useWindow) {
-				fourierRawTmp[i + 1] *= (0.54 - 0.46 * cos(2 * M_PI * index / (length - 1)));
+				fourierRawTmp[i] *= (0.54 - 0.46 * cos(2 * M_PI * i / (length - 1)));
 			}
+
 		} else {
-			fourierRawTmp[i + 1] = 0;
+			fourierRawTmp[i] = complex<double>(0, 0);
 		}
 	}
 
-	// Reverse-binary reindexing
-	uint32_t i = 1;
-	uint32_t j = 1;
-	uint32_t m;
-	double tmpReal, tmpImg;
-	while (i < n) {
-		if (j > i) {
-			tmpReal = fourierRawTmp[i];
-			fourierRawTmp[i] = fourierRawTmp[j];
-			fourierRawTmp[j] = tmpReal;
+	// Perform recursive calculations
+	fourierTransformFastRecursion(fourierRawTmp);
 
-			tmpReal = fourierRawTmp[i + 1];
-			fourierRawTmp[i + 1] = fourierRawTmp[j + 1];
-			fourierRawTmp[j + 1] = tmpReal;
-		}
-
-		i = i + 2;
-		m = p2length;
-		while ((m >= 2) && (j > m)) {
-			j = j - m;
-			m = m >> 1;
-		}
-		j = j + m;
+	// As for magnitude, let's use Euclid's distance for its calculation
+	for (uint32_t i = 0; i < length; i++) {
+		fourierRaw[i] = sqrt(norm(fourierRawTmp[i]));
 	}
-
-	// Danielson-Lanczos section
-	uint32_t mMax = 2;
-	uint32_t mMax2;
-	double sinTheta2Sq, sinTheta, wReal, wImagine, sinTheta2, theta;
-
-	while (n > mMax) {
-		theta = -2 * M_PI / mMax;
-		sinTheta = sin(theta);
-		sinTheta2 = sin(theta / 2);
-		sinTheta2Sq = sinTheta2 * sinTheta2 * 2;
-		mMax2 = mMax * 2;
-		wReal = 1;
-		wImagine = 0;
-		m = 1;
-
-		while (m < mMax) {
-			i = m;
-			m = m + 2;
-			tmpReal = wReal;
-			tmpImg = wImagine;
-			wReal = wReal - tmpReal * sinTheta2Sq - tmpImg * sinTheta;
-			wImagine = wImagine + tmpReal * sinTheta - tmpImg * sinTheta2Sq;
-
-			while (i < n) {
-				j = i + mMax;
-				tmpReal = wReal * fourierRawTmp[j] - wImagine * fourierRawTmp[j - 1];
-				tmpImg = wImagine * fourierRawTmp[j] + wReal * fourierRawTmp[j - 1];
-
-				fourierRawTmp[j] = fourierRawTmp[i] - tmpReal;
-				fourierRawTmp[j - 1] = fourierRawTmp[i - 1] - tmpImg;
-				fourierRawTmp[i] = fourierRawTmp[i] + tmpReal;
-				fourierRawTmp[i - 1] = fourierRawTmp[i - 1] + tmpImg;
-				i = i + mMax2;
-			}
-		}
-
-		mMax = mMax2;
-	}
-
-	// Calculate magnitude
-	double val;
-	int position;
-	for (i = 0; i < p2length; i++) {
-		j = i * 2;
-		position = p2length - i - 1;
-
-		fourierRaw[position] = sqrt(pow(fourierRawTmp[j], 2) + pow(fourierRawTmp[j + 1], 2));
-	}
-
-	delete[] fourierRawTmp;
 
 	return fourierRaw;
+}
+
+void MFCC::fourierTransformFastRecursion(valarray<complex<double>>& data) {
+
+	// Exit from recursion
+	const size_t n = data.size();
+	if (n <= 1) {
+		return;
+	}
+
+	// Divide into Even/Odd
+	valarray<complex<double>> even = data[std::slice(0, n/2, 2)];
+	valarray<complex<double>> odd = data[std::slice(1, n/2, 2)];
+
+	// Compute recursion
+	fourierTransformFastRecursion(even);
+	fourierTransformFastRecursion(odd);
+
+	// Combine
+	for (size_t i = 0; i < n / 2; i++) {
+		complex<double> t = polar(1.0, -2 * M_PI * i / n) * odd[i];
+		data[i]       = even[i] + t;
+		data[i + n/2] = even[i] - t;
+	}
 }
 
 

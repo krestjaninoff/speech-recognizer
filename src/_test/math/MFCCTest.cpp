@@ -50,29 +50,25 @@ TEST(MATH_MFCC, FOURIER_TRANSFORM) {
 
 TEST(MATH_MFCC, FOURIER_TRANSFORM_FST) {
 
-	const uint8_t frameSize = 10;
+	const uint8_t frameSize = 8;
 	const double frame[] = {0.12165, -0.05362, -0.18302, -0.25706, -0.28193, -0.26713,
-		-0.22056, -0.15699,-0.10022, -0.07285};
+			-0.22056, -0.15699};
 
-	const double fourierExpected[] = {1.47173, 0.75985, 0.24049, 0.17987, 0.15109, 0.14357,
-		0.15109, 0.17987, 0.24049, 0.75985};
+	const double fourierExpected[] = {1.29866, 0.636305, 0.260576, 0.186786, 0.17094, 0.186786,
+			0.260576, 0.636305};
 	double* fourierResult = MFCC::fourierTransformFast(frame, frameSize, false);
 
 	for (uint32_t i = 0; i < frameSize; i++) {
-		cout << fourierExpected[i] << "\t" <<  fourierResult[i] << endl;
-		//EXPECT_NEAR(fourierExpected[i], fourierResult[i], EPS_TEST);
+		EXPECT_NEAR(fourierExpected[i], fourierResult[i], EPS_TEST);
 	}
 	delete [] fourierResult;
 
-cout << endl << endl;
-
-	const double fourierHamExpected[] = {1.0830011, 0.7111400, 0.1586940, 0.0093373, 0.0068586,
-		0.0085555, 0.0068586, 0.0093373, 0.1586940, 0.7111400};
+	const double fourierHamExpected[] = {0.87584, 0.56686, 0.11259, 0.00918, 0.01031, 0.00918,
+			0.11259, 0.56686};
 	fourierResult = MFCC::fourierTransformFast(frame, frameSize, true);
 
 	for (uint32_t i = 0; i < frameSize; i++) {
-		cout << fourierHamExpected[i] << "\t" <<  fourierResult[i] << "\t" << (0.54 - 0.46 * cos(2 * 3.14 * i / (10 - 1))) << endl;
-		//EXPECT_NEAR(fourierHamExpected[i], fourierResult[i], EPS_TEST);
+		EXPECT_NEAR(fourierHamExpected[i], fourierResult[i], EPS_TEST);
 	}
 
 	delete [] fourierResult;
@@ -216,7 +212,7 @@ TEST(MATH_MFCC, CONSOLIDATED) {
 		-0.194159, -0.242439, -0.300729, -0.36198, -0.425123, -0.480209, -0.493149, -0.449599,
 		-0.365917};
 
-	const double mfccExpected[] = {-23.12352, 8.07315, 3.84674, 0.61758, 1.00891, 0.26051};
+	const double mfccExpected[] = {-25.1561, 9.57915, 5.26455, 1.7276, 1.84162, 0.436018};
 
 	double* mfccResult = MFCC::transform(frame, 0, frameSize - 1, mfccCnt, frequency, freqMin, freqMax);
 

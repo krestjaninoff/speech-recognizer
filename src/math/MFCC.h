@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <vector>
 #include <math.h>
+#include <cmath>
+#include <complex>
+#include <valarray>
 #include "math.h"
 #include "../config.h"
 
@@ -27,9 +30,6 @@ public:
 	static double* transform(const double* source, uint32_t start, uint32_t finish,
 			uint8_t mfccSize, uint32_t frequency, uint32_t freqMin, uint32_t freqMax);
 
-// The methods below should be private, but for testing purposes they are public now
-// private:
-
 	/**
 	 * Preemphasis digital filtration
 	 */
@@ -45,12 +45,16 @@ public:
 	 *
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l6.pdf
 	 * @see http://www.robots.ox.ac.uk/~sjrob/Teaching/SP/l7.pdf
-	 *
-	 * http://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
 	 */
 	static double* fourierTransform(const double* source, uint32_t length, bool useWindow);
 
-	static double* fourierTransformFast(const double *source, uint32_t length, bool useWindow);
+	/**
+	 * Compute singnal's magnitude (short-time Fourier transform with Hamming window)
+	 *
+	 * @see http://www.drdobbs.com/cpp/a-simple-and-efficient-fft-implementatio/199500857
+	 * @see http://rosettacode.org/wiki/Fast_Fourier_transform#C.2B.2B
+	 */
+	static double* fourierTransformFast(const double* source, uint32_t length, bool useWindow);
 
 	/**
 	 * Create mel filters (for range of frequencies), using triangular overlapping windows
@@ -80,6 +84,10 @@ public:
 	// Mel convertors
 	static double convertToMel(double f) { return 1125. * log(1. + f/700.); }
 	static double convertFromMel(double m) { return 700. * (exp(m/1125.) - 1); }
+
+
+private:
+	static void fourierTransformFastRecursion(valarray<complex<double>>& data);
 };
 
 } /* namespace math */
