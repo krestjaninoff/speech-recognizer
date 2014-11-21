@@ -39,11 +39,10 @@ Milestone
 ~~At the moment I'm working (sometimes) on implementing the basis (framework) of the application. It is supposed to be
 a lightweight console application which can recognize the limited dictionary by MFCC / DTW.~~
 
-The second step is integration the C++ library into the Java/Android application. Just because I do believe that mobile
-technologies need this stuff more than console computers.
+~~The next step is replacing DTW solution (which is a temporary stub) with HHM. This should increase recognition quality
+and make this project... finished? :)~~
 
-Final step is replacing DTW solution (which is a temporary stub) with HHM. This should increase recognition quality
-and make this project... finished? :) 
+Project is unfinished and moved into archive.
 
 
 Command line
